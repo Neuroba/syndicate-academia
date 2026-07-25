@@ -8,7 +8,7 @@
 <meta property="og:site_name" content="SYNDICATE Академия">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="Месяц в Академии — и ты играешь осознанно | SYNDICATE">
-<meta property="og:description" content="Академия закрытого клуба SYNDICATE: 8 занятий один на один за реальным столом + тренажёр в телефоне. Буэнос-Айрес, по-русски. Абонемент $350.">
+<meta property="og:description" content="8 занятий за реальным столом + тренажёр в телефоне. Академия → клуб → фонд игроков. Буэнос-Айрес, обучение на русском.">
 <meta property="og:url" content="https://neuroba.github.io/syndicate-academia/">
 <meta property="og:image" content="https://neuroba.github.io/syndicate-academia/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -33,8 +33,8 @@
   --max:1180px; --ease:cubic-bezier(.22,.61,.36,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:76px}
-body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:76px;overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 .pf{font-family:'Playfair Display',Georgia,serif}
@@ -140,7 +140,9 @@ nav .in{max-width:var(--max);margin:0 auto;padding:12px 22px;display:flex;align-
 @media(max-width:860px){.facts{grid-template-columns:1fr 1fr}}
 
 /* ═══════════ СЕКЦИИ ═══════════ */
-section{position:relative;z-index:2;padding:clamp(52px,6.4vw,96px) 0}
+section{position:relative;z-index:2;padding:clamp(52px,6.4vw,96px) 0;overflow:clip}
+/* текстовые ссылки-контакты: увеличенная зона нажатия под палец */
+.finalcontact a,footer a{display:inline-block;padding:8px 4px;margin:-8px 0}
 .sechead{max-width:66ch;margin-bottom:clamp(26px,3.2vw,42px)}
 .sechead h2{margin:12px 0 12px}
 .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);position:relative;z-index:2}
@@ -311,7 +313,10 @@ section{position:relative;z-index:2;padding:clamp(52px,6.4vw,96px) 0}
 .stat{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--panel);padding:16px 15px}
 .stat b{display:block;font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:var(--gold);line-height:1.16;padding-bottom:1px}
 .stat span{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:7px;line-height:1.35}
-@media(max-width:860px){.coach{grid-template-columns:1fr}.coach .pic{max-width:300px;margin:0 auto}.coach .pic img{aspect-ratio:4/5;object-fit:cover;object-position:top}}
+/* на телефоне снимок показываем целиком: лучше меньше, чем обрезанный */
+@media(max-width:860px){.coach{grid-template-columns:1fr}
+  .coach .pic{max-width:270px;margin:0 auto}
+  .coach .pic img{aspect-ratio:9/16;object-fit:contain;max-height:74vh}}
 
 /* ═══════════ КОМУ ═══════════ */
 .fit{display:grid;grid-template-columns:1fr 1fr;gap:14px}
