@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<!-- зум не запрещаем: в матрице шрифт 8px, ученику нужно уметь приблизить -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SYNDICATE Академия</title>
+<meta name="theme-color" content="#0b0b0d">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0b0d'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23d4af37' font-family='Georgia,serif'%3E%E2%99%A0%3C/text%3E%3C/svg%3E">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- шрифты грузятся параллельно с CSS: через @import внутри app.css это была
+     цепочка из трёх последовательных запросов до первого пикселя -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="app.css?v=202607251704">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══ ВХОД ═══ -->
+  <section class="screen" data-screen="onboarding">
+    <div class="body ob">
+      <div>
+        <div class="mark">SYNDICATE<i>♠ ♥ ♦ ♣</i></div>
+        <div class="acad">Академия покера</div>
+      </div>
+      <div class="hi" id="ob-hi">Добро пожаловать</div>
+      <div class="hitx">Это твой тренажёр между занятиями. Пять минут в день — и к следующей встрече теория на месте.</div>
+      <div class="oblist">
+        <div class="li"><span class="ic">♠</span><div><div class="t">8 занятий по 90 минут</div><div class="d">программа от «что бьёт что» до турнира</div></div></div>
+        <div class="li"><span class="ic">♥</span><div><div class="t">Шпаргалки всегда с собой</div><div class="d">169 стартовых рук, шансы, push/fold</div></div></div>
+        <div class="li"><span class="ic">♦</span><div><div class="t">Задание каждый день</div><div class="d">карточки по теме последнего занятия</div></div></div>
+      </div>
+      <div class="who">Тренер — <b>Sergei Zubov</b>, основатель Синдиката</div>
+    </div>
+    <button class="mainbtn solid" data-go="home">Начать</button>
+  </section>
+
+  <!-- ═══ ГЛАВНЫЙ ═══ -->
+  <section class="screen" data-screen="home">
+    <div class="body">
+      <div class="hrow">
+        <div class="streak"><span class="s">♠</span><span class="v" id="h-streak">0</span><span class="u">дней подряд</span></div>
+        <div class="lesson-of">занятие <b id="h-lesson">1 / 8</b></div>
+      </div>
+      <div class="brandwrap"><div class="brandline">SYNDICATE<span>♠ ♥ ♦ ♣</span></div><div class="rule"></div></div>
+      <div class="todo">
+        <div class="kick">сегодня</div>
+        <div class="big" id="h-task">Загрузка…</div>
+        <div class="meta" id="h-taskd"></div>
+      </div>
+      <div class="prog">
+        <div class="proglab"><span>до занятия <b id="h-next">2</b></span><span id="h-left"></span></div>
+        <div class="bar"><i id="h-bar" style="width:0%"></i></div>
+      </div>
+      <div class="items">
+        <button class="it" data-go="quiz">
+          <span class="badge">◈</span>
+          <span class="tx"><span class="tt">Квиз</span><span class="ts" id="h-quiz-sub">24 карточки</span></span>
+          <span class="go" id="h-quiz-go">начать</span>
+        </button>
+        <button class="it" data-go="sheets">
+          <span class="badge b2">▦</span>
+          <span class="tx"><span class="tt">Шпаргалки</span><span class="ts">руки · стартовые · шансы · push/fold</span></span>
+          <span class="go">4</span>
+        </button>
+        <button class="it" data-go="spot">
+          <span class="badge b3">◷</span>
+          <span class="tx"><span class="tt">Спот дня</span><span class="ts" id="h-spot-sub">реальная раздача</span></span>
+          <span class="go" id="h-spot-go">новый</span>
+        </button>
+        <button class="it" data-go="program">
+          <span class="badge b4">☰</span>
+          <span class="tx"><span class="tt">Программа</span><span class="ts">8 занятий курса</span></span>
+          <span class="go" id="h-prog-go">3 / 8</span>
+        </button>
+        <button class="it" data-go="profile">
+          <span class="badge b5">♠</span>
+          <span class="tx"><span class="tt">Мой прогресс</span><span class="ts">серия, карточки, вехи</span></span>
+          <span class="go">›</span>
+        </button>
+      </div>
+    </div>
+    <button class="mainbtn solid" id="h-main" data-go="quiz">Начать тренировку · 5 минут</button>
+  </section>
+
+  <!-- ═══ ПРОГРАММА ═══ -->
+  <section class="screen" data-screen="program">
+    <div class="body">
+      <div class="sechead">Программа</div>
+      <div class="secsub" id="pr-sub">8 занятий</div>
+      <div class="prog"><div class="bar"><i id="pr-bar" style="width:0%"></i></div></div>
+      <div class="lessons" id="pr-list"></div>
+    </div>
+    <button class="mainbtn" id="pr-main">Открыть занятие</button>
+  </section>
+
+  <!-- ═══ ЗАНЯТИЕ ═══ -->
+  <section class="screen" data-screen="lesson">
+    <div class="body">
+      <div class="kick" id="ls-kick">занятие</div>
+      <div class="sechead" id="ls-title">—</div>
+      <div class="chips">
+        <div class="chip"><b>25′</b><span>теория</span></div>
+        <div class="chip"><b>45′</b><span>практика</span></div>
+        <div class="chip"><b>20′</b><span>разбор</span></div>
+      </div>
+      <div class="blk">
+        <div class="bt">что разберём</div>
+        <ul class="ul" id="ls-about"></ul>
+      </div>
+      <div class="blk" id="ls-matwrap">
+        <div class="bt">материалы</div>
+        <div class="mat" id="ls-mat"></div>
+      </div>
+      <div class="when" id="ls-hw"></div>
+    </div>
+    <button class="mainbtn" id="ls-main">Открыть шпаргалку</button>
+  </section>
+
+  <!-- ═══ ХАБ ШПАРГАЛОК ═══ -->
+  <section class="screen" data-screen="sheets">
+    <div class="body">
+      <div class="sechead">Шпаргалки</div>
+      <div class="secsub">То же, что напечатано и лежит у тебя дома — только всегда в кармане.</div>
+      <div class="sheetlist" id="sh-list"></div>
+      <div class="foot-note">Шпаргалка открывается и без интернета — один раз загрузилась и осталась.</div>
+    </div>
+    <button class="mainbtn" data-go="quiz">Проверить себя на карточках</button>
+  </section>
+
+  <!-- ═══ ШПАРГАЛКА (универсальный экран) ═══ -->
+  <section class="screen" data-screen="sheet">
+    <div class="body">
+      <div class="sechead" id="s-title">—</div>
+      <div class="secsub" id="s-sub"></div>
+      <div id="s-content"></div>
+      <div class="foot-note" id="s-note"></div>
+    </div>
+    <button class="mainbtn" data-go="quiz">Проверить себя на карточках</button>
+  </section>
+
+  <!-- ═══ КВИЗ ═══ -->
+  <section class="screen" data-screen="quiz">
+    <div class="body">
+      <div class="q-top">
+        <div class="q-prog"><i id="q-bar" style="width:0%"></i></div>
+        <div class="q-n" id="q-n">1 / 6</div>
+      </div>
+      <div class="qcard">
+        <div class="lb" id="q-lb">—</div>
+        <div class="qq" id="q-q">—</div>
+      </div>
+      <div class="stack"><i></i><i></i></div>
+      <div class="answers" id="q-answers"></div>
+      <div class="why" id="q-why" hidden></div>
+    </div>
+    <button class="mainbtn solid" id="q-main" disabled>Выбери ответ</button>
+  </section>
+
+  <!-- ═══ ИТОГ КВИЗА ═══ -->
+  <section class="screen" data-screen="result">
+    <div class="body res">
+      <div>
+        <div class="score" id="r-score">0<i> / 6</i></div>
+        <div class="lbl">верных ответов</div>
+      </div>
+      <div class="strk">
+        <div class="v" id="r-streak">♠ 1 день</div>
+        <div class="d" id="r-streakd">Серия сохранена</div>
+      </div>
+      <div class="redo" id="r-redo" hidden>
+        <div class="rt">вернётся завтра</div>
+        <div class="rq" id="r-redoq"></div>
+        <button class="rl" id="r-redol" hidden>Повторить тему →</button>
+      </div>
+      <div class="next" id="r-next"></div>
+    </div>
+    <button class="mainbtn" data-go="home">Готово</button>
+  </section>
+
+  <!-- ═══ СПОТ ДНЯ ═══ -->
+  <section class="screen felt" data-screen="spot">
+    <div class="body">
+      <div>
+        <div class="sp-k" id="sp-k">спот дня</div>
+        <div class="sp-t" id="sp-t">—</div>
+      </div>
+      <div class="board" id="sp-board"></div>
+      <div class="board mine" id="sp-hand"></div>
+      <div class="mine-lbl">твоя рука</div>
+      <div class="potrow" id="sp-pots"></div>
+      <div class="acts" id="sp-acts"></div>
+      <div class="sp-foot" id="sp-foot">Выбери решение — увидишь разбор.</div>
+    </div>
+    <button class="mainbtn felt-btn" id="sp-main" disabled>Выбери решение</button>
+  </section>
+
+  <!-- ═══ ПРОФИЛЬ ═══ -->
+  <section class="screen" data-screen="profile">
+    <div class="body">
+      <div class="me">
+        <div class="av" id="p-av">?</div>
+        <div>
+          <div class="nm" id="p-name">Ученик</div>
+          <div class="since" id="p-since">—</div>
+        </div>
+      </div>
+      <div class="twocol">
+        <div class="stat"><b id="p-streak">♠ 0</b><span>серия дней</span></div>
+        <div class="stat"><b id="p-lesson">0 / 8</b><span>занятий</span></div>
+        <div class="stat"><b id="p-cards">0 / 24</b><span>карточек</span></div>
+      </div>
+      <div class="heatwrap">
+        <div class="kick">последние две недели</div>
+        <div class="heat" id="p-heat"></div>
+      </div>
+      <div class="mile" id="p-mile"></div>
+      <button class="reset" id="p-reset">Сбросить прогресс</button>
+    </div>
+    <a class="mainbtn" id="p-main" href="https://t.me/oxzuu" target="_blank" rel="noopener">Написать тренеру</a>
+  </section>
+
+</div>
+
+<!-- Данные подключаются как <script>, а не через fetch: так апп работает и с диска
+     (file://, где fetch запрещён), и с хостинга. Генерируются build-data.py из JSON. -->
+<!-- ?v= — метка версии: deploy.sh подставляет в неё дату сборки, иначе телефон
+     ученика месяцами показывает старый app.js из кэша. -->
+<script src="data/quiz.js?v=202607251704"></script>
+<script src="data/content.js?v=202607251704"></script>
+<script src="app.js?v=202607251704"></script>
+</body>
+</html>
