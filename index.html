@@ -1,0 +1,991 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — покер с нуля за месяц + тренажёр в телефоне | Буэнос-Айрес</title>
+<meta name="description" content="8 занятий один на один за реальным столом в Буэнос-Айресе + приложение-тренажёр, чтобы не забывать между занятиями. По-русски. Абонемент $350, разовое занятие $50, знакомство бесплатно.">
+<meta name="theme-color" content="#0b0b0d">
+<link rel="canonical" href="https://neuroba.github.io/syndicate-academia/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SYNDICATE Академия">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Месяц в Академии — и ты играешь осознанно | SYNDICATE">
+<meta property="og:description" content="Академия закрытого клуба SYNDICATE: 8 занятий один на один за реальным столом + тренажёр в телефоне. Буэнос-Айрес, по-русски. Абонемент $350.">
+<meta property="og:url" content="https://neuroba.github.io/syndicate-academia/">
+<meta property="og:image" content="https://neuroba.github.io/syndicate-academia/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Месяц в Академии — и ты играешь осознанно | SYNDICATE">
+<meta name="twitter:description" content="8 занятий за реальным столом + тренажёр в телефоне. Буэнос-Айрес, по-русски.">
+<meta name="twitter:image" content="https://neuroba.github.io/syndicate-academia/og.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0b0d'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23d4af37' font-family='Georgia,serif'%3E%E2%99%A0%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ ТОКЕНЫ ═══════════ */
+:root{
+  --bg:#0b0b0d; --panel:rgba(255,255,255,.035); --panel-2:rgba(255,255,255,.06);
+  --gold:#d4af37; --gold-lt:#f2dc93; --gold-dk:#a8842a;
+  --felt:#355129; --felt-lt:#4a7038; --felt-txt:#a9d195; --red:#8a5b5b;
+  --ink:#efe9db; --white:#fff; --muted:#a29d94; --dim:#6f6a62;
+  --line:rgba(212,175,55,.18); --line-soft:rgba(255,255,255,.075);
+  --r:18px; --r-sm:13px; --r-lg:26px;
+  --shadow:0 30px 80px -22px rgba(0,0,0,.88);
+  --max:1180px; --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.pf{font-family:'Playfair Display',Georgia,serif}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 22px}
+.grad{background:linear-gradient(96deg,var(--gold-lt),var(--gold) 42%,var(--gold-dk));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ═══════════ ФОНОВАЯ КОЛОДА: карты вскрываются от прокрутки ═══════════ */
+.deck{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  user-select:none;-webkit-user-select:none;contain:layout paint style}
+/* perspective на самой карте, а не на слое: иначе карты у краёв уводит трапецией */
+.deck i{position:absolute;top:0;display:block;width:var(--w);height:calc(var(--w)*1.4);
+  opacity:var(--o);perspective:2400px;will-change:transform}
+.deck i>b{position:absolute;inset:0;display:block;transform-style:preserve-3d}
+.deck s{position:absolute;inset:0;display:block;border-radius:calc(var(--w)*.055);
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;text-decoration:none;overflow:hidden}
+/* лицо: угловой индекс на тёмном стекле, как у настоящей карты */
+.deck s.f{border:1px solid rgba(212,175,55,.95);padding:calc(var(--w)*.085);
+  background:radial-gradient(120% 90% at 26% 12%,rgba(255,255,255,.1),rgba(255,255,255,.016) 58%),
+             linear-gradient(158deg,rgba(212,175,55,.12),rgba(255,255,255,.014));
+  font-family:'Playfair Display',Georgia,serif;font-size:calc(var(--w)*.155);line-height:1.05;color:rgba(212,175,55,.92)}
+.deck s.f::after{content:attr(data-s);position:absolute;right:calc(var(--w)*.085);bottom:calc(var(--w)*.085);
+  transform:rotate(180deg);white-space:pre-line;text-align:center}
+/* рубашка — сторона по умолчанию: разреженная золотая решётка на сукне */
+.deck s.b{transform:rotateY(180deg);border:1px solid rgba(212,175,55,.75);
+  background:repeating-linear-gradient(45deg,rgba(212,175,55,.18) 0 6px,transparent 6px 13px),
+             repeating-linear-gradient(-45deg,rgba(212,175,55,.15) 0 6px,transparent 6px 13px),
+             linear-gradient(160deg,rgba(53,81,41,.5),rgba(11,11,13,.55))}
+.deck i.felt s.f{border-color:rgba(122,166,96,.5);color:rgba(122,166,96,.55);
+  background:radial-gradient(120% 90% at 26% 12%,rgba(255,255,255,.07),rgba(255,255,255,.012) 58%),
+             linear-gradient(158deg,rgba(53,81,41,.22),rgba(255,255,255,.01))}
+@media(max-width:720px){
+  .deck i:nth-child(4){display:none}
+  .deck i:nth-child(1){--w:52vw;--o:.155;left:-18vw}
+  .deck i:nth-child(2){--w:58vw;--o:.14;left:70vw}
+  .deck i:nth-child(3){--w:46vw;--o:.135;left:-6vw}
+}
+/* уважаем «меньше движения»: карты остаются фактурой, но не крутятся (см. JS) */
+
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.bar{position:fixed;top:0;left:0;height:2px;width:0;z-index:130;background:linear-gradient(90deg,var(--gold-dk),var(--gold-lt));box-shadow:0 0 14px rgba(212,175,55,.6);transition:width .1s linear}
+.glow{position:absolute;border-radius:50%;filter:blur(95px);pointer-events:none;z-index:0}
+.suit{position:absolute;font-family:'Playfair Display',serif;color:rgba(212,175,55,.035);font-weight:900;line-height:1;pointer-events:none;user-select:none;z-index:0}
+
+/* ═══════════ ТИПОГРАФИКА ═══════════ */
+h1{font-family:'Playfair Display',serif;font-weight:900;letter-spacing:-.015em;line-height:1.03;font-size:clamp(38px,5.9vw,68px);color:var(--white)}
+h2{font-family:'Playfair Display',serif;font-weight:800;letter-spacing:-.01em;line-height:1.1;font-size:clamp(27px,3.7vw,44px);color:var(--white)}
+h3{font-weight:700;font-size:18px;color:var(--white);line-height:1.3}
+.kick{font-size:11px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.lead{color:var(--muted);font-size:clamp(15.5px,1.3vw,18px);max-width:66ch;line-height:1.62}
+.lead b{color:var(--ink);font-weight:600}
+
+/* ═══════════ КНОПКИ ═══════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15.5px;
+  padding:15px 26px;border-radius:999px;border:1px solid transparent;cursor:pointer;text-align:center;
+  transition:transform .22s var(--ease),box-shadow .22s var(--ease),border-color .22s,color .22s}
+.btn svg{width:18px;height:18px;fill:currentColor;flex:none}
+.btn-gold{background:linear-gradient(180deg,var(--gold-lt),var(--gold) 55%,var(--gold-dk));color:#120e04;
+  box-shadow:0 12px 32px -12px rgba(212,175,55,.6),inset 0 1px 0 rgba(255,255,255,.45)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 20px 44px -14px rgba(212,175,55,.78),inset 0 1px 0 rgba(255,255,255,.5)}
+.btn-felt{background:linear-gradient(180deg,var(--felt-lt),var(--felt));color:#f2f7ee;border-color:rgba(212,175,55,.45);box-shadow:0 12px 30px -14px rgba(0,0,0,.9)}
+.btn-felt:hover{transform:translateY(-2px);border-color:var(--gold)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--ink);border-color:var(--line-soft);backdrop-filter:blur(8px)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-lt);transform:translateY(-2px)}
+.btn-sm{padding:11px 18px;font-size:14px}
+.btn-full{width:100%}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ═══════════ NAV ═══════════ */
+nav{position:sticky;top:0;z-index:100;background:rgba(11,11,13,.74);backdrop-filter:blur(16px) saturate(140%);border-bottom:1px solid var(--line-soft)}
+nav .in{max-width:var(--max);margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:24px}
+.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:20px;color:var(--white);line-height:1}
+.logo i{font-style:normal;color:var(--gold);font-size:11px;vertical-align:super;margin-left:5px}
+.logo small{display:block;font-family:'Inter';font-weight:700;font-size:8.5px;letter-spacing:.3em;color:var(--gold);opacity:.85;margin-top:2px}
+.navlinks{display:flex;gap:2px;margin-left:auto;align-items:center}
+.navlinks a{font-size:13.5px;color:var(--muted);font-weight:500;padding:8px 12px;border-radius:999px;transition:color .2s,background .2s}
+.navlinks a:hover{color:var(--white);background:rgba(255,255,255,.05)}
+.navlinks a.on{color:var(--white);background:rgba(212,175,55,.13)}
+.navcta{margin-left:6px}
+@media(max-width:1000px){.navlinks{display:none}.navcta{margin-left:auto}}
+
+/* ═══════════ HERO ═══════════ */
+.hero{position:relative;padding:clamp(28px,3.4vw,52px) 0 clamp(36px,4.4vw,58px);overflow:hidden;z-index:2}
+/* герой — от лица клуба: одна колонка по центру, без личного фото */
+.herocol{position:relative;z-index:2;text-align:center;max-width:900px;margin:0 auto}
+.hero h1{margin:16px auto 18px;max-width:19ch;font-size:clamp(35px,6.1vw,74px)}
+.hero .lead{max-width:60ch;margin:0 auto}
+.cred{display:inline-flex;align-items:center;gap:8px;margin:22px 0 24px;font-size:13px;font-weight:600;color:var(--ink);
+  background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.4);
+  border-radius:999px;padding:8px 15px;backdrop-filter:blur(8px)}
+.cred b{color:var(--gold)}
+.hero .ctas{justify-content:center}
+.hint{font-size:13px;color:var(--muted);margin:15px auto 0;display:flex;align-items:flex-start;gap:8px;max-width:52ch;line-height:1.5;justify-content:center}
+.hint i{font-style:normal;color:var(--gold)}
+
+
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(30px,3.6vw,44px);position:relative;z-index:2}
+.fct{border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:16px 17px;background:var(--panel);backdrop-filter:blur(6px);
+  transition:transform .26s var(--ease),border-color .26s}
+.fct:hover{transform:translateY(-3px);border-color:var(--line)}
+.fct b{font-family:'Playfair Display',serif;font-size:27px;color:var(--gold);font-weight:800;display:block;line-height:1.16;padding-bottom:1px}
+.fct span{font-size:12px;color:var(--muted);display:block;margin-top:7px;line-height:1.4}
+@media(max-width:860px){.facts{grid-template-columns:1fr 1fr}}
+
+/* ═══════════ СЕКЦИИ ═══════════ */
+section{position:relative;z-index:2;padding:clamp(52px,6.4vw,96px) 0}
+.sechead{max-width:66ch;margin-bottom:clamp(26px,3.2vw,42px)}
+.sechead h2{margin:12px 0 12px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);position:relative;z-index:2}
+
+/* ═══════════ БОЛЬ ═══════════ */
+.pains{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pn{position:relative;border:1px solid var(--line-soft);border-radius:var(--r);padding:22px 22px 22px 26px;
+  background:linear-gradient(180deg,rgba(138,91,91,.07),var(--panel));overflow:hidden;transition:transform .26s var(--ease),border-color .26s}
+.pn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#8a5b5b,rgba(138,91,91,.15))}
+.pn:hover{transform:translateY(-3px);border-color:rgba(138,91,91,.35)}
+.pn .t{font-size:16.5px;color:var(--white);font-weight:700;margin-bottom:7px;line-height:1.3}
+.pn .d{font-size:14px;color:var(--muted);line-height:1.55}
+.pn .d b{color:var(--ink);font-weight:600}
+.turn{margin-top:22px;border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;
+  background:linear-gradient(135deg,rgba(212,175,55,.11),rgba(11,11,13,.3));font-size:15.5px;color:var(--ink);line-height:1.6}
+.turn b{color:var(--gold)}
+@media(max-width:800px){.pains{grid-template-columns:1fr}}
+
+/* ═══════════ МЕТОД 25/45/20 ═══════════ */
+.method{border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel);padding:24px;backdrop-filter:blur(6px)}
+.mtrack{display:flex;height:12px;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.07)}
+.mtrack span{display:block;height:100%}
+.mtrack .a{width:27.8%;background:linear-gradient(90deg,var(--gold-dk),var(--gold))}
+.mtrack .b{width:50%;background:linear-gradient(90deg,var(--felt),var(--felt-lt))}
+.mtrack .c{width:22.2%;background:linear-gradient(90deg,#57564e,#8f8d80)}
+.mlabels{display:grid;grid-template-columns:27.8% 50% 22.2%;margin-top:15px}
+.mlabels div{padding-right:16px}
+.mlabels .t{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--white);line-height:1.16;padding-bottom:1px}
+.mlabels .l{font-size:13.5px;font-weight:600;color:var(--gold);margin:6px 0 4px}
+.mlabels .d{font-size:12.5px;color:var(--dim);line-height:1.45}
+@media(max-width:700px){.mlabels{grid-template-columns:1fr;gap:14px}.mlabels div{padding:0}}
+
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.rescard{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:rgba(11,11,13,.4);padding:17px 18px}
+.rescard b{display:block;color:var(--white);font-size:15px;font-weight:700;margin-bottom:6px}
+.rescard span{font-size:13.5px;color:var(--muted);line-height:1.5}
+@media(max-width:800px){.res{grid-template-columns:1fr}}
+
+/* ═══════════ ПРИЛОЖЕНИЕ ═══════════ */
+/* витрина экранов приложения */
+.galwrap{position:relative}
+.galhint{display:flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:14px;font-weight:600}
+.galhint .arr{color:var(--gold);animation:nudge 1.9s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+.gal{display:flex;gap:16px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+  padding:2px 2px 20px;scrollbar-width:thin;scrollbar-color:rgba(212,175,55,.45) transparent;
+  -webkit-overflow-scrolling:touch}
+.gal::-webkit-scrollbar{height:6px}
+.gal::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:99px}
+.gal::-webkit-scrollbar-thumb{background:rgba(212,175,55,.45);border-radius:99px}
+.gal figure{flex:0 0 auto;width:min(238px,64vw);scroll-snap-align:center;margin:0}
+.gal img{width:100%;border-radius:20px;border:1px solid rgba(212,175,55,.26);background:#0d0d10;
+  box-shadow:0 24px 60px -26px rgba(0,0,0,.95);transition:transform .3s var(--ease),border-color .3s}
+.gal figure:hover img{transform:translateY(-6px);border-color:rgba(212,175,55,.5)}
+.gal figcaption{margin-top:14px;font-size:13px;color:var(--muted);line-height:1.5}
+.gal figcaption b{display:block;color:var(--white);font-size:15px;font-weight:700;margin-bottom:5px}
+.appcard{border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 24px;
+  background:linear-gradient(160deg,rgba(212,175,55,.09),rgba(11,11,13,.35) 60%)}
+.appmeta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line-soft)}
+.appmeta b{display:block;font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);font-weight:800;line-height:1.16;padding-bottom:1px}
+.appmeta span{font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;display:block;margin-top:5px;line-height:1.3}
+.appgrid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(24px,3.4vw,48px);align-items:center}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.phone{position:relative;border-radius:20px;padding:7px;background:linear-gradient(160deg,rgba(212,175,55,.34),rgba(255,255,255,.05) 42%,rgba(212,175,55,.16));
+  box-shadow:var(--shadow);transition:transform .3s var(--ease)}
+.phone:hover{transform:translateY(-5px)}
+.phone img{border-radius:14px;width:100%;background:#0d0d10}
+.phone .cap{position:absolute;left:8px;right:8px;bottom:8px;font-size:10.5px;text-align:center;color:var(--ink);
+  background:rgba(11,11,13,.72);backdrop-filter:blur(6px);border:1px solid var(--line-soft);border-radius:9px;padding:5px 7px;letter-spacing:.02em}
+.appfeat{list-style:none;display:flex;flex-direction:column}
+.appfeat li{padding:14px 0 14px 26px;border-bottom:1px solid var(--line-soft);font-size:15px;color:var(--white);font-weight:600;position:relative;line-height:1.4}
+.appfeat li::before{content:'♠';position:absolute;left:0;top:15px;color:var(--gold);font-size:12px}
+.appfeat li span{color:var(--muted);font-size:13.5px;display:block;margin-top:4px;font-weight:400;line-height:1.5}
+.appnote{margin-top:18px;font-size:13.5px;color:var(--muted)}
+.appnote b{color:var(--gold)}
+@media(max-width:900px){.appgrid{grid-template-columns:1fr}.phones{max-width:440px;margin:0 auto}}
+
+/* ═══════════ ВОРОНКА: СТУПЕНИ ═══════════ */
+.stage{position:relative;padding:clamp(40px,5.2vw,74px) 0;overflow:hidden;z-index:2}
+.stage+.stage::before{content:'';position:absolute;left:50%;top:0;transform:translateX(-50%);width:min(100%,var(--max));height:1px;
+  background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.stage .rail{position:absolute;left:max(22px,calc(50% - var(--max)/2 + 44px));top:0;bottom:0;width:1px;z-index:0;
+  background:linear-gradient(180deg,rgba(212,175,55,.05),rgba(212,175,55,.3) 14%,rgba(212,175,55,.3) 86%,rgba(212,175,55,.05))}
+.stage .dot{position:absolute;left:max(17px,calc(50% - var(--max)/2 + 39px));top:clamp(40px,5.2vw,74px);width:11px;height:11px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 0 5px rgba(212,175,55,.13),0 0 22px rgba(212,175,55,.65);z-index:1}
+.stagegrid{position:relative;z-index:2;display:grid;grid-template-columns:92px 1fr;gap:clamp(16px,2.4vw,32px);align-items:start}
+.stagenum{padding-top:2px}
+.stagenum .lb{font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:6px}
+.stagenum .rn{display:block;font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(52px,6.4vw,90px);line-height:.82;letter-spacing:-.02em;
+  background:linear-gradient(180deg,var(--gold-lt),rgba(168,132,42,.35));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 8px 26px rgba(212,175,55,.28))}
+.stage.s2 .stagenum .rn{background:linear-gradient(180deg,#bfe0ab,rgba(53,81,41,.4));-webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 8px 26px rgba(122,166,96,.26))}
+.stage.s3 .stagenum .rn{background:linear-gradient(180deg,#fff3c9,rgba(212,175,55,.45));-webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 8px 30px rgba(242,220,147,.34))}
+.stage.s2 .dot{background:#7aa660;box-shadow:0 0 0 5px rgba(122,166,96,.14),0 0 22px rgba(122,166,96,.6)}
+.stage.s3 .dot{background:var(--gold-lt);box-shadow:0 0 0 5px rgba(242,220,147,.16),0 0 26px rgba(242,220,147,.7)}
+.stagetitle{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.03em;border-radius:999px;
+  padding:6px 13px;border:1px solid var(--line);background:var(--panel);color:var(--gold)}
+.chip.felt{color:var(--felt-txt);border-color:rgba(122,166,96,.34);background:rgba(53,81,41,.22)}
+.chip.mut{color:var(--muted);border-color:var(--line-soft)}
+@media(max-width:900px){
+  .stage .rail,.stage .dot{display:none}
+  .stagegrid{grid-template-columns:1fr;gap:8px}
+  .stagenum{font-size:42px}
+}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}
+.fcard{border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel);padding:22px 20px;transition:transform .26s var(--ease),border-color .26s,background .26s}
+.fcard:hover{transform:translateY(-4px);border-color:var(--line);background:var(--panel-2)}
+.fcard .ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;
+  font-size:19px;color:var(--gold);background:rgba(212,175,55,.1);border:1px solid var(--line);margin-bottom:13px}
+.stage.s2 .fcard .ic{color:var(--felt-txt);background:rgba(53,81,41,.26);border-color:rgba(122,166,96,.3)}
+.fcard h3{margin-bottom:7px}
+.fcard p{font-size:14px;color:var(--muted);line-height:1.55}
+@media(max-width:860px){.feat{grid-template-columns:1fr}}
+
+.fund{margin-top:24px;border:1px solid rgba(212,175,55,.32);border-radius:var(--r-lg);overflow:hidden;
+  background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(11,11,13,.35) 48%,rgba(53,81,41,.18))}
+.fund .in{padding:clamp(22px,3.2vw,36px);display:grid;grid-template-columns:1.28fr .72fr;gap:clamp(20px,3vw,38px);align-items:center}
+.fsteps{display:flex;flex-direction:column;gap:13px}
+.fstp{display:flex;gap:13px;align-items:flex-start}
+.fstp .b{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:rgba(11,11,13,.6);
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:var(--gold)}
+.fstp .tx{font-size:14.5px;color:var(--ink);line-height:1.5}
+.fstp .tx b{color:var(--gold-lt)}
+.fund .note{font-size:12.5px;color:var(--dim);border-top:1px solid var(--line-soft);padding-top:14px;margin-top:17px;line-height:1.55}
+.split{border-left:1px solid var(--line-soft);padding-left:clamp(18px,2.4vw,30px)}
+.split .big{font-family:'Playfair Display',serif;font-size:clamp(32px,4.2vw,50px);font-weight:900;line-height:1.22;padding-bottom:4px;margin-bottom:5px}
+.split .cap{font-size:13px;color:var(--muted);line-height:1.55}
+@media(max-width:860px){.fund .in{grid-template-columns:1fr}.split{border-left:0;border-top:1px solid var(--line-soft);padding:18px 0 0}}
+
+/* ═══════════ ПРОГРАММА ═══════════ */
+.prog{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pcard{position:relative;border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--panel);padding:17px 16px 16px;
+  overflow:hidden;transition:transform .26s var(--ease),border-color .26s,background .26s}
+.pcard::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform .32s var(--ease)}
+.pcard:hover{transform:translateY(-4px);border-color:var(--line);background:var(--panel-2)}
+.pcard:hover::before{transform:scaleX(1)}
+.pcard .n{font-family:'Playfair Display',serif;font-size:14px;font-weight:800;color:var(--gold);letter-spacing:.06em}
+.pcard .t{font-size:15px;font-weight:700;color:var(--white);margin:7px 0 6px;line-height:1.28}
+.pcard .d{font-size:12.5px;color:var(--dim);line-height:1.45}
+@media(max-width:980px){.prog{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.prog{grid-template-columns:1fr}}
+
+/* ═══════════ КИТ ═══════════ */
+.kit{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kcard{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--panel),transparent);padding:18px 16px;transition:transform .26s var(--ease),border-color .26s}
+.kcard:hover{transform:translateY(-4px);border-color:var(--line)}
+.kcard .s{font-family:'Playfair Display',serif;font-size:23px;color:var(--gold);line-height:1}
+.kcard .t{font-size:15px;font-weight:700;color:var(--white);margin:9px 0 5px}
+.kcard .d{font-size:12.5px;color:var(--dim);line-height:1.5}
+@media(max-width:980px){.kit{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.kit{grid-template-columns:1fr}}
+
+/* ═══════════ ТРЕНЕР ═══════════ */
+.note-box{border:1px dashed rgba(212,175,55,.3);border-radius:var(--r);padding:18px 21px;background:rgba(255,255,255,.02);
+  font-size:14.5px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.note-box b{color:var(--ink)}
+.coach{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(22px,3.2vw,42px);align-items:center}
+.coach .pic{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:#0d0d10;box-shadow:var(--shadow)}
+.coach .pic img{width:100%;aspect-ratio:9/16;object-fit:contain;background:#0d0d10}
+.coach .pill{position:absolute;left:13px;right:13px;bottom:13px;font-size:11.5px;color:var(--ink);background:rgba(11,11,13,.72);
+  backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center;line-height:1.4}
+.coach .pill b{color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.stat{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--panel);padding:16px 15px}
+.stat b{display:block;font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:var(--gold);line-height:1.16;padding-bottom:1px}
+.stat span{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:7px;line-height:1.35}
+@media(max-width:860px){.coach{grid-template-columns:1fr}.coach .pic{max-width:300px;margin:0 auto}.coach .pic img{aspect-ratio:4/5;object-fit:cover;object-position:top}}
+
+/* ═══════════ КОМУ ═══════════ */
+.fit{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fbox{border:1px solid var(--line-soft);border-radius:var(--r);padding:24px 22px;background:var(--panel)}
+.fbox.yes{border-color:rgba(122,166,96,.32);background:linear-gradient(180deg,rgba(53,81,41,.2),transparent)}
+.fbox h3{margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.fbox h3 i{font-style:normal;font-family:'Playfair Display',serif;font-size:17px}
+.fbox.yes h3 i{color:var(--felt-txt)}.fbox.no h3 i{color:var(--red)}
+.fbox ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.fbox li{position:relative;padding-left:24px;font-size:14.5px;color:var(--muted);line-height:1.5}
+.fbox li::before{position:absolute;left:0;top:1px;font-size:13px}
+.fbox.yes li::before{content:'♠';color:var(--gold)}
+.fbox.no li::before{content:'×';color:var(--red);font-weight:800;font-size:15px}
+@media(max-width:800px){.fit{grid-template-columns:1fr}}
+
+/* ═══════════ КАК НАЧАТЬ ═══════════ */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stp{position:relative;border:1px solid var(--line-soft);border-radius:var(--r);padding:26px 22px 22px;background:var(--panel);transition:transform .26s var(--ease),border-color .26s}
+.stp:hover{transform:translateY(-4px);border-color:var(--line)}
+.stp .n{position:absolute;top:-14px;left:22px;width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(180deg,var(--gold-lt),var(--gold-dk));color:#140f03;font-weight:800;font-size:14px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -8px rgba(212,175,55,.7)}
+.stp h3{margin:6px 0 8px}
+.stp p{font-size:14px;color:var(--muted);line-height:1.55}
+.stp .free{display:inline-block;margin-top:12px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--felt-txt);background:rgba(53,81,41,.34);border:1px solid rgba(122,166,96,.34);border-radius:7px;padding:4px 10px}
+@media(max-width:860px){.steps{grid-template-columns:1fr}}
+
+/* ═══════════ ЦЕНЫ ═══════════ */
+.prices{display:grid;grid-template-columns:.85fr .85fr 1.1fr;gap:14px;align-items:stretch}
+.pc{position:relative;border:1px solid var(--line-soft);border-radius:var(--r-lg);background:var(--panel);padding:26px 24px;display:flex;flex-direction:column;
+  transition:transform .26s var(--ease),border-color .26s}
+.pc:hover{transform:translateY(-4px)}
+.pc.free{border-color:rgba(122,166,96,.34);background:linear-gradient(175deg,rgba(53,81,41,.2),transparent 60%)}
+.pc.hl{border-color:rgba(212,175,55,.5);background:linear-gradient(170deg,rgba(212,175,55,.13),rgba(11,11,13,.3) 58%)}
+.pc .bd{position:absolute;top:-12px;left:24px;background:linear-gradient(180deg,var(--gold-lt),var(--gold-dk));color:#150f02;
+  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:8px}
+.pc .nm{font-size:14px;color:var(--muted);font-weight:600}
+.pc .amt{font-family:'Playfair Display',serif;font-size:clamp(36px,4.4vw,50px);font-weight:900;color:var(--white);line-height:1.2;padding-bottom:4px;margin:8px 0 1px}
+.pc.hl .amt{color:transparent;background:linear-gradient(96deg,var(--gold-lt),var(--gold) 45%,var(--gold-dk));-webkit-background-clip:text;background-clip:text}
+.pc.free .amt{color:var(--felt-txt)}
+.pc .per{font-size:13px;color:var(--muted);margin-bottom:18px}
+.pc ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.pc li{font-size:13.5px;color:var(--muted);padding-left:20px;position:relative;line-height:1.45}
+.pc li::before{content:'♠';position:absolute;left:0;top:1px;color:var(--gold);font-size:11px;opacity:.85}
+.pc li b{color:var(--gold)}
+.pc li.no{color:var(--dim)}
+.pc li.no::before{content:'×';color:var(--red);opacity:1}
+.pc .sp{margin-top:auto}
+.payline{margin-top:20px;font-size:13.5px;color:var(--dim);max-width:74ch;line-height:1.55}
+@media(max-width:900px){.prices{grid-template-columns:1fr}}
+
+/* ═══════════ FAQ ═══════════ */
+.faq{display:grid;gap:10px;max-width:920px}
+details{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--panel);overflow:hidden;transition:border-color .22s}
+details[open]{border-color:var(--line)}
+summary{cursor:pointer;list-style:none;padding:17px 20px;font-size:16px;font-weight:600;color:var(--white);display:flex;align-items:center;justify-content:space-between;gap:14px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';font-family:'Playfair Display',serif;font-size:21px;color:var(--gold);flex:none;transition:transform .26s var(--ease)}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 20px 18px;font-size:14.5px;color:var(--muted);line-height:1.6;max-width:80ch}
+details p b{color:var(--ink)}
+
+/* ═══════════ ФИНАЛ ═══════════ */
+.final{position:relative;text-align:center;padding:clamp(60px,7.4vw,108px) 0;overflow:hidden;z-index:2}
+.final h2{margin-bottom:14px}
+.final .lead{margin:0 auto 24px;text-align:center}
+.final .ctas{justify-content:center}
+.finalcontact{margin-top:18px;font-size:14px;color:var(--muted)}
+.finalcontact a{color:var(--gold);font-weight:600}
+
+footer{border-top:1px solid var(--line-soft);padding:26px 0 92px;position:relative;z-index:2}
+footer .in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--dim)}
+footer b{color:var(--gold)}
+footer a{color:var(--gold)}
+
+/* ═══════════ ЛИПКИЕ CTA ═══════════ */
+.fab{position:fixed;right:20px;bottom:22px;z-index:110;display:inline-flex;align-items:center;gap:9px;
+  background:linear-gradient(180deg,var(--felt-lt),var(--felt));color:#f2f7ee;border:1px solid rgba(212,175,55,.5);
+  border-radius:999px;padding:13px 19px;font-size:14.5px;font-weight:700;box-shadow:0 16px 40px -14px rgba(0,0,0,.9);
+  transition:transform .22s var(--ease),border-color .22s}
+.fab:hover{transform:translateY(-2px);border-color:var(--gold)}
+.fab svg{width:19px;height:19px;fill:currentColor}
+.mobar{display:none}
+@media(max-width:720px){
+  .fab{display:none}
+  .mobar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:110;align-items:center;gap:12px;
+    background:rgba(11,11,13,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:11px 14px}
+  .mobar .px{flex:1;line-height:1.15}
+  .mobar .px b{display:block;font-family:'Playfair Display',serif;font-size:19px;color:var(--felt-txt);font-weight:800}
+  .mobar .px span{font-size:11px;color:var(--dim)}
+}
+
+/* ═══════════ REVEAL ═══════════ */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style></head>
+<body>
+<div class="deck" id="deck" aria-hidden="true">
+  <i style="--w:30vw;--o:.2;left:-12vw"            data-base="10"  data-turn="1.8"  data-start="180" data-drift="-430" data-tilt="-12"><b><s class="f" data-s="A&#10;♠">A&#10;♠</s><s class="b"></s></b></i>
+  <i style="--w:33vw;--o:.18;left:78vw"             data-base="105" data-turn="-1.6" data-start="195" data-drift="-560" data-tilt="13"><b><s class="f" data-s="K&#10;♣">K&#10;♣</s><s class="b"></s></b></i>
+  <i class="wide" style="--w:21vw;--o:.17;left:8vw" data-base="195" data-turn="2.2"  data-start="0"   data-drift="-640" data-tilt="7"><b><s class="f" data-s="Q&#10;♠">Q&#10;♠</s><s class="b"></s></b></i>
+  <i class="wide felt" style="--w:26vw;--o:.18;left:54vw" data-base="250" data-turn="-1.9" data-start="165" data-drift="-490" data-tilt="-6"><b><s class="f" data-s="J&#10;♣">J&#10;♣</s><s class="b"></s></b></i>
+</div>
+<div class="grain"></div>
+<div class="bar" id="bar"></div>
+
+<nav><div class="in">
+  <a class="logo" href="#top">SYNDICATE<i>♠</i><small>АКАДЕМИЯ</small></a>
+  <div class="navlinks">
+    <a href="#zanyatie">Занятие</a>
+    <a href="#app">Тренажёр</a>
+    <a href="#put">Путь игрока</a>
+    <a href="#programma">Программа</a>
+    <a href="#trener">Тренер</a>
+    <a href="#cena">Цена</a>
+  </div>
+  <a class="btn btn-gold btn-sm navcta" href="#cena">Записаться</a>
+</div></nav>
+
+<!-- ═══ 1 · HERO ═══ -->
+<header class="hero" id="top">
+  <div class="glow" style="width:620px;height:520px;background:rgba(212,175,55,.13);top:-200px;right:-130px"></div>
+  <div class="glow" style="width:460px;height:400px;background:rgba(53,81,41,.2);bottom:-220px;left:-150px"></div>
+  <div class="suit" style="font-size:min(44vw,520px);top:-80px;right:-60px;transform:rotate(-9deg)">♠</div>
+  <div class="wrap">
+    <div class="herocol">
+      <div class="kick">Академия клуба SYNDICATE · Буэнос-Айрес · по-русски</div>
+      <h1>Месяц в Академии — и ты <span class="grad">играешь осознанно</span></h1>
+      <p class="lead">Мы не курс из интернета, а <b>школа закрытого клуба</b>: учим за тем же столом, за которым потом играем. За 8 занятий один на один — от «знаю только правила» до продуманных решений в живой раздаче. Между занятиями держит форму <b>тренажёр в телефоне</b>.</p>
+      <div class="cred">♠ Три ступени под одной крышей: <b>академия → клуб → фонд игроков</b></div>
+      <div>
+        <div class="ctas">
+          <a class="btn btn-felt" href="https://t.me/oxzuu" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.8 19c-.2 1-.9 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.9 8.9-8c.4-.3-.1-.5-.6-.2L7 11.1l-4.7-1.5c-1-.3-1-1 .2-1.5l18.3-7c.8-.3 1.5.2 1.1 1.2z"/></svg>
+            Знакомство 20 минут — бесплатно
+          </a>
+          <a class="btn btn-ghost" href="#programma">Посмотреть программу</a>
+        </div>
+        <div class="hint"><i>♠</i> Первое занятие — уже на этой неделе. Группы нет: только один на один, расписание под тебя.</div>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div class="fct"><b>8</b><span>занятий по 90 минут, один на один</span></div>
+      <div class="fct"><b>30</b><span>дней — весь курс от нуля до мини-турнира</span></div>
+      <div class="fct"><b>5 мин</b><span>в день в приложении между занятиями</span></div>
+      <div class="fct"><b>Пн · Чт · Сб</b><span>игровые вечера клуба — идёшь туда после курса</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ 2 · БОЛЬ ═══ -->
+<section>
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">Почему не получалось</div>
+      <h2>Книги и ютуб <span class="grad">не сработали</span></h2>
+      <p class="lead">Если ты уже пробовал разобраться сам — вот что обычно происходит. Ничего личного, так у всех.</p>
+    </div>
+    <div class="pains rv">
+      <div class="pn">
+        <div class="t">Правила знаю — за столом ступор</div>
+        <div class="d">Знать «что бьёт что» и <b>принять решение за 10 секунд</b>, когда трое смотрят и в банке твои деньги, — это два разных навыка. Второй тренируется только за столом.</div>
+      </div>
+      <div class="pn">
+        <div class="t">Деньги уходят, и непонятно где</div>
+        <div class="d">Проигрыш не приходит одной большой раздачей. Он собирается из <b>лишних входов и пассивных коллов</b> — а их не видно, пока никто не показал со стороны.</div>
+      </div>
+      <div class="pn">
+        <div class="t">Между занятиями всё выветривается</div>
+        <div class="d">Разобрали шансы банка в четверг — к следующему разу осталось ощущение, а не знание. <b>7 дней пустоты</b> съедают любую теорию.</div>
+      </div>
+      <div class="pn">
+        <div class="t">Ютуб про турниры на $10.000</div>
+        <div class="d">Стримы и разборы GTO — не про твою ситуацию. Тебе нужно знать, <b>с чем открывать с баттона</b> в живой игре за столом в Палермо, а не соло-эквити в вакууме.</div>
+      </div>
+    </div>
+    <div class="turn rv">Поэтому здесь всё построено на двух вещах: <b>теория сразу проверяется за реальным столом</b>, а между занятиями работает тренажёр — пять минут в день, чтобы к следующей игре знание было на месте.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 3 · ЗАНЯТИЕ ═══ -->
+<section id="zanyatie">
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">Как устроено занятие</div>
+      <h2>90 минут без единой минуты <span class="grad">«послушать и записать»</span></h2>
+      <p class="lead">Занятие делится на три части, и все три — в игре. Тема сразу проверяется за столом, а не остаётся конспектом.</p>
+    </div>
+
+    <div class="method rv">
+      <div class="mtrack"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+      <div class="mlabels">
+        <div><div class="t">25′</div><div class="l">Теория</div><div class="d">Одна тема, без воды. Шпаргалка остаётся у тебя.</div></div>
+        <div><div class="t">45′</div><div class="l">Практика</div><div class="d">Играешь за реальным столом — тему проверяем сразу.</div></div>
+        <div><div class="t">20′</div><div class="l">Разбор</div><div class="d">Только твои раздачи: где сыграл верно, где отдал деньги.</div></div>
+      </div>
+    </div>
+
+    <div class="turn rv" style="margin-top:24px">
+      <b>Что ты умеешь через 30 дней</b> — проверяемо, без обещаний про выигрыш:
+      <div class="res">
+        <div class="rescard"><b>Знаешь, с чем входить</b><span>С каждой из позиций: 169 рук разложены по трём зонам, без «на глаз».</span></div>
+        <div class="rescard"><b>Считаешь шансы за 5 секунд</b><span>Ауты × 4 и × 2, решение о колле — арифметикой, а не чувством.</span></div>
+        <div class="rescard"><b>Видишь свои утечки</b><span>После 8 разборов знаешь, где именно теряешь деньги лично ты.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4 · ПРИЛОЖЕНИЕ ═══ -->
+<section id="app">
+  <div class="glow" style="width:560px;height:440px;background:rgba(53,81,41,.18);top:-120px;right:-160px"></div>
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">входит в абонемент</div>
+      <h2>Тренажёр <span class="grad">в телефоне</span></h2>
+      <p class="lead">Главная причина, по которой обучение раз в неделю обычно не работает, — семь дней между занятиями. Приложение закрывает именно это: <b>каждый день конкретное задание на пять минут</b>, а не «позанимайся сам».</p>
+    </div>
+    <!-- витрина экранов -->
+    <div class="galwrap rv">
+      <div class="galhint"><span>9 экранов · листай в сторону</span><span class="arr">→</span></div>
+      <div class="gal" id="gal">
+        <figure><img src="app-shots/scr-02-glavnyy.png" alt="Главный экран: задание дня, серия и прогресс до занятия" loading="lazy" decoding="async">
+          <figcaption><b>Задание дня</b>Открыл — и сразу видно, что делать сегодня. Пять минут, без выбора и раздумий.</figcaption></figure>
+        <figure><img src="app-shots/scr-03-kviz.png" alt="Квиз: вопрос с вариантами ответов" loading="lazy" decoding="async">
+          <figcaption><b>Квиз</b>Выбираешь ответ и сразу видишь, знал ты или угадал. Ошибся — карточка вернётся позже.</figcaption></figure>
+        <figure><img src="app-shots/scr-11-spot.png" alt="Спот дня: реальная раздача за столом" loading="lazy" decoding="async">
+          <figcaption><b>Спот дня</b>Настоящая раздача: принимаешь решение, потом читаешь разбор и смотришь, как сыграли другие.</figcaption></figure>
+        <figure><img src="app-shots/scr-08-matrica.png" alt="Шпаргалка: матрица 169 стартовых рук" loading="lazy" decoding="async">
+          <figcaption><b>Матрица 169 рук</b>С чем входить с каждой позиции — вся сетка стартовых рук всегда в кармане.</figcaption></figure>
+        <figure><img src="app-shots/scr-09-shansy.png" alt="Шпаргалка: ауты и шансы банка" loading="lazy" decoding="async">
+          <figcaption><b>Шансы банка</b>Ауты, правило 4 и 2, цена колла. То, что за столом считается за пять секунд.</figcaption></figure>
+        <figure><img src="app-shots/scr-10-pushfold.png" alt="Шпаргалка: push/fold на коротком стеке" loading="lazy" decoding="async">
+          <figcaption><b>Push / Fold</b>Турнир, короткий стек: с чем идти на всю руку, а с чем спокойно сбрасывать.</figcaption></figure>
+        <figure><img src="app-shots/scr-05-programma.png" alt="Программа курса: пройденные и следующие занятия" loading="lazy" decoding="async">
+          <figcaption><b>Программа</b>Все 8 занятий: что уже пройдено, что следующее. Курс виден целиком, а не по кусочкам.</figcaption></figure>
+        <figure><img src="app-shots/scr-04-itog.png" alt="Итог тренировки" loading="lazy" decoding="async">
+          <figcaption><b>Итог тренировки</b>Что закрепилось за эти пять минут и к чему вернёмся завтра.</figcaption></figure>
+        <figure><img src="app-shots/scr-12-profil.png" alt="Профиль: прогресс ученика" loading="lazy" decoding="async">
+          <figcaption><b>Профиль</b>Пройденные занятия, серия дней и разобранные споты — весь путь в одном экране.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="appgrid" style="margin-top:clamp(24px,3vw,38px)">
+      <div class="rv">
+        <ul class="appfeat">
+          <li>Задание дня на 5 минут<span>Не «повтори тему», а шесть конкретных карточек по тому, что разобрали на занятии.</span></li>
+          <li>Все шпаргалки всегда с собой<span>Матрица 169 стартовых рук, ауты и шансы банка, push/fold на коротком стеке.</span></li>
+          <li>Квиз с вариантами ответов<span>Видно разницу между «знал» и «угадал». Ошибся — карточка вернётся позже.</span></li>
+          <li>Спот дня<span>Реальная раздача: принимаешь решение, потом видишь разбор и как сыграли другие.</span></li>
+          <li>Серия дней<span>Та самая механика, из-за которой приложение открывают ежедневно, а не раз в неделю.</span></li>
+        </ul>
+      </div>
+      <div class="rv">
+        <div class="appcard">
+          <div class="kick" style="margin-bottom:12px">как получить</div>
+          <h3 style="font-size:20px;margin-bottom:10px">Ставить ничего не нужно</h3>
+          <p style="font-size:14.5px;color:var(--muted);line-height:1.6">Тренажёр живёт внутри <b style="color:var(--gold)">Telegram</b> — просто открываешь чат. Доступ даётся на первом занятии и остаётся на весь курс и <b style="color:var(--ink)">ещё два месяца после</b>.</p>
+          <div class="appmeta">
+            <div><b>9</b><span>экранов</span></div>
+            <div><b>24</b><span>карточки квиза</span></div>
+            <div><b>4</b><span>шпаргалки</span></div>
+          </div>
+          <a class="btn btn-gold btn-full" style="margin-top:20px" href="https://t.me/oxzuu" target="_blank" rel="noopener">Хочу курс с приложением</a>
+          <div class="appnote" style="margin-top:12px;font-size:12.5px">Входит только в абонемент — в разовом занятии тренажёра нет.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 5 · ПУТЬ ИГРОКА: ВВЕДЕНИЕ ═══ -->
+<section id="put" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">Путь игрока Syndicate</div>
+      <h2>Репетитор доводит до конца курса.<br><span class="grad">Мы — до места за столом.</span></h2>
+      <p class="lead">У обычного преподавателя после последнего занятия ты остаёшься один: играть негде, спросить не у кого. Здесь курс — только вход. Дальше живой клуб, а при результате — деньги фонда в твоём стеке. Три ступени, один бренд, один человек, который тебя ведёт.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ СТУПЕНЬ I — АКАДЕМИЯ ═══ -->
+<div class="stage s1">
+  <div class="rail"></div><div class="dot"></div>
+  <div class="glow" style="width:520px;height:420px;background:rgba(212,175,55,.1);top:-150px;right:-140px"></div>
+  <div class="wrap"><div class="stagegrid">
+    <div class="stagenum rv"><span class="lb">ступень</span><span class="rn">I</span></div>
+    <div>
+      <div class="rv">
+        <div class="stagetitle">
+          <h2>Академия</h2>
+          <span class="chip">8 занятий · 90 минут</span>
+          <span class="chip mut">от $43,75 за занятие</span>
+        </div>
+        <p class="lead" style="margin-top:14px">Этот курс. От «что бьёт что» до турнирной игры на коротком стеке — за месяц, с тренажёром в телефоне и разбором каждой своей игры.</p>
+      </div>
+      <div class="feat rv">
+        <div class="fcard"><div class="ic">♠</div><h3>Один на один</h3><p>Никакой группы: весь час с половиной — про твои руки, твои ошибки и твой темп.</p></div>
+        <div class="fcard"><div class="ic">♦</div><h3>Сразу за столом</h3><p>Теория живёт 25 минут, дальше — живая игра. Навык ставится руками, а не конспектом.</p></div>
+        <div class="fcard"><div class="ic">♥</div><h3>Материалы навсегда</h3><p>Печатные шпаргалки, 24 карточки и доступ в приложение — остаются у тебя после курса.</p></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ═══ СТУПЕНЬ II — КЛУБ ═══ -->
+<div class="stage s2">
+  <div class="rail"></div><div class="dot"></div>
+  <div class="glow" style="width:520px;height:420px;background:rgba(53,81,41,.2);bottom:-200px;left:-150px"></div>
+  <div class="wrap"><div class="stagegrid">
+    <div class="stagenum rv"><span class="lb">ступень</span><span class="rn">II</span></div>
+    <div>
+      <div class="rv">
+        <div class="stagetitle">
+          <h2>Клуб</h2>
+          <span class="chip felt">Пн · Чт · Сб</span>
+          <span class="chip mut">members-only</span>
+        </div>
+        <p class="lead" style="margin-top:14px">Учиться и не играть — потерянный месяц. После курса садишься за живой стол Синдиката уже своим человеком: без «а как тут принято» и без стеснения спросить правила.</p>
+      </div>
+      <div class="feat rv">
+        <div class="fcard"><div class="ic">♣</div><h3>Три вечера в неделю</h3><p>Понедельник, четверг, суббота. Приходишь в своём ритме — раз в неделю или на каждую игру.</p></div>
+        <div class="fcard"><div class="ic">♠</div><h3>Свой круг, не казино</h3><p>Закрытый клуб: знакомые лица, спокойная атмосфера, никто не «охотится на новичка».</p></div>
+        <div class="fcard"><div class="ic">♥</div><h3>Тренер за тем же столом</h3><p>Я играю там же. Спорную раздачу разбираем сразу после вечера, а не через неделю.</p></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ═══ СТУПЕНЬ III — ФОНД ═══ -->
+<div class="stage s3">
+  <div class="rail"></div><div class="dot"></div>
+  <div class="glow" style="width:600px;height:460px;background:rgba(212,175,55,.12);top:-170px;right:-170px"></div>
+  <div class="wrap"><div class="stagegrid">
+    <div class="stagenum rv"><span class="lb">ступень</span><span class="rn">III</span></div>
+    <div>
+      <div class="rv">
+        <div class="stagetitle">
+          <h2>Фонд игроков</h2>
+          <span class="chip">бэкинг · staking</span>
+        </div>
+        <p class="lead" style="margin-top:14px">Ступень, которой нет ни у одного репетитора. Показал результат за столом — заходишь в фонд: играешь на банкролл инвестора, профит делите.</p>
+      </div>
+
+      <div class="fund rv"><div class="in">
+        <div>
+          <div class="fsteps">
+            <div class="fstp"><div class="b">1</div><div class="tx">Проходишь курс и <b>играешь в клубе</b> — я вижу твою игру вживую, а не по словам.</div></div>
+            <div class="fstp"><div class="b">2</div><div class="tx">Стабильные решения на дистанции → <b>обсуждаем бэкинг</b>: лимиты, дисциплина, границы потерь.</div></div>
+            <div class="fstp"><div class="b">3</div><div class="tx">Играешь на <b>деньги фонда</b>. Профит делим по договорённости, минус за собой не тянешь.</div></div>
+          </div>
+          <div class="note">Бэкинг — не обещание и не подарок: это доверие, которое зарабатывается игрой. Кто-то доходит до этой ступени, кто-то остаётся играть в клубе для удовольствия — оба варианта нормальные.</div>
+        </div>
+        <div class="split">
+          <div class="big grad">3 из 3</div>
+          <div class="cap">ступени под одной крышей: академия, клуб и фонд. Ты не остаёшься один после последнего занятия — в этом и весь смысл Синдиката.</div>
+        </div>
+      </div></div>
+    </div>
+  </div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 6 · ПРОГРАММА ═══ -->
+<section id="programma">
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">Программа курса</div>
+      <h2>Восемь тем — <span class="grad">восемь вечеров за столом</span></h2>
+      <p class="lead">Каждая тема сразу отрабатывается в игре, а на неделю уходит в приложение карточками.</p>
+    </div>
+    <div class="prog rv">
+      <div class="pcard"><div class="n">01</div><div class="t">Механика и рейтинг рук</div><div class="d">Что бьёт что, блайнды, порядок улиц, все действия за столом.</div></div>
+      <div class="pcard"><div class="n">02</div><div class="t">Ход раздачи и позиция</div><div class="d">Почему последнее слово = деньги и как повернуть это в свою пользу.</div></div>
+      <div class="pcard"><div class="n">03</div><div class="t">Стартовые руки</div><div class="d">Что играть и откуда. Диапазоны вместо «красивых карт».</div></div>
+      <div class="pcard"><div class="n">04</div><div class="t">Ауты и шансы банка</div><div class="d">Правило 4 и 2, pot odds: колл по цифрам, а не по ощущению.</div></div>
+      <div class="pcard"><div class="n">05</div><div class="t">Постфлоп и борд</div><div class="d">Ставка, размер, текстура доски. Когда давить, когда тормозить.</div></div>
+      <div class="pcard"><div class="n">06</div><div class="t">Кеш: стеки и банкролл</div><div class="d">Сколько выносить на стол, чтение соперника, дисциплина.</div></div>
+      <div class="pcard"><div class="n">07</div><div class="t">Турниры и push/fold</div><div class="d">Блайнды, стадии, короткий стек и решения на всю руку.</div></div>
+      <div class="pcard"><div class="n">08</div><div class="t">Сборка и мини-турнир</div><div class="d">Играем турнир и разбираем весь месяц: что закрепилось, что дошлифовать.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 7 · ЧТО ОСТАЁТСЯ ═══ -->
+<section>
+  <div class="wrap">
+    <div class="sechead rv">
+      <div class="kick">После курса</div>
+      <h2>Что остаётся <span class="grad">у тебя</span></h2>
+      <p class="lead">Курс заканчивается — материалы остаются. Печатные, чтобы не искать в телефоне за столом, и цифровые, чтобы тренироваться где угодно.</p>
+    </div>
+    <div class="kit rv">
+      <div class="kcard"><div class="s">♠</div><div class="t">4 шпаргалки</div><div class="d">Рейтинг рук, стартовые руки по позициям, ауты и шансы банка, push/fold. Напечатанные.</div></div>
+      <div class="kcard"><div class="s">♥</div><div class="t">24 квиз-карточки</div><div class="d">Разрезал, согнул — ответ на обороте. Плюс те же карточки в приложении.</div></div>
+      <div class="kcard"><div class="s">♦</div><div class="t">Разбор своей игры</div><div class="d">20 минут каждого занятия — только твои раздачи, а не абстрактные примеры.</div></div>
+      <div class="kcard"><div class="s">♣</div><div class="t">Сертификат и вход в клуб</div><div class="d">Курс пройден полностью — садишься за живой стол Синдиката: Пн / Чт / Сб.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 8 · ТРЕНЕР ═══ -->
+<section id="trener">
+  <div class="wrap">
+    <div class="sechead rv"><div class="kick">Кто ведёт</div><h2>Sergei Zubov</h2></div>
+    <div class="coach rv">
+      <div class="pic">
+        <img src="foto/web/a-final.jpg" alt="Публикация City Center Poker: chip leader дня" loading="lazy" decoding="async">
+        <div class="pill">Публикация <b>City Center Poker</b> прямо с Main Event — chip leader своего дня</div>
+      </div>
+      <div>
+        <h3 style="font-size:21px">Основатель SYNDICATE · серийный предприниматель</h3>
+        <p class="lead" style="margin-top:13px">Участник живых офлайн-турниров и 1000+ часов онлайн. Смотрю на игру многофакторно — и учу так же: из своей практики, а не из книжек. Построил весь путь под одной крышей: клуб, академию и фонд игроков, поэтому отвечаю не только за курс, но и за то, что будет с тобой после него.</p>
+        <div class="stats">
+          <div class="stat"><b>3</b><span>клуб · академия · фонд</span></div>
+          <div class="stat"><b>1000+ ч</b><span>онлайн-турниры</span></div>
+          <div class="stat"><b>Live</b><span>офлайн-турниры</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 9 · КОМУ ═══ -->
+<section>
+  <div class="wrap">
+    <div class="sechead rv"><div class="kick">Честно</div><h2>Кому подойдёт</h2>
+      <p class="lead">Чтобы не тратить ни твоё время, ни моё.</p></div>
+    <div class="fit rv">
+      <div class="fbox yes">
+        <h3><i>♠</i> Да, это для тебя</h3>
+        <ul>
+          <li>Никогда не играл или знаешь только правила — начинаем с нуля, это норма.</li>
+          <li>Играл с друзьями «на интерес» и хочешь наконец понимать, что делаешь.</li>
+          <li>Ходишь в клуб, но чувствуешь себя за столом донором.</li>
+          <li>Интересна не только игра: покер — тренажёр решений под неопределённостью.</li>
+          <li>Хочешь дойти до бэкинга — играть на деньги фонда, а не на свои.</li>
+        </ul>
+      </div>
+      <div class="fbox no">
+        <h3><i>×</i> Нет, не сюда</h3>
+        <ul>
+          <li>Ищешь быстрый заработок — покер так не работает, обещать не буду.</li>
+          <li>Нужен онлайн-курс с видео: здесь только очно, за реальным столом.</li>
+          <li>Готов заниматься «когда-нибудь» — курс держится на ритме два занятия в неделю.</li>
+          <li>Уже играешь в плюс на регулярной основе — тебе нужен другой уровень разбора.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 10 · КАК НАЧАТЬ ═══ -->
+<section>
+  <div class="wrap">
+    <div class="sechead rv"><div class="kick">Как начать</div><h2>Три шага. <span class="grad">Первый бесплатный</span></h2>
+      <p class="lead">Ничего не покупаешь вслепую: сначала знакомство, потом решаешь.</p></div>
+    <div class="steps rv">
+      <div class="stp">
+        <div class="n">1</div>
+        <h3>Знакомство, 20 минут</h3>
+        <p>Созвон или встреча. Я пойму твой уровень и цель, ты — подходит ли тебе формат и тренер. Без продажи в лоб.</p>
+        <div class="free">бесплатно</div>
+      </div>
+      <div class="stp">
+        <div class="n">2</div>
+        <h3>Первое занятие</h3>
+        <p>90 минут за реальным столом. Уходишь с первой шпаргалкой и доступом в приложение — уже с заданием на завтра.</p>
+      </div>
+      <div class="stp">
+        <div class="n">3</div>
+        <h3>Ритм на месяц</h3>
+        <p>Два занятия в неделю плюс пять минут в день в телефоне. Через месяц — все восемь тем и мини-турнир с разбором.</p>
+      </div>
+    </div>
+    <div class="ctas rv" style="margin-top:26px">
+      <a class="btn btn-felt" href="https://t.me/oxzuu" target="_blank" rel="noopener">Начать со знакомства</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 · ЦЕНА ═══ -->
+<section id="cena">
+  <div class="glow" style="width:600px;height:460px;background:rgba(212,175,55,.1);top:-180px;left:50%;transform:translateX(-50%)"></div>
+  <div class="wrap">
+    <div class="sechead rv"><div class="kick">Стоимость</div><h2>Абонемент <span class="grad">держит ритм</span></h2>
+      <p class="lead">Абонемент дешевле на $50, включает приложение и укладывает курс в месяц. Разовое — если хочешь сначала посмотреть.</p></div>
+    <div class="prices rv">
+      <div class="pc free">
+        <div class="nm">Знакомство</div>
+        <div class="amt">$0</div>
+        <div class="per">20 минут · онлайн или очно</div>
+        <ul>
+          <li>Разбор твоего уровня и цели</li>
+          <li>Честный ответ, нужен ли тебе курс</li>
+          <li>Никаких обязательств</li>
+        </ul>
+        <div class="sp"><a class="btn btn-ghost btn-full" href="https://t.me/oxzuu" target="_blank" rel="noopener">Записаться</a></div>
+      </div>
+      <div class="pc">
+        <div class="nm">Разовое занятие</div>
+        <div class="amt">$50</div>
+        <div class="per">90 минут · попробовать</div>
+        <ul>
+          <li>Одна тема + практика за столом</li>
+          <li>Разбор твоих раздач</li>
+          <li>Шпаргалка по теме</li>
+          <li class="no">Без приложения-тренажёра</li>
+        </ul>
+        <div class="sp"><a class="btn btn-ghost btn-full" href="https://t.me/oxzuu" target="_blank" rel="noopener">Записаться</a></div>
+      </div>
+      <div class="pc hl">
+        <div class="bd">выгодно · −$50</div>
+        <div class="nm">Абонемент · 8 занятий</div>
+        <div class="amt">$350</div>
+        <div class="per">$43,75 за занятие · курс за месяц</div>
+        <ul>
+          <li>Все 8 тем за месяц + мини-турнир</li>
+          <li><b>Приложение-тренажёр</b> на курс и 2 месяца после</li>
+          <li>4 печатные шпаргалки + 24 карточки</li>
+          <li>Разбор своей игры на каждом занятии</li>
+          <li>Сертификат и вход в клуб Синдикат</li>
+        </ul>
+        <div class="sp"><a class="btn btn-gold btn-full" href="https://t.me/oxzuu" target="_blank" rel="noopener">Взять абонемент</a></div>
+      </div>
+    </div>
+    <p class="payline rv">Оплата наличными, переводом или MercadoPago. Место фиксируется после первой оплаты — расписание согласуем под тебя, включая поздний вечер и выходные.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 12 · FAQ ═══ -->
+<section>
+  <div class="wrap">
+    <div class="sechead rv"><div class="kick">Вопросы</div><h2>Что обычно спрашивают</h2></div>
+    <div class="faq rv">
+      <details open><summary>Я вообще не умею играть. Подойдёт?</summary><p>Именно для этого курс. Начинаем с «что бьёт что» — нулевой уровень норма, и в приложении первые карточки такие же простые.</p></details>
+      <details><summary>$350 — это дорого</summary><p>Это <b>$43,75 за занятие</b> с личным тренером за реальным столом. Один вечер в клубе без понимания игры обычно стоит дороже — и не оставляет ни шпаргалок, ни навыка. Хочешь проверить без риска — начни с разового за $50 или бесплатного знакомства.</p></details>
+      <details><summary>У меня нет времени</summary><p>Два занятия в неделю по 90 минут и пять минут в день в телефоне. Приложение как раз для тех, у кого нет времени сидеть за книгами.</p></details>
+      <details><summary>А если после первого занятия пойму, что не моё?</summary><p>Тогда не продолжаешь. Поэтому и есть разовое занятие и бесплатное знакомство — чтобы не покупать месяц вслепую.</p></details>
+      <details><summary>Вы обещаете, что я буду выигрывать?</summary><p>Нет, и никто честный не обещает. Обещаю другое: ты будешь <b>понимать свои решения</b> и перестанешь отдавать деньги на пустых входах. Дальше решает практика и дисциплина.</p></details>
+      <details><summary>Придётся играть на свои деньги?</summary><p>Нет. На занятиях играем на фишки — деньги не нужны. Отдельная тема курса — банкролл: сколько можно выносить на стол, чтобы проигрыш не задевал твою жизнь.</p></details>
+      <details><summary>Нужно что-то приносить?</summary><p>Ничего. Стол, карты, фишки и шпаргалки — на месте. Шпаргалки останутся у тебя.</p></details>
+      <details><summary>Где и на каком языке?</summary><p>Очно за реальным столом в Буэнос-Айресе, занятия на русском. Дни согласуем под тебя, включая выходные.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 13 · ФИНАЛ ═══ -->
+<div class="final">
+  <div class="glow" style="width:640px;height:480px;background:rgba(212,175,55,.12);top:-200px;left:50%;transform:translateX(-50%)"></div>
+  <div class="suit" style="font-size:min(38vw,400px);bottom:-130px;left:-50px">♦</div>
+  <div class="wrap">
+    <div class="rv">
+      <h2>Сядь за стол <span class="grad">осознанно</span></h2>
+      <p class="lead">Начни со знакомства на 20 минут — это ничего не стоит. Первое занятие может быть уже на этой неделе.</p>
+      <div class="ctas">
+        <a class="btn btn-gold" href="https://t.me/oxzuu" target="_blank" rel="noopener">Написать в Telegram</a>
+        <a class="btn btn-ghost" href="#cena">Посмотреть цены</a>
+      </div>
+      <div class="finalcontact">пишу лично: Telegram <a href="https://t.me/oxzuu" target="_blank" rel="noopener">@oxzuu</a></div>
+    </div>
+  </div>
+</div>
+
+<a class="fab" href="https://t.me/oxzuu" target="_blank" rel="noopener" aria-label="Написать в Telegram">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.8 19c-.2 1-.9 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.9 8.9-8c.4-.3-.1-.5-.6-.2L7 11.1l-4.7-1.5c-1-.3-1-1 .2-1.5l18.3-7c.8-.3 1.5.2 1.1 1.2z"/></svg>
+  Telegram
+</a>
+
+<div class="mobar">
+  <div class="px"><b>$0</b><span>знакомство 20 мин · курс $350</span></div>
+  <a class="btn btn-felt btn-sm" href="https://t.me/oxzuu" target="_blank" rel="noopener">Записаться</a>
+</div>
+
+<footer><div class="wrap in">
+  <div><b>SYNDICATE</b> · Академия покера · Buenos Aires · Telegram <a href="https://t.me/oxzuu" target="_blank" rel="noopener">@oxzuu</a></div>
+  <div>Только для 18+ · Играй ответственно · Обучение игре, не гарантия дохода</div>
+</div></footer>
+
+<script>
+// прогресс чтения + фоновая колода: одна rAF-петля, только transform и opacity
+const bar=document.getElementById('bar');
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches&&!location.search.includes('anim=1');
+const deck=[...document.querySelectorAll('.deck i')].map(el=>({
+  el,face:el.firstElementChild,
+  turn:+el.dataset.turn||0,start:+el.dataset.start||0,
+  drift:+el.dataset.drift||0,tilt:+el.dataset.tilt||0,
+  from:+el.dataset.base||0,base:.08}));
+// карты идут по кругу: уходя за верх экрана, тут же возвращаются снизу — фон живой
+// на всей длине страницы. Период = экран + высота карты, поэтому подмена кадра
+// происходит ровно за краем и в кадре всегда есть хотя бы одна карта.
+const wrap=(v,low,period)=>low+((v-low)%period+period)%period;
+
+// метрики документа кэшируем: чтение scrollHeight каждый кадр = принудительный
+// пересчёт раскладки 12-тысячепиксельной страницы
+let maxScroll=1,quietZones=[],mobile=false;
+function measure(){
+  const h=document.documentElement;
+  maxScroll=Math.max(1,h.scrollHeight-h.clientHeight);
+  mobile=innerWidth<=720;
+  // базовая непрозрачность из --o и геометрия цикла (на мобиле карты крупнее)
+  for(const c of deck){
+    c.base=parseFloat(getComputedStyle(c.el).getPropertyValue('--o'))||.08;
+    const h=c.el.offsetHeight/innerHeight*100; // высота карты в vh
+    c.low=-(h+2);c.period=102+h;
+  }
+  quietZones=['top','cena'].map(id=>document.getElementById(id))
+    .concat([document.querySelector('.final')])
+    .filter(Boolean).map(el=>{const r=el.getBoundingClientRect();
+      return{top:r.top+scrollY,bottom:r.bottom+scrollY}});
+}
+// тихие зоны: первый экран, прайс и финальный CTA — фон почти гаснет
+function quiet(center){
+  let q=1;const fade=260;
+  for(const z of quietZones){
+    const d=Math.min(center-(z.top-fade),(z.bottom+fade)-center);
+    if(d>0)q=Math.min(q,1-.55*Math.min(1,d/fade));
+  }
+  return q;
+}
+
+let ticking=false,shown=-1,target=0;
+const MAX_STEP=.005; // клэмп на прыжки по якорям: не больше ~4° поворота за кадр
+function render(){
+  ticking=false;
+  target=scrollY/maxScroll;
+  bar.style.width=(Math.min(1,target)*100)+'%';
+  if(still){if(shown<0){shown=0;paint(0)}return}
+  const d=target-shown;
+  const p=Math.abs(d)<=MAX_STEP?target:shown+Math.sign(d)*MAX_STEP;
+  if(Math.abs(p-shown)<.0002)return;
+  shown=p;
+  paint(p);
+  if(Math.abs(target-shown)>.0002&&!ticking){ticking=true;requestAnimationFrame(render)}
+}
+function paint(p){
+  const center=p*maxScroll+innerHeight/2,q=quiet(center);
+  for(const c of deck){
+    const turn=c.turn*(mobile?1.15:1),deg=c.start+p*360*turn,rad=deg*Math.PI/180;
+    c.el.style.transform='translate3d(0,'+wrap(c.from+p*c.drift,c.low,c.period).toFixed(2)+'vh,0) rotate('+c.tilt+'deg)';
+    c.face.style.transform='rotateY('+deg.toFixed(1)+'deg)';
+    // карта на ребре тусклее, развёрнутая — ярче; без золотой вспышки в профиль
+    c.el.style.opacity=(c.base*q*(.62+.38*Math.abs(Math.cos(rad)))).toFixed(4);
+  }
+}
+const onScroll=()=>{if(!ticking){ticking=true;requestAnimationFrame(render)}};
+addEventListener('scroll',onScroll,{passive:true});
+addEventListener('resize',()=>{measure();onScroll()},{passive:true});
+addEventListener('load',()=>{measure();onScroll()});
+// картинки грузятся лениво и меняют высоту страницы — пересчитываем метрики
+if(window.ResizeObserver)new ResizeObserver(()=>{measure();onScroll()}).observe(document.body);
+measure();render();
+
+// появление блоков
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},
+  {rootMargin:'0px 0px -6% 0px',threshold:.06});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(Math.min(i%3,2)*80)+'ms';io.observe(el)});
+
+// активный раздел в меню
+const links=new Map([...document.querySelectorAll('.navlinks a')].map(a=>[a.getAttribute('href').slice(1),a]));
+const io2=new IntersectionObserver(es=>{es.forEach(e=>{const a=links.get(e.target.id);if(!a)return;
+  if(e.isIntersecting){links.forEach(x=>x.classList.remove('on'));a.classList.add('on')}})},
+  {rootMargin:'-42% 0px -52% 0px'});
+['zanyatie','app','put','programma','trener','cena'].forEach(id=>{const el=document.getElementById(id);if(el)io2.observe(el)});
+</script>
+</body></html>
