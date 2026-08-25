@@ -317,3 +317,28 @@ tr.hi td{background:rgba(212,175,55,.07)}
   .mark{font-size:34px} .hi{font-size:20px;margin-top:22px} .oblist{margin-top:18px}
   .todo .big{font-size:25px} .score{font-size:56px}
 }
+
+/* ─── тренажёры ─── */
+.dr-note{margin-top:auto;padding:14px 0 4px;font-size:10px;color:var(--muted);line-height:1.55}
+.dr-top{display:flex;justify-content:space-between;align-items:baseline}
+.dr-k{font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(239,233,219,.85);font-weight:600}
+.dr-sc{font-size:11px;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
+.dr-q{font-family:'Playfair Display',serif;font-size:20px;line-height:1.25;color:#fff;
+  font-weight:800;margin-top:9px}
+.dr-pos{text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-top:16px}
+.duo{display:flex;gap:10px;margin-top:14px}
+.duo .side{flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(239,233,219,.14);
+  border-radius:11px;padding:11px 8px 12px}
+.duo .side.good{border-color:#8fc07a;background:rgba(63,91,49,.34)}
+.duo .side.bad{border-color:#8f5b5b;background:rgba(107,58,58,.26)}
+.duo .sl{text-align:center;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(239,233,219,.8);font-weight:700;margin-bottom:8px}
+.duo .board{margin-top:0;gap:4px}
+.duo .pcard{width:40px;height:57px;padding:4px 5px}
+.duo .pcard .r{font-size:15px}.duo .pcard .s{font-size:12px}
+.grid4{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:17px}
+.grid4 .act{justify-content:center;font-size:16px;padding:15px 6px}
+.bl{text-align:center;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(239,233,219,.75);font-weight:700;margin-top:11px}

@@ -10,8 +10,18 @@ const TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : 
 const DEMO = new URLSearchParams(location.search).get('demo') === '1';
 const QUIZ = window.QUIZ || { cards: [] };
 const CONTENT = window.CONTENT || { lessons: [], spots: [], sheets: {} };
+const DRILLS = window.DRILLS || {};
 const DAY_CARDS = 6;
-const STORE = 'syndicate.academia.v1';
+
+/* Ключ хранения — свой на каждого ученика Telegram. Один и тот же телефон
+   может открыть и она, и её партнёр, и тренер на показе: без разделения
+   их серии и ошибки складывались бы в одну кучу. Кто вошёл без Telegram
+   (браузер, отладка) — общий ключ, как было. */
+const TG_USER = (() => {
+  try { return (window.Telegram.WebApp.initDataUnsafe.user) || null; } catch (e) { return null; }
+})();
+const STORE_BASE = 'syndicate.academia.v1';
+const STORE = TG_USER && TG_USER.id ? STORE_BASE + '.u' + TG_USER.id : STORE_BASE;
 
 /* ─────────── состояние ─────────── */
 
@@ -35,7 +45,9 @@ const defaults = () => ({
   wrong: [],          // очередь на повтор
   days: [],           // даты завершённых тренировок
   spots: {},          // id спота -> выбранный индекс
+  drills: {},         // вид тренажёра -> {n, ok}
   bestStreak: 0,
+  tgId: null,         // чей это прогресс — видно в профиле
   onboarded: false    // экран входа уже показан и закрыт
 });
 
@@ -45,6 +57,12 @@ function load() {
   try {
     const raw = localStorage.getItem(STORE);
     if (raw) return Object.assign(defaults(), JSON.parse(raw));
+    // первый вход под своим Telegram: если на этом телефоне уже был прогресс
+    // до разделения по ученикам — забираем его себе, а не начинаем с нуля
+    if (STORE !== STORE_BASE) {
+      const old = localStorage.getItem(STORE_BASE);
+      if (old) return Object.assign(defaults(), JSON.parse(old));
+    }
   } catch (e) { /* приватный режим — работаем без сохранения */ }
   return defaults();
 }
@@ -127,7 +145,8 @@ function render(name, param) {
     onboarding: () => {},
     home: renderHome, program: renderProgram, lesson: renderLesson,
     sheets: renderSheets, sheet: renderSheet,
-    quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile
+    quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile,
+    drills: renderDrills, drill: renderDrill
   })[name];
   if (fn) fn(param);
 }
@@ -185,6 +204,13 @@ function renderHome() {
     ? `${sp.board.length ? sp.board.map(c => c.r + c.s).join(' ') : 'префлоп'} — твоё решение?`
     : 'скоро';
   document.getElementById('h-spot-go').textContent = sp && S.spots[sp.id] != null ? 'решён' : 'новый';
+
+  const dn = Object.values(S.drills || {}).reduce((a, d) => a + (d.n || 0), 0);
+  const dok = Object.values(S.drills || {}).reduce((a, d) => a + (d.ok || 0), 0);
+  document.getElementById('h-dr-sub').textContent = dn
+    ? `решено ${dn} · верно ${Math.round(dok / dn * 100)}%`
+    : 'считать и запоминать · без конца';
+  document.getElementById('h-dr-go').textContent = dn ? 'ещё' : '4 вида';
 
   const main = document.getElementById('h-main');
   main.textContent = doneToday ? 'Повторить карточки' : 'Начать тренировку · 5 минут';
@@ -629,6 +655,206 @@ function paintSpotResult(sp, idx) {
   main.onclick = () => go('home');
 }
 
+/* ─────────── тренажёры ───────────
+
+   Отдельно от квиза: квиз — это шесть карточек в день по теме занятия, а здесь
+   бесконечная отработка одного навыка. Ради этого их и открывают прямо на уроке.
+
+   Ответы в drills.json не написаны руками, а вычислены сборщиком build-drills.py:
+   руки сравнивает оценщик семи карт, ауты пересчитаны перебором колоды, цена
+   колла — формулой. Поэтому здесь нет поля «правильный ответ по мнению автора». */
+
+const DRILL_KINDS = [
+  { id: 'ranks', icon: '♠', badge: '', name: 'Что сильнее',
+    sub: 'две руки на одном борде — чья лучше', skill: 'запоминать' },
+  { id: 'starting', icon: '▦', badge: 'b2', name: 'Играть или пас',
+    sub: 'позиция и две карты — открываем?', skill: 'запоминать' },
+  { id: 'outs', icon: '◷', badge: 'b3', name: 'Считай ауты',
+    sub: 'сколько карт тебя спасёт', skill: 'считать' },
+  { id: 'potodds', icon: '◈', badge: 'b5', name: 'Цена колла',
+    sub: 'банк, ставка — платить или уйти', skill: 'считать' }
+];
+
+let D = { kind: null, item: null, pool: [], n: 0, ok: 0, sel: null, answered: false };
+
+function drillPool(kind) {
+  return (DRILLS && DRILLS[kind]) || [];
+}
+
+function renderDrills() {
+  const box = document.getElementById('dr-list');
+  box.innerHTML = '';
+  DRILL_KINDS.forEach(k => {
+    const pool = drillPool(k.id);
+    const st = S.drills[k.id] || { n: 0, ok: 0 };
+    const b = document.createElement('button');
+    b.className = 'it';
+    b.disabled = !pool.length;
+    b.innerHTML = `<span class="badge ${k.badge}">${k.icon}</span>
+      <span class="tx"><span class="tt">${k.name}</span>
+      <span class="ts">${k.sub}</span></span>
+      <span class="go">${st.n ? st.ok + ' / ' + st.n : 'начать'}</span>`;
+    b.onclick = () => go('drill', k.id);
+    box.appendChild(b);
+  });
+  const total = DRILL_KINDS.reduce((a, k) => a + drillPool(k.id).length, 0);
+  document.getElementById('dr-sub').textContent =
+    `${total} ${plural(total, 'задача', 'задачи', 'задач')} · повторяются по кругу. ` +
+    'Можно решать на занятии вместе с тренером.';
+}
+
+/* Порядок задач перемешан один раз на заход, дальше идём по кругу: одна и та же
+   задача не должна выпасть дважды подряд, но и «кончиться» тренажёр не может. */
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function renderDrill(kind) {
+  if (kind && kind !== D.kind) {
+    const pool = drillPool(kind);
+    if (!pool.length) { go('drills'); return; }
+    D = { kind, item: null, pool: shuffled(pool), n: 0, ok: 0, sel: null, answered: false };
+  }
+  if (!D.kind) { go('drills'); return; }
+  if (!D.item) nextDrill();
+  paintDrill();
+}
+
+function nextDrill() {
+  if (!D.pool.length) D.pool = shuffled(drillPool(D.kind));
+  D.item = D.pool.pop();
+  D.sel = null; D.answered = false;
+}
+
+function pc(c) {
+  const red = c.s === '♥' || c.s === '♦';
+  return `<div class="pcard${red ? ' red' : ''}"><div class="r">${c.r === 'T' ? '10' : c.r}</div><div class="s">${c.s}</div></div>`;
+}
+function boardHtml(cards, cls) {
+  return `<div class="board${cls ? ' ' + cls : ''}">${cards.map(pc).join('')}</div>`;
+}
+
+/* Каждый тренажёр описывает себя сам: вопрос, что показать, какие кнопки
+   и какой из них верный. Дальше механика общая — выбрал, проверил, следующая. */
+const DRILL_VIEW = {
+  ranks: it => ({
+    q: 'Чья рука сильнее?',
+    stage: boardHtml(it.board) + '<div class="bl">общие карты</div>' +
+      `<div class="duo">
+        <div class="side" data-side="0"><div class="sl">первая</div>${boardHtml(it.a).replace('board', 'board')}</div>
+        <div class="side" data-side="1"><div class="sl">вторая</div>${boardHtml(it.b)}</div>
+      </div>`,
+    acts: ['Первая рука', 'Вторая рука'],
+    right: it.winner
+  }),
+  starting: it => ({
+    q: 'Открываем эту руку?',
+    stage: `<div class="dr-pos">${it.pos}</div>` + boardHtml(it.hand, 'mine'),
+    acts: ['Пас', 'Открываем рейзом'],
+    right: it.answer
+  }),
+  outs: it => {
+    const opts = [2, 4, 6, 8, 9, 15];
+    return {
+      q: 'Сколько у тебя аутов?',
+      stage: boardHtml(it.board) + '<div class="bl">флоп</div>' +
+        boardHtml(it.hand, 'mine') + '<div class="mine-lbl">твоя рука</div>',
+      acts: opts.map(String), grid: true,
+      right: opts.indexOf(it.outs)
+    };
+  },
+  potodds: it => ({
+    q: `У тебя ${it.draw}. Платить?`,
+    stage: `<div class="potrow">
+        <div class="pot"><div class="pl">банк</div><div class="pv">$${it.pot}</div></div>
+        <div class="pot"><div class="pl">ставка</div><div class="pv">$${it.bet}</div></div>
+        <div class="pot"><div class="pl">аутов</div><div class="pv">${it.outs}</div></div>
+      </div>`,
+    acts: ['Пас', `Колл $${it.bet}`],
+    right: it.answer
+  })
+};
+
+function paintDrill() {
+  const it = D.item, v = DRILL_VIEW[D.kind](it);
+  const kind = DRILL_KINDS.find(k => k.id === D.kind);
+  document.getElementById('dk-name').textContent = kind.name;
+  document.getElementById('dk-score').textContent = `${D.ok} / ${D.n}`;
+  document.getElementById('dk-q').textContent = v.q;
+  document.getElementById('dk-stage').innerHTML = v.stage;
+
+  const box = document.getElementById('dk-acts');
+  box.className = v.grid ? 'grid4' : 'acts';
+  box.innerHTML = '';
+  v.acts.forEach((txt, i) => {
+    const b = document.createElement('button');
+    b.className = 'act';
+    b.innerHTML = `<span>${txt}</span>`;
+    b.onclick = () => pickDrill(i, b);
+    box.appendChild(b);
+  });
+
+  document.getElementById('dk-why').innerHTML = 'Выбери ответ.';
+  const main = document.getElementById('dk-main');
+  main.textContent = 'Выбери ответ';
+  main.disabled = true;
+  main.onclick = onDrillMain;
+}
+
+function pickDrill(i, el) {
+  if (D.answered) return;
+  D.sel = i;
+  document.querySelectorAll('#dk-acts .act').forEach(a => a.classList.remove('sel'));
+  el.classList.add('sel');
+  const main = document.getElementById('dk-main');
+  main.disabled = false;
+  main.textContent = 'Ответить';
+}
+
+function onDrillMain() {
+  if (!D.answered) { checkDrill(); return; }
+  nextDrill();
+  paintDrill();
+}
+
+function checkDrill() {
+  const it = D.item, v = DRILL_VIEW[D.kind](it);
+  D.answered = true;
+  const good = D.sel === v.right;
+  D.n++; if (good) D.ok++;
+
+  document.querySelectorAll('#dk-acts .act').forEach((a, i) => {
+    a.classList.remove('sel');
+    if (i === v.right) a.classList.add('good');
+    else if (i === D.sel) a.classList.add('bad');
+  });
+  // у «что сильнее» подсветить ещё и саму руку — так понятнее, чем подпись кнопки
+  if (D.kind === 'ranks') {
+    document.querySelectorAll('#dk-stage .side').forEach(s => {
+      const n = +s.dataset.side;
+      s.classList.add(n === v.right ? 'good' : (n === D.sel ? 'bad' : 'x'));
+    });
+  }
+
+  const st = S.drills[D.kind] || { n: 0, ok: 0 };
+  st.n++; if (good) st.ok++;
+  S.drills[D.kind] = st;
+  save();
+
+  document.getElementById('dk-score').textContent = `${D.ok} / ${D.n}`;
+  document.getElementById('dk-why').innerHTML =
+    `<b>${good ? 'Верно.' : 'Не так.'}</b> ${it.why}`;
+  if (TG && TG.HapticFeedback) TG.HapticFeedback.notificationOccurred(good ? 'success' : 'warning');
+
+  const main = document.getElementById('dk-main');
+  main.textContent = 'Следующая';
+}
+
 /* ─────────── профиль ─────────── */
 
 function renderProfile() {
@@ -681,8 +907,11 @@ function init() {
     // без этого свайп вниз внутри списка сворачивает Mini App на полуслове
     if (TG.disableVerticalSwipes) { try { TG.disableVerticalSwipes(); } catch (e) {} }
     if (TG.BackButton) TG.BackButton.onClick(back);
-    const u = TG.initDataUnsafe && TG.initDataUnsafe.user;
-    if (u && u.first_name && !S.name) { S.name = u.first_name; save(); }
+    if (TG_USER) {
+      if (TG_USER.first_name && !S.name) S.name = TG_USER.first_name;
+      if (!S.tgId) S.tgId = TG_USER.id;
+      save();
+    }
   }
 
   document.querySelectorAll('[data-go]').forEach(el => {
