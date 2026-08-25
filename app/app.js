@@ -612,6 +612,10 @@ function renderSpot() {
   if (!sp) { go('home'); return; }
   document.getElementById('sp-k').textContent = `спот ${sp.id}`;
   document.getElementById('sp-t').textContent = sp.position;
+  // Схема стола: где сидишь ты и как называются остальные места.
+  // Одинаковая во всех разделах — ученик привыкает к одной картинке.
+  const felt = document.getElementById('sp-felt');
+  if (felt) felt.innerHTML = sp.seat ? tableHtml(sp.seat) : '';
   document.getElementById('sp-board').innerHTML = sp.board.length
     ? sp.board.map(cardHtml).join('')
     : '<div class="sp-k" style="padding:18px 0">префлоп — общих карт ещё нет</div>';
