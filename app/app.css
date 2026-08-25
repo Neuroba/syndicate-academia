@@ -412,3 +412,11 @@ tr.hi td{background:rgba(212,175,55,.07)}
   background:rgba(181,41,42,.1);border-radius:8px;padding:9px 11px}
 .gtrap b{color:#e6a6a6}
 .glnone{font-size:13px;color:var(--muted);margin-top:18px;line-height:1.5}
+
+/* ─── тренажёры в профиле ─── */
+.dst{display:flex;align-items:baseline;gap:9px;padding:9px 0;border-top:1px solid #1a1a20;font-size:13px}
+.dst:first-of-type{border-top:none}
+.dst .t{flex:1;color:var(--ink)}
+.dst .v{color:var(--muted);font-variant-numeric:tabular-nums}
+.dst .p{color:var(--gold);font-weight:700;width:42px;text-align:right}
+.dst.none{color:var(--muted);font-size:12px;display:block;padding-top:4px}

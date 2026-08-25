@@ -1112,6 +1112,23 @@ function renderProfile() {
     heat.appendChild(i2);
   }
 
+  // Тренажёры появились после квиза, и профиль их не считал — а решают в них
+  // теперь больше, чем в карточках. Показываем разбивку по видам.
+  const drow = DRILL_KINDS.map(k => {
+    const d = S.drills[k.id];
+    if (!d || !d.n) return '';
+    return `<div class="dst"><span class="t">${k.name}</span>
+      <span class="v">${d.ok} / ${d.n}</span>
+      <span class="p">${Math.round(d.ok / d.n * 100)}%</span></div>`;
+  }).filter(Boolean).join('');
+  const dbox = document.getElementById('p-drills');
+  if (dbox) {
+    const any = drow.length > 0;
+    dbox.innerHTML = any
+      ? '<div class="bt">тренажёры</div>' + drow
+      : '<div class="bt">тренажёры</div><div class="dst none">пока не открывала — там считают и запоминают</div>';
+  }
+
   const total = QUIZ.cards.length || 24;
   const miles = [
     { t: 'Первая неделя без пропусков', got: S.bestStreak >= 7, pr: `${Math.min(S.bestStreak, 7)} / 7` },
