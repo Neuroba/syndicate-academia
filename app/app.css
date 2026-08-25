@@ -259,11 +259,16 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .sp-t{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:#fff;margin-top:4px}
 .board{display:flex;gap:6px;justify-content:center;margin-top:18px;min-height:0}
 .board.mine{margin-top:12px}
-.pcard{width:52px;height:74px;border-radius:7px;background:#fdfbf4;display:flex;flex-direction:column;
-  justify-content:space-between;padding:6px 7px;font-family:'Playfair Display',serif;font-weight:800;
+/* Карта читается за долю секунды или не читается вообще. Поэтому:
+   Inter вместо Playfair (у декоративной антиквы тонкие штрихи плывут на 19px),
+   номинал и масть в одной колонке по центру — глазу не надо ходить по диагонали,
+   и обе крупнее. Раньше «10» и «Q» на зелёном сукне путались между собой. */
+.pcard{width:54px;height:76px;border-radius:8px;background:#fdfbf4;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;padding:4px;
+  font-family:'Inter',Arial,sans-serif;font-weight:800;
   box-shadow:0 8px 18px rgba(0,0,0,.45)}
-.pcard .r{font-size:19px;line-height:1;color:#14140f}
-.pcard .s{font-size:15px;line-height:1;text-align:right;color:#14140f}
+.pcard .r{font-size:27px;line-height:1;color:#14140f;letter-spacing:-.02em}
+.pcard .s{font-size:21px;line-height:1;color:#14140f}
 .pcard.red .r,.pcard.red .s{color:var(--red)}
 .board.mine .pcard{box-shadow:0 8px 18px rgba(0,0,0,.45),0 0 0 2px var(--gold)}
 .mine-lbl{text-align:center;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
@@ -336,9 +341,74 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .duo .sl{text-align:center;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
   color:rgba(239,233,219,.8);font-weight:700;margin-bottom:8px}
 .duo .board{margin-top:0;gap:4px}
-.duo .pcard{width:40px;height:57px;padding:4px 5px}
-.duo .pcard .r{font-size:15px}.duo .pcard .s{font-size:12px}
+.duo .pcard{width:42px;height:60px;padding:3px}
+.duo .pcard .r{font-size:21px}.duo .pcard .s{font-size:16px}
 .grid4{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:17px}
 .grid4 .act{justify-content:center;font-size:16px;padding:15px 6px}
 .bl{text-align:center;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
   color:rgba(239,233,219,.75);font-weight:700;margin-top:11px}
+
+/* ─── план дня ─── */
+.mins{display:flex;gap:7px;margin-top:15px}
+.mn{flex:1;padding:10px 0;border-radius:9px;background:#131317;border:1px solid #1e1e24;
+  font-size:12.5px;font-weight:650;color:var(--muted)}
+.mn.on{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.55);color:var(--gold)}
+.plan{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.pb{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:13px 13px;
+  border-radius:11px;background:#131317;border:1px solid #1e1e24}
+.pb.now{border-color:rgba(212,175,55,.55);background:linear-gradient(180deg,#1d1a10,#141209)}
+.pb.done{opacity:.55}
+.pb .pn{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;
+  font-size:12.5px;font-weight:700;background:#1c1c22;color:var(--muted)}
+.pb.now .pn{background:var(--gold);color:#0b0b0d}
+.pb.done .pn{background:rgba(53,81,41,.5);color:var(--ok)}
+.pb .tx{flex:1}
+.pb .tt{display:block;font-size:13.5px;font-weight:650;color:var(--ink)}
+.pb .ts{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.pb .pm{font-size:11px;color:var(--gold);font-weight:700;white-space:nowrap}
+
+/* ─── разбор в тренажёрах ─── */
+.acts.hidden{display:none}
+.duo.tap .side{cursor:pointer}
+.duo .side.sel{border-color:var(--gold);background:rgba(212,175,55,.14)}
+.minifelt{position:relative;width:100%;max-width:280px;height:104px;margin:14px auto 0;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:5px solid #17171c;
+  border-radius:56px;box-shadow:inset 0 0 26px rgba(0,0,0,.55)}
+.sd{position:absolute;transform:translate(-50%,-50%);font-size:8.5px;font-weight:700;
+  letter-spacing:.04em;padding:3px 5px;border-radius:5px;background:#101014;
+  border:1px solid var(--line);color:rgba(239,233,219,.6);white-space:nowrap}
+.sd.bl{color:var(--gold-soft)}
+.sd.on{background:var(--gold);color:#0b0b0d;border-color:var(--gold);
+  font-size:9.5px;box-shadow:0 0 0 3px rgba(212,175,55,.25)}
+.dr-pos{margin-top:12px}
+.dk-extra{margin-top:16px}
+.obar{margin-bottom:14px}
+.ol{display:flex;justify-content:space-between;font-size:10.5px;font-weight:650;
+  color:rgba(239,233,219,.9);margin-bottom:6px}
+.ol span:first-child{color:#e6a6a6}.ol span:last-child{color:#a9e9bf}
+.ob{position:relative;height:16px;border-radius:8px;background:rgba(0,0,0,.35);overflow:hidden}
+.ob i{position:absolute;left:0;top:0;height:100%;border-radius:8px}
+.ob .need{background:rgba(181,41,42,.55)}
+.ob .have{background:rgba(63,185,104,.45);border-right:2px solid #a9e9bf}
+.outs .orow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px}
+.outs .pcard{width:30px;height:42px;border-radius:5px;padding:2px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.outs .pcard .r{font-size:15px}.outs .pcard .s{font-size:12px}
+
+/* ─── словарь ─── */
+.search{width:100%;margin-top:14px;padding:12px 14px;border-radius:11px;background:#131317;
+  border:1px solid #23232a;color:var(--ink);font-size:14.5px;font-family:inherit;-webkit-appearance:none}
+.search::placeholder{color:#6c6860}
+.search:focus{outline:none;border-color:rgba(212,175,55,.5)}
+.gl{display:block;width:100%;text-align:left;margin-top:8px;padding:13px 14px;border-radius:11px;
+  background:#131317;border:1px solid #1e1e24}
+.gl.open{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1a1810,#131110)}
+.gh{display:flex;align-items:baseline;gap:9px}
+.gt{font-size:15px;font-weight:700;color:var(--ink)}
+.ge{font-size:10.5px;color:var(--gold-soft);letter-spacing:.04em}
+.gs{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+.gf{font-size:13px;color:var(--ink);margin-top:10px;line-height:1.55}
+.ga{font-size:10.5px;color:#6c6860;margin-top:8px}
+.gtrap{font-size:12px;color:#e6a6a6;margin-top:9px;line-height:1.5;
+  background:rgba(181,41,42,.1);border-radius:8px;padding:9px 11px}
+.gtrap b{color:#e6a6a6}
+.glnone{font-size:13px;color:var(--muted);margin-top:18px;line-height:1.5}

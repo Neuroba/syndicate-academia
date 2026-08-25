@@ -11,6 +11,7 @@ const DEMO = new URLSearchParams(location.search).get('demo') === '1';
 const QUIZ = window.QUIZ || { cards: [] };
 const CONTENT = window.CONTENT || { lessons: [], spots: [], sheets: {} };
 const DRILLS = window.DRILLS || {};
+const GLOSSARY = (window.GLOSSARY && window.GLOSSARY.terms) || [];
 const DAY_CARDS = 6;
 
 /* Ключ хранения — свой на каждого ученика Telegram. Один и тот же телефон
@@ -46,6 +47,7 @@ const defaults = () => ({
   days: [],           // даты завершённых тренировок
   spots: {},          // id спота -> выбранный индекс
   drills: {},         // вид тренажёра -> {n, ok}
+  plan: null,         // план дня: {date, mins, done:[номера блоков]}
   bestStreak: 0,
   tgId: null,         // чей это прогресс — видно в профиле
   onboarded: false    // экран входа уже показан и закрыт
@@ -146,7 +148,7 @@ function render(name, param) {
     home: renderHome, program: renderProgram, lesson: renderLesson,
     sheets: renderSheets, sheet: renderSheet,
     quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile,
-    drills: renderDrills, drill: renderDrill
+    drills: renderDrills, drill: renderDrill, day: renderDay, glossary: renderGlossary
   })[name];
   if (fn) fn(param);
 }
@@ -213,7 +215,11 @@ function renderHome() {
   document.getElementById('h-dr-go').textContent = dn ? 'ещё' : '4 вида';
 
   const main = document.getElementById('h-main');
-  main.textContent = doneToday ? 'Повторить карточки' : 'Начать тренировку · 5 минут';
+  const pl = S.plan && S.plan.date === today() ? S.plan : null;
+  const total = planBlocks(pl ? pl.mins : 20).length;
+  main.textContent = !pl || !pl.done.length ? 'Начать занятие дня'
+    : pl.done.length >= total ? 'Занятие дня закрыто · повторить'
+    : `Продолжить · блок ${pl.done.length + 1} из ${total}`;
 }
 function plural(n, a, b, c) {
   const m = n % 100, d = n % 10;
@@ -557,6 +563,7 @@ function checkAnswer() {
 }
 function finishQuiz() {
   markDay();
+  if (finishBlock()) return;   // шли по плану дня — возвращаемся в него
   go('result');
 }
 
@@ -636,6 +643,7 @@ function renderSpot() {
   }
 }
 function answerSpot(sp, idx) {
+  if (PLAN.active != null && S.spots[sp.id] != null) { markDay(); finishBlock(); return; }
   S.spots[sp.id] = idx; save();
   paintSpotResult(sp, idx);
   if (TG && TG.HapticFeedback) TG.HapticFeedback.notificationOccurred(idx === sp.best ? 'success' : 'warning');
@@ -653,6 +661,178 @@ function paintSpotResult(sp, idx) {
   main.disabled = false;
   main.textContent = 'На главную';
   main.onclick = () => go('home');
+}
+
+/* ─────────── словарь ───────────
+
+   Открывается посреди раздачи: услышала слово, не поняла, нашла. Поэтому
+   список не бесконечный — сразу показываем ходовые три десятка, остальные
+   семь десятков достаются поиском. Длинный список на телефоне не листают. */
+
+let GL_OPEN = null;
+
+/* Вес совпадения: само слово важнее упоминания в чужом примере.
+   Иначе «лимп» первым находит «изолирующий рейз», где лимпер только упомянут. */
+function glRank(t, q) {
+  const term = t.term.toLowerCase(), en = (t.en || '').toLowerCase();
+  if (term === q) return 0;
+  if (term.startsWith(q)) return 1;
+  if (en.startsWith(q)) return 2;
+  if (term.includes(q)) return 3;
+  if ((t.also || '').toLowerCase().includes(q)) return 4;
+  if (en.includes(q)) return 5;
+  if ((t.short || '').toLowerCase().includes(q)) return 6;
+  return 99;
+}
+function glMatch(t, q) { return glRank(t, q) < 99; }
+
+function renderGlossary() {
+  const inp = document.getElementById('gl-q');
+  const box = document.getElementById('gl-list');
+  const draw = () => {
+    const q = (inp.value || '').trim().toLowerCase();
+    const list = q
+      ? GLOSSARY.filter(t => glMatch(t, q))
+          .sort((a, b) => glRank(a, q) - glRank(b, q) || a.term.localeCompare(b.term))
+      : GLOSSARY.filter(t => t.core);
+    document.getElementById('gl-sub').textContent = q
+      ? `нашлось ${list.length} ${plural(list.length, 'слово', 'слова', 'слов')}`
+      : 'Услышала слово и не поняла — найди его здесь.';
+    document.getElementById('gl-note').textContent = q
+      ? '' : `Показаны ходовые ${list.length}. Остальные — поиском, всего в словаре ${GLOSSARY.length}.`;
+    box.innerHTML = '';
+    if (!list.length) {
+      box.innerHTML = '<div class="glnone">Ничего не нашлось. Попробуй часть слова или английское написание.</div>';
+      return;
+    }
+    list.forEach(t => {
+      const el = document.createElement('button');
+      el.className = 'gl' + (GL_OPEN === t.id ? ' open' : '');
+      el.innerHTML = `<div class="gh"><span class="gt">${t.term}</span>` +
+        (t.en ? `<span class="ge">${t.en}</span>` : '') + '</div>' +
+        `<div class="gs">${t.short}</div>` +
+        (GL_OPEN === t.id ? `<div class="gf">${t.full}</div>` +
+          (t.also ? `<div class="ga">ещё говорят: ${t.also}</div>` : '') +
+          (t.trap ? `<div class="gtrap"><b>Частая ошибка.</b> ${t.trap}</div>` : '') +
+          `<div class="ga">разбираем на занятии ${t.lesson}</div>` : '');
+      el.onclick = () => { GL_OPEN = GL_OPEN === t.id ? null : t.id; draw(); };
+      box.appendChild(el);
+    });
+  };
+  inp.oninput = draw;
+  draw();
+}
+
+/* ─────────── план дня ───────────
+
+   Меню — это витрина: ученик открывает её и не знает, с чего начать. План ведёт
+   за руку: блок за блоком, по порядку, с показанным временем. Ровно это нужно
+   и на занятии, когда тренер рассказывает, а ученики решают в моменте.
+
+   Состав зависит от того, докуда дошёл курс: тренажёр на ауты бессмысленно
+   давать до четвёртого занятия, там ещё не объясняли, что такое аут. */
+
+const PLAN_MINS = [20, 40, 60];
+
+/* Блок ≈ 30 секунд на вопрос. Числа подобраны так, чтобы сумма попадала
+   в выбранное время, а не «примерно около». */
+function planBlocks(mins) {
+  const L = S.lesson;
+  const avail = [
+    { kind: 'drill', id: 'ranks', name: 'Комбинации', sub: 'что сильнее', from: 1, n: 8, min: 4 },
+    { kind: 'quiz', name: 'Карточки дня', sub: 'по теме занятия', from: 1, n: DAY_CARDS, min: 5 },
+    { kind: 'drill', id: 'starting', name: 'Стартовые руки', sub: 'играть или пас', from: 3, n: 10, min: 5 },
+    { kind: 'spot', name: 'Спот дня', sub: 'разбор раздачи', from: 1, n: 1, min: 3 },
+    { kind: 'drill', id: 'outs', name: 'Ауты', sub: 'сколько карт спасёт', from: 4, n: 8, min: 4 },
+    { kind: 'drill', id: 'potodds', name: 'Цена колла', sub: 'платить или уйти', from: 4, n: 8, min: 4 },
+    { kind: 'drill', id: 'ranks', name: 'Комбинации ещё', sub: 'на скорость', from: 1, n: 12, min: 6 },
+    { kind: 'drill', id: 'starting', name: 'Руки ещё', sub: 'закрепляем чарт', from: 3, n: 14, min: 7 },
+    { kind: 'drill', id: 'potodds', name: 'Счёт ещё', sub: 'пока не станет автоматом', from: 4, n: 12, min: 6 }
+  ].filter(b => b.from <= L && (b.kind !== 'drill' || drillPool(b.id).length));
+
+  const out = [];
+  let left = mins;
+  for (const b of avail) {
+    if (b.min <= left + 1) { out.push(b); left -= b.min; }
+    if (left <= 1) break;
+  }
+  return out;
+}
+
+let PLAN = { active: null };
+
+function planState() {
+  const t = today();
+  if (!S.plan || S.plan.date !== t) S.plan = { date: t, mins: 20, done: [] };
+  return S.plan;
+}
+
+function renderDay() {
+  const st = planState();
+  const blocks = planBlocks(st.mins);
+  document.getElementById('dy-h1').textContent =
+    st.mins === 20 ? 'Двадцать минут' : st.mins === 40 ? 'Сорок минут' : 'Час работы';
+  document.getElementById('dy-kick').textContent =
+    st.done.length ? `сделано ${st.done.length} из ${blocks.length}` : 'план на сегодня';
+
+  const mbox = document.getElementById('dy-mins');
+  mbox.innerHTML = '';
+  PLAN_MINS.forEach(m => {
+    const b = document.createElement('button');
+    b.className = 'mn' + (m === st.mins ? ' on' : '');
+    b.textContent = m + ' мин';
+    b.onclick = () => { st.mins = m; st.done = []; save(); renderDay(); };
+    mbox.appendChild(b);
+  });
+
+  const box = document.getElementById('dy-list');
+  box.innerHTML = '';
+  blocks.forEach((b, i) => {
+    const done = st.done.includes(i);
+    const next = !done && !blocks.some((_, k) => k < i && !st.done.includes(k));
+    const el = document.createElement('button');
+    el.className = 'pb' + (done ? ' done' : next ? ' now' : '');
+    el.innerHTML = `<span class="pn">${done ? '✓' : i + 1}</span>
+      <span class="tx"><span class="tt">${b.name}</span><span class="ts">${b.sub} · ${b.n} ${b.kind === 'spot' ? 'раздача' : plural(b.n, 'вопрос', 'вопроса', 'вопросов')}</span></span>
+      <span class="pm">${b.min} мин</span>`;
+    el.onclick = () => startBlock(i);
+    box.appendChild(el);
+  });
+
+  const all = st.done.length >= blocks.length;
+  document.getElementById('dy-note').textContent = all
+    ? 'План на сегодня закрыт. Можно продолжать в тренажёрах — они не кончаются.'
+    : 'Можно останавливаться между блоками: план запомнит, где ты.';
+  const main = document.getElementById('dy-main');
+  main.textContent = all ? 'Открыть тренажёры' : st.done.length ? 'Продолжить' : 'Начать';
+  main.onclick = () => {
+    if (all) { go('drills'); return; }
+    const i = blocks.findIndex((_, k) => !st.done.includes(k));
+    startBlock(i < 0 ? 0 : i);
+  };
+}
+
+function startBlock(i) {
+  const st = planState();
+  const b = planBlocks(st.mins)[i];
+  if (!b) return;
+  PLAN.active = i;
+  if (b.kind === 'quiz') { Q = { list: [], i: 0, ok: 0, sel: null, answered: false, missed: [], order: [] }; go('quiz'); }
+  else if (b.kind === 'spot') go('spot');
+  else { D = { kind: null }; go('drill', b.id); D.limit = b.n; }
+}
+
+/* Блок закрыт — отмечаем и возвращаем в план. Возврат именно сюда, а не «назад»:
+   иначе после квиза ученик оказывался на главной и терял нить. */
+function finishBlock() {
+  if (PLAN.active == null) return false;
+  const st = planState();
+  if (!st.done.includes(PLAN.active)) st.done.push(PLAN.active);
+  PLAN.active = null;
+  save();
+  stack = [{ name: 'home' }, { name: 'day' }];
+  render('day');
+  return true;
 }
 
 /* ─────────── тренажёры ───────────
@@ -741,44 +921,80 @@ function boardHtml(cards, cls) {
 
 /* Каждый тренажёр описывает себя сам: вопрос, что показать, какие кнопки
    и какой из них верный. Дальше механика общая — выбрал, проверил, следующая. */
+/* Схема стола: где ты сидишь. Словами «ты на лоджеке» новичку не сказать
+   ничего — нужно место, подсвеченное на картинке, и рядом его имя. */
+const SEATS = [
+  { id: 'UTG', x: 22, y: 6 }, { id: 'UTG+1', x: 50, y: 0 }, { id: 'LJ', x: 78, y: 6 },
+  { id: 'HJ', x: 97, y: 46 }, { id: 'CO', x: 84, y: 90 }, { id: 'BTN', x: 50, y: 100 },
+  { id: 'SB', x: 16, y: 90 }, { id: 'BB', x: 3, y: 46 }
+];
+function tableHtml(active) {
+  const dots = SEATS.map(s => {
+    const on = s.id === active ? ' on' : '';
+    const bl = (s.id === 'SB' || s.id === 'BB') ? ' bl' : '';
+    return `<span class="sd${on}${bl}" style="left:${s.x}%;top:${s.y}%">${s.id}</span>`;
+  }).join('');
+  return `<div class="minifelt">${dots}</div>`;
+}
+
+const OUTS_OPTS = [2, 4, 6, 8, 9, 15];
+
 const DRILL_VIEW = {
   ranks: it => ({
-    q: 'Чья рука сильнее?',
+    q: 'Чья рука сильнее? Жми по руке',
     stage: boardHtml(it.board) + '<div class="bl">общие карты</div>' +
-      `<div class="duo">
-        <div class="side" data-side="0"><div class="sl">первая</div>${boardHtml(it.a).replace('board', 'board')}</div>
-        <div class="side" data-side="1"><div class="sl">вторая</div>${boardHtml(it.b)}</div>
+      `<div class="duo tap">
+        <div class="side" data-pick="0"><div class="sl">первая</div>${boardHtml(it.a)}</div>
+        <div class="side" data-pick="1"><div class="sl">вторая</div>${boardHtml(it.b)}</div>
       </div>`,
-    acts: ['Первая рука', 'Вторая рука'],
+    tapStage: true,
     right: it.winner
   }),
   starting: it => ({
     q: 'Открываем эту руку?',
-    stage: `<div class="dr-pos">${it.pos}</div>` + boardHtml(it.hand, 'mine'),
+    stage: tableHtml(it.seat) +
+      `<div class="dr-pos">${it.pos} · ${it.seat}</div>` +
+      boardHtml(it.hand, 'mine'),
     acts: ['Пас', 'Открываем рейзом'],
     right: it.answer
   }),
-  outs: it => {
-    const opts = [2, 4, 6, 8, 9, 15];
-    return {
-      q: 'Сколько у тебя аутов?',
-      stage: boardHtml(it.board) + '<div class="bl">флоп</div>' +
-        boardHtml(it.hand, 'mine') + '<div class="mine-lbl">твоя рука</div>',
-      acts: opts.map(String), grid: true,
-      right: opts.indexOf(it.outs)
-    };
-  },
+  outs: it => ({
+    q: 'Сколько у тебя аутов?',
+    stage: boardHtml(it.board) + '<div class="bl">флоп</div>' +
+      boardHtml(it.hand, 'mine') + '<div class="mine-lbl">твоя рука</div>',
+    acts: OUTS_OPTS.map(String), grid: true,
+    right: OUTS_OPTS.indexOf(it.outs)
+  }),
   potodds: it => ({
-    q: `У тебя ${it.draw}. Платить?`,
-    stage: `<div class="potrow">
-        <div class="pot"><div class="pl">банк</div><div class="pv">$${it.pot}</div></div>
-        <div class="pot"><div class="pl">ставка</div><div class="pv">$${it.bet}</div></div>
-        <div class="pot"><div class="pl">аутов</div><div class="pv">${it.outs}</div></div>
+    q: 'Платить эту ставку?',
+    stage: boardHtml(it.board) + '<div class="bl">флоп</div>' +
+      boardHtml(it.hand, 'mine') + '<div class="mine-lbl">твоя рука</div>' +
+      `<div class="potrow">
+        <div class="pot"><div class="pl">в банке</div><div class="pv">$${it.pot}</div></div>
+        <div class="pot"><div class="pl">он поставил</div><div class="pv">$${it.bet}</div></div>
       </div>`,
     acts: ['Пас', `Колл $${it.bet}`],
     right: it.answer
   })
 };
+
+/* Полоса «сколько нужно против того, сколько есть» — цифра 29% против 35%
+   ничего не говорит, пока не увидишь эти два куска рядом. */
+function oddsBar(it) {
+  return `<div class="obar">
+    <div class="ol"><span>нужно ${it.need}%</span><span>у тебя ${it.equity}%</span></div>
+    <div class="ob"><i class="need" style="width:${it.need}%"></i>
+      <i class="have" style="width:${it.equity}%"></i></div>
+  </div>`;
+}
+
+/* Показать сами карты-ауты: «девять» превращается из числа в девять карт,
+   которые видно. Это и есть ответ на вопрос «на что мне смотреть». */
+function outsHtml(it) {
+  if (!it.outCards || !it.outCards.length) return '';
+  return `<div class="outs"><div class="bl">вот они, ${it.outCards.length} — считать надо их</div>
+    <div class="orow">${it.outCards.map(pc).join('')}</div></div>`;
+}
 
 function paintDrill() {
   const it = D.item, v = DRILL_VIEW[D.kind](it);
@@ -789,15 +1005,22 @@ function paintDrill() {
   document.getElementById('dk-stage').innerHTML = v.stage;
 
   const box = document.getElementById('dk-acts');
-  box.className = v.grid ? 'grid4' : 'acts';
+  box.className = v.tapStage ? 'acts hidden' : (v.grid ? 'grid4' : 'acts');
   box.innerHTML = '';
-  v.acts.forEach((txt, i) => {
-    const b = document.createElement('button');
-    b.className = 'act';
-    b.innerHTML = `<span>${txt}</span>`;
-    b.onclick = () => pickDrill(i, b);
-    box.appendChild(b);
-  });
+  if (v.tapStage) {
+    // ответ — сама карта, а не кнопка внизу: тянуться через весь экран неудобно
+    document.querySelectorAll('#dk-stage [data-pick]').forEach(el => {
+      el.onclick = () => pickDrill(+el.dataset.pick, el);
+    });
+  } else {
+    v.acts.forEach((txt, i) => {
+      const b = document.createElement('button');
+      b.className = 'act';
+      b.innerHTML = `<span>${txt}</span>`;
+      b.onclick = () => pickDrill(i, b);
+      box.appendChild(b);
+    });
+  }
 
   document.getElementById('dk-why').innerHTML = 'Выбери ответ.';
   const main = document.getElementById('dk-main');
@@ -809,7 +1032,8 @@ function paintDrill() {
 function pickDrill(i, el) {
   if (D.answered) return;
   D.sel = i;
-  document.querySelectorAll('#dk-acts .act').forEach(a => a.classList.remove('sel'));
+  document.querySelectorAll('#dk-acts .act, #dk-stage [data-pick]')
+    .forEach(a => a.classList.remove('sel'));
   el.classList.add('sel');
   const main = document.getElementById('dk-main');
   main.disabled = false;
@@ -828,17 +1052,24 @@ function checkDrill() {
   const good = D.sel === v.right;
   D.n++; if (good) D.ok++;
 
-  document.querySelectorAll('#dk-acts .act').forEach((a, i) => {
+  document.querySelectorAll('#dk-acts .act, #dk-stage [data-pick]').forEach(a => {
+    const i = a.dataset.pick != null ? +a.dataset.pick
+      : [...a.parentNode.children].indexOf(a);
     a.classList.remove('sel');
     if (i === v.right) a.classList.add('good');
     else if (i === D.sel) a.classList.add('bad');
   });
-  // у «что сильнее» подсветить ещё и саму руку — так понятнее, чем подпись кнопки
-  if (D.kind === 'ranks') {
-    document.querySelectorAll('#dk-stage .side').forEach(s => {
-      const n = +s.dataset.side;
-      s.classList.add(n === v.right ? 'good' : (n === D.sel ? 'bad' : 'x'));
-    });
+
+  // Показать, НА ЧТО смотреть: сами карты-ауты и полосу «нужно против есть».
+  // Без этого «девять аутов» и «29%» остаются числами из воздуха.
+  const extra = [];
+  if (D.kind === 'potodds') extra.push(oddsBar(it));
+  if (it.outCards) extra.push(outsHtml(it));
+  if (extra.length) {
+    const box = document.createElement('div');
+    box.className = 'dk-extra';
+    box.innerHTML = extra.join('');
+    document.getElementById('dk-stage').appendChild(box);
   }
 
   const st = S.drills[D.kind] || { n: 0, ok: 0 };
@@ -852,7 +1083,9 @@ function checkDrill() {
   if (TG && TG.HapticFeedback) TG.HapticFeedback.notificationOccurred(good ? 'success' : 'warning');
 
   const main = document.getElementById('dk-main');
-  main.textContent = 'Следующая';
+  const last = D.limit && D.n >= D.limit;
+  main.textContent = last ? 'Блок закрыт' : 'Следующая';
+  if (last) main.onclick = () => { markDay(); if (!finishBlock()) go('drills'); };
 }
 
 /* ─────────── профиль ─────────── */
