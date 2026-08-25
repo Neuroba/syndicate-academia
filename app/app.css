@@ -442,3 +442,12 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .more{width:100%;margin-top:12px;padding:12px 0;border-radius:11px;background:#131317;
   border:1px solid #23232a;color:var(--gold);font-size:13px;font-weight:650}
 .more:active{background:#1a1a20}
+.sd[data-seat]{cursor:pointer}
+.felthint{text-align:center;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(239,233,219,.5);margin-top:9px}
+.seatpop{margin-top:10px;background:rgba(0,0,0,.42);border:1px solid rgba(212,175,55,.45);
+  border-radius:10px;padding:10px 12px}
+.sp-h{font-size:13.5px;color:#fff;font-weight:650}
+.sp-h b{color:var(--gold)}
+.sp-en{font-size:10px;color:var(--gold-soft);margin-left:8px;letter-spacing:.04em}
+.sp-d{font-size:11.5px;color:rgba(239,233,219,.85);margin-top:5px;line-height:1.45}

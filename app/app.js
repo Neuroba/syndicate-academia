@@ -625,7 +625,7 @@ function renderSpot() {
   // Схема стола: где сидишь ты и как называются остальные места.
   // Одинаковая во всех разделах — ученик привыкает к одной картинке.
   const felt = document.getElementById('sp-felt');
-  if (felt) felt.innerHTML = sp.seat ? tableHtml(sp.seat) : '';
+  if (felt) { felt.innerHTML = sp.seat ? tableHtml(sp.seat) : ''; bindSeats(felt); }
   document.getElementById('sp-board').innerHTML = sp.board.length
     ? sp.board.map(cardHtml).join('')
     : '<div class="sp-k" style="padding:18px 0">префлоп — общих карт ещё нет</div>';
@@ -751,36 +751,34 @@ function srezAnswer(good) {
 
 function srezFinish() {
   const level = srezLevel();
-  S.srez = { date: today(), res: SZ.res, start: level.start };
-  if (S.lesson < level.start) S.lesson = level.start;
+  S.srez = { date: today(), res: SZ.res, knows: level.knows };
+  // Занятие НЕ перематываем. Курс рассчитан с нуля и идёт по порядку для всех:
+  // срез — знакомство и карта дыр для тренера, а не распределение по уровням.
   save();
   stack = [{ name: 'home' }, { name: 'srezres' }];
   render('srezres');
 }
 
-/* Уровень считаем по областям, а не по общему проценту: человек может
-   знать комбинации и не уметь считать — это разные дыры и разный старт. */
+/* Считаем по областям, а не общим процентом: человек может знать комбинации
+   и не уметь считать — это разные дыры. Нужно ТРЕНЕРУ, чтобы знать, где
+   притормозить, а не ученику, чтобы куда-то перепрыгнуть. */
 function srezLevel() {
   const pct = id => { const r = SZ.res[id]; return r && r.n ? r.ok / r.n : 0; };
-  const solid = id => pct(id) >= 0.67;
-  let start = 1;
-  if (solid('ranks') && pct('quiz') >= 0.67) start = 2;
-  if (start === 2 && solid('starting')) start = 4;
-  if (start === 4 && solid('outs') && solid('potodds')) start = 5;
   const weak = SREZ_AREAS.filter(a => pct(a.id) < 0.67);
-  return { start, weak, pct };
+  const knows = SREZ_AREAS.filter(a => pct(a.id) >= 0.67).map(a => a.id);
+  return { weak, knows, pct };
 }
 
 function renderSrezRes() {
-  const { start, weak, pct } = srezLevel();
+  const { weak, knows, pct } = srezLevel();
   const total = Object.values(SZ.res).reduce((a, r) => a + r.ok, 0);
   const all = Object.values(SZ.res).reduce((a, r) => a + r.n, 0);
 
   document.getElementById('sr-h1').textContent =
-    start >= 5 ? 'База уже есть' : start >= 4 ? 'Основа заложена'
-      : start >= 2 ? 'Кое-что знаешь' : 'Начинаем с нуля';
+    knows.length >= 4 ? 'Кое-что уже знаешь' : knows.length >= 2 ? 'Что-то знакомо'
+      : 'Всё впереди';
   document.getElementById('sr-sub').textContent =
-    `${total} из ${all} верно. Это не оценка — это карта, где у нас дыры.`;
+    `${total} из ${all} верно. Это не оценка и не экзамен — просто знакомство.`;
 
   document.getElementById('sr-bars').innerHTML = SREZ_AREAS.map(a => {
     const p = Math.round(pct(a.id) * 100);
@@ -790,13 +788,16 @@ function renderSrezRes() {
       <div class="b"><i class="${cls}" style="width:${Math.max(p, 4)}%"></i></div></div>`;
   }).join('');
 
+  const l1 = (CONTENT.lessons.find(l => l.n === 1) || {}).title || '';
   const v = document.getElementById('sr-verdict');
-  v.innerHTML = '<div class="bt">с чего начинаем</div>' +
-    `<div class="szv">Занятие <b>${start}</b> — ${(CONTENT.lessons.find(l => l.n === start) || {}).title || ''}</div>` +
+  v.innerHTML = '<div class="bt">что дальше</div>' +
+    `<div class="szv">Занятие <b>1</b> — ${l1}</div>` +
+    '<div class="szw">Курс идёт по порядку для всех: он и рассчитан с нуля, ' +
+    'перепрыгивать через занятия мы не будем. ' +
     (weak.length
-      ? `<div class="szw">Отдельно подтянуть: ${weak.map(w => w.name.toLowerCase()).join(', ')}. ` +
-        'Тренажёры по этим темам открыты, они не кончаются.</div>'
-      : '<div class="szw">Провалов нет — идём по программе и закрепляем.</div>');
+      ? `На чём притормозим отдельно: ${weak.map(w => w.name.toLowerCase()).join(', ')}. ` +
+        'Тренажёры по этим темам уже открыты, они не кончаются.'
+      : 'Знакомое повторим быстро и пойдём дальше.') + '</div>';
 
   document.getElementById('sr-note').textContent =
     'Срез можно пройти заново в любой момент — из профиля.';
@@ -1086,13 +1087,42 @@ const SEATS = [
   { id: 'HJ', x: 97, y: 46 }, { id: 'CO', x: 84, y: 90 }, { id: 'BTN', x: 50, y: 100 },
   { id: 'SB', x: 16, y: 90 }, { id: 'BB', x: 3, y: 46 }
 ];
+/* Место на схеме -> слово в словаре. Ткнул в «LJ» — получил «лоджек»
+   и объяснение: три буквы сами по себе новичку не говорят ничего. */
+const SEAT_TERM = {
+  'UTG': 'UTG', 'UTG+1': 'ранняя позиция', 'LJ': 'лоджек', 'HJ': 'хайджек',
+  'CO': 'катофф', 'BTN': 'кнопка', 'SB': 'малый блайнд', 'BB': 'большой блайнд'
+};
+
 function tableHtml(active) {
   const dots = SEATS.map(s => {
     const on = s.id === active ? ' on' : '';
     const bl = (s.id === 'SB' || s.id === 'BB') ? ' bl' : '';
-    return `<span class="sd${on}${bl}" style="left:${s.x}%;top:${s.y}%">${s.id}</span>`;
+    return `<span class="sd${on}${bl}" data-seat="${s.id}" style="left:${s.x}%;top:${s.y}%">${s.id}</span>`;
   }).join('');
-  return `<div class="minifelt">${dots}</div>`;
+  return `<div class="minifelt">${dots}</div>
+    <div class="felthint">Жми по любому месту — покажу, как оно называется</div>
+    <div class="seatpop" id="seatpop" hidden></div>`;
+}
+
+/* Подсказка по месту — прямо на экране, без ухода в словарь: ученик посреди
+   задачи не должен терять раздачу, чтобы узнать значение трёх букв. */
+function bindSeats(root) {
+  (root || document).querySelectorAll('.sd[data-seat]').forEach(el => {
+    el.onclick = ev => {
+      ev.stopPropagation();
+      const code = el.dataset.seat;
+      const name = SEAT_TERM[code];
+      const g = GLOSSARY.find(x => x.term.toLowerCase() === (name || '').toLowerCase());
+      const pop = document.getElementById('seatpop');
+      if (!pop) return;
+      if (!g) { pop.hidden = true; return; }
+      pop.hidden = false;
+      pop.innerHTML = `<div class="sp-h"><b>${code}</b> — ${g.term}` +
+        (g.en ? `<span class="sp-en">${g.en}</span>` : '') + '</div>' +
+        `<div class="sp-d">${g.short}</div>`;
+    };
+  });
 }
 
 const OUTS_OPTS = [2, 4, 6, 8, 9, 15];
@@ -1167,6 +1197,7 @@ function paintDrill() {
     ? `${SZ.i + 1} / ${SZ.list.length}` : `${D.ok} / ${D.n}`;
   document.getElementById('dk-q').textContent = v.q;
   document.getElementById('dk-stage').innerHTML = v.stage || '';
+  bindSeats(document.getElementById('dk-stage'));
 
   const box = document.getElementById('dk-acts');
   box.className = v.tapStage ? 'acts hidden' : (v.grid ? 'grid4' : 'acts');
