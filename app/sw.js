@@ -11,7 +11,7 @@
      помечены ?v=<дата>, новая сборка = новый адрес = промах кэша и свежая версия;
    - чужие домены (Telegram SDK, шрифты) не трогаем вообще.
 */
-const V = 'syn-academia-202608251619';   // deploy.sh подставляет сюда дату сборки
+const V = 'syn-academia-202608251628';   // deploy.sh подставляет сюда дату сборки
 
 self.addEventListener('install', () => self.skipWaiting());
 

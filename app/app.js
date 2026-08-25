@@ -48,6 +48,7 @@ const defaults = () => ({
   spots: {},          // id спота -> выбранный индекс
   drills: {},         // вид тренажёра -> {n, ok}
   plan: null,         // план дня: {date, mins, done:[номера блоков]}
+  srez: null,         // входной срез: {date, res, start}
   bestStreak: 0,
   tgId: null,         // чей это прогресс — видно в профиле
   onboarded: false    // экран входа уже показан и закрыт
@@ -148,7 +149,8 @@ function render(name, param) {
     home: renderHome, program: renderProgram, lesson: renderLesson,
     sheets: renderSheets, sheet: renderSheet,
     quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile,
-    drills: renderDrills, drill: renderDrill, day: renderDay, glossary: renderGlossary
+    drills: renderDrills, drill: renderDrill, day: renderDay, glossary: renderGlossary,
+    srez: renderSrez, srezres: renderSrezRes
   })[name];
   if (fn) fn(param);
 }
@@ -333,6 +335,14 @@ function renderSheets() {
     b.onclick = () => go('sheet', key);
     box.appendChild(b);
   });
+  // Словарь — та же шпаргалка, только по словам. Отдельного пункта на главной
+  // ему не нужно: человек идёт «посмотреть, что значит» туда же, куда за чартом.
+  const g = document.createElement('button');
+  g.className = 'sh';
+  g.innerHTML = `<span class="prev">Аа</span><span class="tx"><span class="tt">Словарь</span>
+    <span class="ts">${GLOSSARY.length} слов с объяснением и примером</span></span><span class="ar">›</span>`;
+  g.onclick = () => go('glossary');
+  box.appendChild(g);
 }
 function miniCells() {
   // мини-превью матрицы: те же три зоны, 4×4
@@ -667,6 +677,132 @@ function paintSpotResult(sp, idx) {
   main.onclick = () => go('home');
 }
 
+/* ─────────── входной срез ───────────
+
+   Первое, что человек делает в приложении. Не экзамен — калибровка: тринадцать
+   задач из пяти областей, чтобы понять, с какого занятия начинать и где дыры.
+   Проходится вместе с тренером на первой встрече, поэтому короткий.
+
+   Формулировки нарочно мягкие: новичок, который решит, что его проверяют,
+   начнёт угадывать вместо того, чтобы честно сказать «не знаю». */
+
+const SREZ_AREAS = [
+  { id: 'ranks', name: 'Комбинации', need: 'что бьёт что', lesson: 1, n: 3 },
+  { id: 'starting', name: 'Стартовые руки', need: 'что играть с какой позиции', lesson: 3, n: 3 },
+  { id: 'outs', name: 'Ауты', need: 'сколько карт спасёт', lesson: 4, n: 2 },
+  { id: 'potodds', name: 'Цена колла', need: 'платить или уйти', lesson: 4, n: 2 },
+  { id: 'quiz', name: 'Правила и позиции', need: 'как устроена игра', lesson: 2, n: 3 }
+];
+
+let SZ = null;
+
+function srezBuild() {
+  const items = [];
+  SREZ_AREAS.forEach(a => {
+    if (a.id === 'quiz') {
+      // по одной карточке из разных занятий: начало, середина, дальше
+      [1, 2, 5].forEach(ls => {
+        const pool = QUIZ.cards.filter(c => c.lesson === ls);
+        if (pool.length) items.push({ area: a.id, kind: 'card', it: pool[Math.floor(Math.random() * pool.length)] });
+      });
+    } else {
+      const pool = shuffled(drillPool(a.id)).slice(0, a.n);
+      pool.forEach(it => items.push({ area: a.id, kind: 'drill', it }));
+    }
+  });
+  return items;
+}
+
+function renderSrez() {
+  const box = document.getElementById('sz-areas');
+  box.innerHTML = SREZ_AREAS.map(a =>
+    `<div class="sza"><span class="n">${a.n}</span>
+     <span class="tx"><span class="tt">${a.name}</span><span class="ts">${a.need}</span></span></div>`).join('');
+  document.getElementById('sz-main').onclick = () => {
+    SZ = { list: srezBuild(), i: 0, res: {}, sel: null, answered: false };
+    SREZ_AREAS.forEach(a => { SZ.res[a.id] = { ok: 0, n: 0 }; });
+    go('drill', '__srez__');
+  };
+}
+
+/* Карточка квиза внутри среза: тот же вид, что у тренажёров, чтобы человек
+   не переключался между двумя разными экранами посреди калибровки. */
+function srezView(step) {
+  if (step.kind === 'drill') {
+    const v = DRILL_VIEW[step.area](step.it);
+    return { ...v, why: step.it.why };
+  }
+  const c = step.it;
+  const order = optionOrder(c);
+  return {
+    q: c.q,
+    stage: '',
+    acts: order.map(src => c.options[src]),
+    grid: false,
+    right: order.indexOf(c.correct),
+    why: c.why
+  };
+}
+
+function srezAnswer(good) {
+  const a = SZ.res[SZ.list[SZ.i].area];
+  a.n++; if (good) a.ok++;
+}
+
+function srezFinish() {
+  const level = srezLevel();
+  S.srez = { date: today(), res: SZ.res, start: level.start };
+  if (S.lesson < level.start) S.lesson = level.start;
+  save();
+  stack = [{ name: 'home' }, { name: 'srezres' }];
+  render('srezres');
+}
+
+/* Уровень считаем по областям, а не по общему проценту: человек может
+   знать комбинации и не уметь считать — это разные дыры и разный старт. */
+function srezLevel() {
+  const pct = id => { const r = SZ.res[id]; return r && r.n ? r.ok / r.n : 0; };
+  const solid = id => pct(id) >= 0.67;
+  let start = 1;
+  if (solid('ranks') && pct('quiz') >= 0.67) start = 2;
+  if (start === 2 && solid('starting')) start = 4;
+  if (start === 4 && solid('outs') && solid('potodds')) start = 5;
+  const weak = SREZ_AREAS.filter(a => pct(a.id) < 0.67);
+  return { start, weak, pct };
+}
+
+function renderSrezRes() {
+  const { start, weak, pct } = srezLevel();
+  const total = Object.values(SZ.res).reduce((a, r) => a + r.ok, 0);
+  const all = Object.values(SZ.res).reduce((a, r) => a + r.n, 0);
+
+  document.getElementById('sr-h1').textContent =
+    start >= 5 ? 'База уже есть' : start >= 4 ? 'Основа заложена'
+      : start >= 2 ? 'Кое-что знаешь' : 'Начинаем с нуля';
+  document.getElementById('sr-sub').textContent =
+    `${total} из ${all} верно. Это не оценка — это карта, где у нас дыры.`;
+
+  document.getElementById('sr-bars').innerHTML = SREZ_AREAS.map(a => {
+    const p = Math.round(pct(a.id) * 100);
+    const cls = p >= 67 ? 'ok' : p >= 34 ? 'mid' : 'low';
+    const word = p >= 67 ? 'уверенно' : p >= 34 ? 'шатко' : 'ещё нет';
+    return `<div class="szb"><div class="l"><span>${a.name}</span><span class="${cls}">${word}</span></div>
+      <div class="b"><i class="${cls}" style="width:${Math.max(p, 4)}%"></i></div></div>`;
+  }).join('');
+
+  const v = document.getElementById('sr-verdict');
+  v.innerHTML = '<div class="bt">с чего начинаем</div>' +
+    `<div class="szv">Занятие <b>${start}</b> — ${(CONTENT.lessons.find(l => l.n === start) || {}).title || ''}</div>` +
+    (weak.length
+      ? `<div class="szw">Отдельно подтянуть: ${weak.map(w => w.name.toLowerCase()).join(', ')}. ` +
+        'Тренажёры по этим темам открыты, они не кончаются.</div>'
+      : '<div class="szw">Провалов нет — идём по программе и закрепляем.</div>');
+
+  document.getElementById('sr-note').textContent =
+    'Срез можно пройти заново в любой момент — из профиля.';
+  document.getElementById('sr-main').onclick = () => go('day');
+}
+
 /* ─────────── словарь ───────────
 
    Открывается посреди раздачи: услышала слово, не поняла, нашла. Поэтому
@@ -674,6 +810,8 @@ function paintSpotResult(sp, idx) {
    семь десятков достаются поиском. Длинный список на телефоне не листают. */
 
 let GL_OPEN = null;
+let GL_SHOWN = 0;          // сколько слов уже открыто кнопкой «показать ещё»
+const GL_STEP = 20;
 
 /* Вес совпадения: само слово важнее упоминания в чужом примере.
    Иначе «лимп» первым находит «изолирующий рейз», где лимпер только упомянут. */
@@ -695,15 +833,25 @@ function renderGlossary() {
   const box = document.getElementById('gl-list');
   const draw = () => {
     const q = (inp.value || '').trim().toLowerCase();
+    const core = GLOSSARY.filter(t => t.core);
+    const rest = GLOSSARY.filter(t => !t.core);
     const list = q
       ? GLOSSARY.filter(t => glMatch(t, q))
           .sort((a, b) => glRank(a, q) - glRank(b, q) || a.term.localeCompare(b.term))
-      : GLOSSARY.filter(t => t.core);
+      : core.concat(rest.slice(0, GL_SHOWN));
     document.getElementById('gl-sub').textContent = q
       ? `нашлось ${list.length} ${plural(list.length, 'слово', 'слова', 'слов')}`
       : 'Услышала слово и не поняла — найди его здесь.';
-    document.getElementById('gl-note').textContent = q
-      ? '' : `Показаны ходовые ${list.length}. Остальные — поиском, всего в словаре ${GLOSSARY.length}.`;
+    const restLeft = GLOSSARY.filter(t => !t.core).length - GL_SHOWN;
+    document.getElementById('gl-note').textContent = q ? ''
+      : restLeft > 0 ? `Показаны ходовые. Ещё ${restLeft} — кнопкой ниже или поиском.`
+      : `Все ${GLOSSARY.length} слов открыты.`;
+    const more = document.getElementById('gl-more');
+    if (more) {
+      more.hidden = !!q || restLeft <= 0;
+      more.textContent = `Показать ещё ${Math.min(GL_STEP, restLeft)}`;
+      more.onclick = () => { GL_SHOWN += GL_STEP; draw(); };
+    }
     box.innerHTML = '';
     if (!list.length) {
       box.innerHTML = '<div class="glnone">Ничего не нашлось. Попробуй часть слова или английское написание.</div>';
@@ -899,6 +1047,12 @@ function shuffled(arr) {
 }
 
 function renderDrill(kind) {
+  if (kind === '__srez__') {          // режим входного среза: свой список, свой финал
+    if (!SZ) { go('srez'); return; }
+    D = { kind: '__srez__', item: SZ.list[SZ.i], sel: null, answered: false, n: SZ.i, ok: 0 };
+    paintDrill();
+    return;
+  }
   if (kind && kind !== D.kind) {
     const pool = drillPool(kind);
     if (!pool.length) { go('drills'); return; }
@@ -1000,13 +1154,19 @@ function outsHtml(it) {
     <div class="orow">${it.outCards.map(pc).join('')}</div></div>`;
 }
 
+function drillView() {
+  return D.kind === '__srez__' ? srezView(SZ.list[SZ.i]) : DRILL_VIEW[D.kind](D.item);
+}
+
 function paintDrill() {
-  const it = D.item, v = DRILL_VIEW[D.kind](it);
-  const kind = DRILL_KINDS.find(k => k.id === D.kind);
+  const v = drillView();
+  const sr = D.kind === '__srez__';
+  const kind = sr ? { name: 'срез' } : DRILL_KINDS.find(k => k.id === D.kind);
   document.getElementById('dk-name').textContent = kind.name;
-  document.getElementById('dk-score').textContent = `${D.ok} / ${D.n}`;
+  document.getElementById('dk-score').textContent = sr
+    ? `${SZ.i + 1} / ${SZ.list.length}` : `${D.ok} / ${D.n}`;
   document.getElementById('dk-q').textContent = v.q;
-  document.getElementById('dk-stage').innerHTML = v.stage;
+  document.getElementById('dk-stage').innerHTML = v.stage || '';
 
   const box = document.getElementById('dk-acts');
   box.className = v.tapStage ? 'acts hidden' : (v.grid ? 'grid4' : 'acts');
@@ -1051,10 +1211,12 @@ function onDrillMain() {
 }
 
 function checkDrill() {
-  const it = D.item, v = DRILL_VIEW[D.kind](it);
+  const sr = D.kind === '__srez__';
+  const it = sr ? SZ.list[SZ.i].it : D.item;
+  const v = drillView();
   D.answered = true;
   const good = D.sel === v.right;
-  D.n++; if (good) D.ok++;
+  if (sr) { srezAnswer(good); } else { D.n++; if (good) D.ok++; }
 
   document.querySelectorAll('#dk-acts .act, #dk-stage [data-pick]').forEach(a => {
     const i = a.dataset.pick != null ? +a.dataset.pick
@@ -1076,17 +1238,24 @@ function checkDrill() {
     document.getElementById('dk-stage').appendChild(box);
   }
 
-  const st = S.drills[D.kind] || { n: 0, ok: 0 };
-  st.n++; if (good) st.ok++;
-  S.drills[D.kind] = st;
-  save();
-
-  document.getElementById('dk-score').textContent = `${D.ok} / ${D.n}`;
+  if (!sr) {
+    const st = S.drills[D.kind] || { n: 0, ok: 0 };
+    st.n++; if (good) st.ok++;
+    S.drills[D.kind] = st;
+    save();
+    document.getElementById('dk-score').textContent = `${D.ok} / ${D.n}`;
+  }
   document.getElementById('dk-why').innerHTML =
-    `<b>${good ? 'Верно.' : 'Не так.'}</b> ${it.why}`;
+    `<b>${good ? 'Верно.' : 'Не так.'}</b> ${v.why || it.why || ''}`;
   if (TG && TG.HapticFeedback) TG.HapticFeedback.notificationOccurred(good ? 'success' : 'warning');
 
   const main = document.getElementById('dk-main');
+  if (sr) {
+    const fin = SZ.i + 1 >= SZ.list.length;
+    main.textContent = fin ? 'Показать итог' : 'Дальше';
+    main.onclick = () => { if (fin) { srezFinish(); return; } SZ.i++; renderDrill('__srez__'); };
+    return;
+  }
   const last = D.limit && D.n >= D.limit;
   main.textContent = last ? 'Блок закрыт' : 'Следующая';
   if (last) main.onclick = () => { markDay(); if (!finishBlock()) go('drills'); };
@@ -1174,6 +1343,8 @@ function init() {
       go(el.dataset.go);
     });
   });
+  const sz = document.getElementById('p-srez');
+  if (sz) sz.onclick = () => go('srez');
   document.getElementById('p-reset').onclick = () => {
     if (confirm('Сбросить весь прогресс: серию, карточки и занятия?')) {
       S = defaults();

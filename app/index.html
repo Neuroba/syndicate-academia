@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="app.css?v=202608251619">
+<link rel="stylesheet" href="app.css?v=202608251628">
 </head>
 <body>
 
@@ -36,7 +36,7 @@
       </div>
       <div class="who">Тренер — <b>Sergei Zubov</b>, основатель Синдиката</div>
     </div>
-    <button class="mainbtn solid" data-go="home">Начать</button>
+    <button class="mainbtn solid" data-go="srez">Начать</button>
   </section>
 
   <!-- ═══ ГЛАВНЫЙ ═══ -->
@@ -67,15 +67,10 @@
           <span class="tx"><span class="tt">Квиз</span><span class="ts" id="h-quiz-sub">24 карточки</span></span>
           <span class="go" id="h-quiz-go">начать</span>
         </button>
-        <button class="it" data-go="glossary">
-          <span class="badge b4">📖</span>
-          <span class="tx"><span class="tt">Словарь</span><span class="ts" id="h-gl-sub">что значит слово — прямо в игре</span></span>
-          <span class="go" id="h-gl-go">поиск</span>
-        </button>
         <button class="it" data-go="sheets">
           <span class="badge b2">▦</span>
-          <span class="tx"><span class="tt">Шпаргалки</span><span class="ts">руки · стартовые · шансы · push/fold</span></span>
-          <span class="go">4</span>
+          <span class="tx"><span class="tt">Шпаргалки</span><span class="ts">руки · стартовые · шансы · push/fold · словарь</span></span>
+          <span class="go">5</span>
         </button>
         <button class="it" data-go="spot">
           <span class="badge b3">◷</span>
@@ -193,6 +188,36 @@
   </section>
 
   <!-- ═══ СПОТ ДНЯ ═══ -->
+  <!-- ═══ ВХОДНОЙ СРЕЗ ═══ -->
+  <section class="screen" data-screen="srez">
+    <div class="body">
+      <div class="hd">
+        <div class="kick">первый заход</div>
+        <div class="h1">С чего начинаем</div>
+        <div class="sub">Тринадцать коротких задач из разных тем. Не экзамен: ошибаться тут
+          не стыдно, наоборот — чем честнее ответишь, тем точнее подберём старт.</div>
+      </div>
+      <div class="srz" id="sz-areas"></div>
+      <div class="foot-note">Пять минут. Можно проходить вместе с тренером.</div>
+    </div>
+    <button class="mainbtn solid" id="sz-main">Начать срез</button>
+  </section>
+
+  <!-- ═══ РЕЗУЛЬТАТ СРЕЗА ═══ -->
+  <section class="screen" data-screen="srezres">
+    <div class="body">
+      <div class="hd">
+        <div class="kick">срез пройден</div>
+        <div class="h1" id="sr-h1">Твой уровень</div>
+        <div class="sub" id="sr-sub"></div>
+      </div>
+      <div id="sr-bars"></div>
+      <div class="blk" id="sr-verdict"></div>
+      <div class="foot-note" id="sr-note"></div>
+    </div>
+    <button class="mainbtn solid" id="sr-main">Начать занятие дня</button>
+  </section>
+
   <!-- ═══ СЛОВАРЬ ═══ -->
   <section class="screen" data-screen="glossary">
     <div class="body">
@@ -200,6 +225,7 @@
       <div class="secsub" id="gl-sub">Услышала слово и не поняла — найди его здесь.</div>
       <input id="gl-q" class="search" type="search" placeholder="Найти слово…" autocomplete="off">
       <div id="gl-list"></div>
+      <button class="more" id="gl-more" hidden>Показать ещё</button>
       <div class="foot-note" id="gl-note"></div>
     </div>
     <button class="mainbtn" data-go="drills">К тренажёрам</button>
@@ -298,10 +324,10 @@
      (file://, где fetch запрещён), и с хостинга. Генерируются build-data.py из JSON. -->
 <!-- ?v= — метка версии: deploy.sh подставляет в неё дату сборки, иначе телефон
      ученика месяцами показывает старый app.js из кэша. -->
-<script src="data/quiz.js?v=202608251619"></script>
-<script src="data/content.js?v=202608251619"></script>
-<script src="data/drills.js?v=202608251619"></script>
-<script src="data/glossary.js?v=202608251619"></script>
-<script src="app.js?v=202608251619"></script>
+<script src="data/quiz.js?v=202608251628"></script>
+<script src="data/content.js?v=202608251628"></script>
+<script src="data/drills.js?v=202608251628"></script>
+<script src="data/glossary.js?v=202608251628"></script>
+<script src="app.js?v=202608251628"></script>
 </body>
 </html>
