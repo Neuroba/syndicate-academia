@@ -153,7 +153,8 @@ function render(name, param) {
     sheets: renderSheets, sheet: renderSheet,
     quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile,
     drills: renderDrills, drill: renderDrill, day: renderDay, glossary: renderGlossary,
-    srez: renderSrez, srezres: renderSrezRes, hw: renderHw
+    srez: renderSrez, srezres: renderSrezRes, hw: renderHw,
+    table: () => window.Table.render()
   })[name];
   if (fn) fn(param);
 }

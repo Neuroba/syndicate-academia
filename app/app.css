@@ -459,3 +459,67 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .hwcard .d{font-size:12.5px;color:var(--gold);margin-top:5px}
 .hwcard.done{background:linear-gradient(180deg,#101a12,#0d140f);border-color:rgba(63,185,104,.4)}
 .hwcard.done .d{color:#8fe0aa}
+
+/* ─── покерный стол ─── */
+.tbody{gap:0}
+.posrow{display:flex;gap:4px;margin-bottom:6px}
+.ps{flex:1;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  padding:5px 2px;border-radius:6px;background:#17171c;color:var(--muted);border:1px solid #1f1f26}
+.ps.on{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.poshint{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.poshint b{color:var(--gold)}
+.felt{background:radial-gradient(ellipse at 50% 45%,#3d5c2e,#263a1c);border:5px solid #15151a;
+  border-radius:80px/56px;padding:11px 10px 13px;margin-bottom:11px;box-shadow:inset 0 0 40px rgba(0,0,0,.55)}
+.felt .ops{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:12px}
+.op{background:rgba(11,11,13,.72);border:1px solid #2a2a30;border-radius:7px;padding:4px 7px;min-width:70px}
+.op.act{border-color:var(--gold);box-shadow:0 0 0 1px rgba(212,175,55,.35)}
+.op.out{opacity:.38}
+.opn{font-size:11px;color:var(--ink);font-weight:600;white-space:nowrap}
+.opn em{color:var(--gold);font-style:normal;font-size:9.5px;letter-spacing:.06em}
+.op .ops{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:2px 0 0}
+.opa{font-size:10px;color:#d8cfa8;margin-top:2px}
+.felt .mid{text-align:center}
+.pot{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.pot em{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);font-style:normal;margin-top:1px}
+.board{display:flex;gap:5px;justify-content:center;margin-top:8px;min-height:48px;align-items:center}
+.bnote{font-size:11.5px;color:rgba(255,255,255,.5)}
+.pc{width:38px;height:54px;background:#f4f1ea;border-radius:5px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#0b0b0d;box-shadow:0 2px 7px rgba(0,0,0,.45)}
+.pc b{font-size:17px;line-height:1}.pc i{font-size:15px;font-style:normal;line-height:1;margin-top:1px}
+.pc.red{color:#b5292a}
+.pc.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold);
+  align-items:center;justify-content:center;font-size:18px}
+.mine{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mycards{display:flex;gap:5px}
+.mycards .pc{width:50px;height:70px}.mycards .pc b{font-size:22px}.mycards .pc i{font-size:19px}
+.mystack{font-size:12.5px;color:var(--muted)}.mystack b{color:var(--ink);font-size:15px}
+.mymade{font-size:13px;color:var(--gold);margin-top:3px;font-weight:600}
+.tacts{display:flex;gap:7px;margin-bottom:10px;min-height:46px}
+.tact{flex:1;padding:13px 6px;border-radius:10px;border:1px solid var(--line);background:#1a1a20;
+  color:var(--ink);font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+.tact.fold{background:#1a1214;border-color:#3a2226;color:#e6a6a6}
+.tact.raise{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.waiting{flex:1;display:grid;place-items:center;font-size:13px;color:var(--muted)}
+.tres{background:linear-gradient(180deg,#1d1a10,#141209);border:1px solid rgba(212,175,55,.45);
+  border-radius:11px;padding:12px 14px;font-size:14.5px;color:var(--ink);margin-bottom:10px}
+.tres .sd{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* Шире 520 px — занятие идёт с ноутбука, места хватает: стол крупнее и по центру */
+@media (min-width:520px){
+  .tbody{max-width:640px;margin:0 auto}
+  .felt{border-radius:150px/96px;padding:22px 24px 26px}
+  .op{min-width:96px;padding:7px 10px}
+  .opn{font-size:12.5px}.op .ops{font-size:14px}
+  .pc{width:46px;height:64px}.pc b{font-size:20px}.pc i{font-size:18px}
+  .mycards .pc{width:62px;height:86px}.mycards .pc b{font-size:27px}.mycards .pc i{font-size:23px}
+  .pot{font-size:28px}
+}
+.tlog{background:#101014;border:1px solid #1c1c22;border-radius:9px;padding:7px 10px;
+  margin-bottom:9px;height:58px;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-end}
+.lg{font-size:11.5px;color:var(--muted);line-height:1.65;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.lg.me{color:var(--gold);font-weight:600}
+.tact.sel{outline:2px solid var(--gold);outline-offset:1px}
+.thint{background:#15150f;border:1px solid rgba(212,175,55,.35);border-radius:9px;
+  padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:10px}
