@@ -49,6 +49,8 @@ const defaults = () => ({
   drills: {},         // вид тренажёра -> {n, ok}
   plan: null,         // план дня: {date, mins, done:[номера блоков]}
   srez: null,         // входной срез: {date, res, start}
+  queue: [],          // события, ещё не доехавшие до сервера
+  consent: null,      // null — не спрашивали, false — ученик отключил отправку
   bestStreak: 0,
   tgId: null,         // чей это прогресс — видно в профиле
   onboarded: false    // экран входа уже показан и закрыт
@@ -513,7 +515,7 @@ function paintCard() {
     box.appendChild(b);
   });
 
-  Q.sel = null; Q.answered = false;
+  Q.sel = null; Q.answered = false; Q.shown = Date.now();
   const main = document.getElementById('q-main');
   main.textContent = 'Выбери ответ';
   main.disabled = true;
@@ -538,6 +540,8 @@ function onQuizMain() {
 }
 function checkAnswer() {
   const c = Q.list[Q.i];
+  track('quiz', 'l' + c.lesson, c.q, c.options[Q.sel], c.options[c.correct],
+        Q.sel === c.correct, Q.shown ? Date.now() - Q.shown : null);
   Q.answered = true;
   const nodes = document.querySelectorAll('#q-answers .ans');
   nodes.forEach((a, pos) => {
@@ -677,6 +681,76 @@ function paintSpotResult(sp, idx) {
   main.onclick = () => go('home');
 }
 
+
+/* ─────────── журнал на сервер ───────────
+
+   Приложение шлёт события тренеру: что решали, что нажали, верно ли, сколько думали.
+   Личность на сервере берётся ИЗ ПОДПИСИ Telegram, а не из того, что прислал клиент,
+   поэтому подделать чужой прогресс нельзя.
+
+   Очередь копится в localStorage и досылается при следующем открытии: сервер может
+   лежать, и это должно означать задержку данных, а не потерянное занятие.
+
+   Без Telegram (файл с диска, браузер) отправки нет вообще — подписывать нечем.
+   Приложение при этом работает целиком: журнал не условие работы, а довесок. */
+
+const API = 'https://academia.neuroba.dev';
+const SESSION = Math.random().toString(36).slice(2, 10) + '-' + Math.floor(Date.now() / 1000);
+const QUEUE_MAX = 800;
+
+let flushTimer = null;
+
+function track(kind, topic, item, answer, correct, ok, ms) {
+  if (S.consent === false) return;
+  if (!S.queue) S.queue = [];
+  S.queue.push({
+    session: SESSION, kind: kind, topic: String(topic || ''),
+    item: String(item || '').slice(0, 120),
+    answer: String(answer == null ? '' : answer).slice(0, 120),
+    correct: String(correct == null ? '' : correct).slice(0, 120),
+    ok: ok === null || ok === undefined ? null : (ok ? 1 : 0),
+    ms: ms || null, at: Math.floor(Date.now() / 1000)
+  });
+  // Потолок очереди: если сервера нет неделю, память телефона не должна кончиться.
+  // Режем СТАРОЕ — свежее занятие важнее позапрошлого.
+  if (S.queue.length > QUEUE_MAX) S.queue = S.queue.slice(-QUEUE_MAX);
+  save();
+  clearTimeout(flushTimer);
+  flushTimer = setTimeout(flush, 4000);   // копим пачку, а не дёргаем сеть на каждый ответ
+}
+
+async function flush() {
+  if (!S.queue || !S.queue.length) return;
+  if (!TG || !TG.initData) return;
+  const batch = S.queue.slice(0, 200);
+  try {
+    const r = await fetch(API + '/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': TG.initData },
+      body: JSON.stringify({ events: batch, consent: S.consent !== false })
+    });
+    if (!r.ok) return;                    // очередь остаётся, дошлём в следующий раз
+    S.queue = S.queue.slice(batch.length);
+    save();
+    if (S.queue.length) { clearTimeout(flushTimer); flushTimer = setTimeout(flush, 1500); }
+  } catch (e) {
+    // сети нет — молча ждём. Ошибку ученику не показываем: он не чинит сервер.
+  }
+}
+
+async function forgetMe() {
+  S.queue = [];
+  S.consent = false;
+  save();
+  if (!TG || !TG.initData) return true;
+  try {
+    const r = await fetch(API + '/api/forget', {
+      method: 'POST', headers: { 'X-Init-Data': TG.initData }
+    });
+    return r.ok;
+  } catch (e) { return false; }
+}
+
 /* ─────────── входной срез ───────────
 
    Первое, что человек делает в приложении. Не экзамен — калибровка: тринадцать
@@ -751,6 +825,8 @@ function srezAnswer(good) {
 
 function srezFinish() {
   const level = srezLevel();
+  const svod = SREZ_AREAS.map(a => a.name + ' ' + SZ.res[a.id].ok + '/' + SZ.res[a.id].n).join(' · ');
+  track('srez', 'итог', svod, '', '', null, null);
   S.srez = { date: today(), res: SZ.res, knows: level.knows };
   // Занятие НЕ перематываем. Курс рассчитан с нуля и идёт по порядку для всех:
   // срез — знакомство и карта дыр для тренера, а не распределение по уровням.
@@ -1067,7 +1143,7 @@ function renderDrill(kind) {
 function nextDrill() {
   if (!D.pool.length) D.pool = shuffled(drillPool(D.kind));
   D.item = D.pool.pop();
-  D.sel = null; D.answered = false;
+  D.sel = null; D.answered = false; D.shown = Date.now();
 }
 
 function pc(c) {
@@ -1269,6 +1345,13 @@ function checkDrill() {
     document.getElementById('dk-stage').appendChild(box);
   }
 
+  track(sr ? 'srez' : 'drill',
+        sr ? SZ.list[SZ.i].area : D.kind,
+        (v.q || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
+        v.acts && v.acts[D.sel] !== undefined ? String(v.acts[D.sel]).replace(/<[^>]*>/g, '') : D.sel,
+        v.acts && v.acts[v.right] !== undefined ? String(v.acts[v.right]).replace(/<[^>]*>/g, '') : v.right,
+        good, D.shown ? Date.now() - D.shown : null);
+
   if (!sr) {
     const st = S.drills[D.kind] || { n: 0, ok: 0 };
     st.n++; if (good) st.ok++;
@@ -1376,6 +1459,15 @@ function init() {
   });
   const sz = document.getElementById('p-srez');
   if (sz) sz.onclick = () => go('srez');
+  const fg = document.getElementById('p-forget');
+  if (fg) fg.onclick = async () => {
+    // Обещание «сотру по просьбе» должно быть выполнимо в один тап, без переписки.
+    if (!confirm('Стереть у тренера всё, что записано о твоих занятиях? Прогресс в телефоне останется.')) return;
+    fg.textContent = 'стираю…';
+    const ok = await forgetMe();
+    fg.textContent = ok ? 'стёрто' : 'не вышло — попробуй позже';
+    fg.disabled = ok;
+  };
   document.getElementById('p-reset').onclick = () => {
     if (confirm('Сбросить весь прогресс: серию, карточки и занятия?')) {
       S = defaults();
@@ -1408,6 +1500,10 @@ function init() {
   const start = url.get('screen') || (seen ? 'home' : 'onboarding');
   stack = [{ name: start }];
   render(start, url.get('param') || (start === 'sheet' ? 'starting' : undefined));
+
+  // Досылаем то, что не уехало в прошлый заход: сервер мог лежать,
+  // и это должно означать задержку данных, а не потерянное занятие.
+  setTimeout(flush, 1200);
 
   // Браузерная кнопка «назад» и свайп в Telegram
   window.addEventListener('popstate', popBack);
