@@ -49,6 +49,7 @@ const defaults = () => ({
   drills: {},         // вид тренажёра -> {n, ok}
   plan: null,         // план дня: {date, mins, done:[номера блоков]}
   srez: null,         // входной срез: {date, res, start}
+  hw: null,           // домашка от тренера, последняя известная копия
   queue: [],          // события, ещё не доехавшие до сервера
   consent: null,      // null — не спрашивали, false — ученик отключил отправку
   bestStreak: 0,
@@ -152,7 +153,7 @@ function render(name, param) {
     sheets: renderSheets, sheet: renderSheet,
     quiz: renderQuiz, result: renderResult, spot: renderSpot, profile: renderProfile,
     drills: renderDrills, drill: renderDrill, day: renderDay, glossary: renderGlossary,
-    srez: renderSrez, srezres: renderSrezRes
+    srez: renderSrez, srezres: renderSrezRes, hw: renderHw
   })[name];
   if (fn) fn(param);
 }
@@ -224,6 +225,7 @@ function renderHome() {
   main.textContent = !pl || !pl.done.length ? 'Начать занятие дня'
     : pl.done.length >= total ? 'Занятие дня закрыто · повторить'
     : `Продолжить · блок ${pl.done.length + 1} из ${total}`;
+  paintHwCard();
 }
 function plural(n, a, b, c) {
   const m = n % 100, d = n % 10;
@@ -749,6 +751,102 @@ async function forgetMe() {
     });
     return r.ok;
   } catch (e) { return false; }
+}
+
+
+
+/* Текст домашки пишет тренер руками — в него легко попадёт «<» или «&».
+   Экранируем: содержимое от человека не должно становиться разметкой. */
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+/* ─────────── домашка от тренера ───────────
+
+   Живёт на сервере, а не в приложении: тренер задаёт её после занятия, глядя
+   на то, что человек реально не понял. Список тянем при каждом открытии —
+   он короткий, а показывать вчерашнее задание, когда уже выдано новое, хуже,
+   чем лишний запрос.
+
+   Без сети список берётся из последнего сохранённого: ученик открывает
+   приложение в метро, и «что мне задали» должно работать там же. */
+
+let HW = null;
+
+async function loadHomework() {
+  if (S.hw) HW = S.hw;                       // сперва показываем сохранённое
+  if (!TG || !TG.initData) return;
+  try {
+    const r = await fetch(API + '/api/homework', { headers: { 'X-Init-Data': TG.initData } });
+    if (!r.ok) return;
+    const d = await r.json();
+    HW = d.items || [];
+    S.hw = HW;
+    save();
+    paintHwCard();
+  } catch (e) { /* нет сети — остаётся сохранённое */ }
+}
+
+function activeHw() {
+  return (HW || []).filter(h => !h.done_at)[0] || null;
+}
+
+function paintHwCard() {
+  const box = document.getElementById('h-hw');
+  if (!box) return;
+  const h = activeHw();
+  const last = (HW || [])[0];
+  if (!h && !last) { box.hidden = true; return; }
+  box.hidden = false;
+  const done = !h;
+  box.classList.toggle('done', done);
+  document.getElementById('h-hw-t').textContent = done ? 'Домашка сделана' : last.title;
+  document.getElementById('h-hw-d').textContent = done
+    ? 'Молодец. Новую задаст тренер после занятия.'
+    : (last.due ? last.due + ' · нажми, чтобы открыть' : 'нажми, чтобы открыть');
+  box.onclick = () => go('hw');
+}
+
+function renderHw() {
+  const h = activeHw() || (HW || [])[0];
+  if (!h) { go('home'); return; }
+  document.getElementById('hw-title').textContent = h.title;
+  document.getElementById('hw-due').textContent = h.due || '';
+  document.getElementById('hw-list').innerHTML =
+    (h.body || '').split('\n').filter(Boolean)
+      .map(s => '<li>' + esc(s.replace(/^\d+[.)]\s*/, '')) + '</li>').join('')
+    || '<li>Тренер не расписал пункты — спроси его.</li>';
+
+  const btn = document.getElementById('hw-main');
+  const note = document.getElementById('hw-note');
+  if (h.done_at) {
+    btn.textContent = 'Уже отмечено';
+    btn.disabled = true;
+    note.textContent = 'Тренер видит, что ты закрыл это задание.';
+    return;
+  }
+  btn.disabled = false;
+  btn.textContent = 'Сделал';
+  note.textContent = 'Отметка уходит тренеру. Если что-то не получилось — лучше не отмечать, а сказать ему.';
+  btn.onclick = async () => {
+    btn.disabled = true; btn.textContent = 'отмечаю…';
+    try {
+      const r = await fetch(API + '/api/homework/done', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Init-Data': (TG && TG.initData) || '' },
+        body: JSON.stringify({ id: h.id })
+      });
+      if (!r.ok) throw new Error();
+      h.done_at = Math.floor(Date.now() / 1000);
+      S.hw = HW; save();
+      btn.textContent = 'Отмечено';
+      paintHwCard();
+      setTimeout(() => go('home'), 800);
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'не вышло — ещё раз';
+    }
+  };
 }
 
 /* ─────────── входной срез ───────────
@@ -1504,6 +1602,7 @@ function init() {
   // Досылаем то, что не уехало в прошлый заход: сервер мог лежать,
   // и это должно означать задержку данных, а не потерянное занятие.
   setTimeout(flush, 1200);
+  loadHomework();
 
   // Браузерная кнопка «назад» и свайп в Telegram
   window.addEventListener('popstate', popBack);

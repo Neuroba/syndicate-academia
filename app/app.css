@@ -451,3 +451,11 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .sp-h b{color:var(--gold)}
 .sp-en{font-size:10px;color:var(--gold-soft);margin-left:8px;letter-spacing:.04em}
 .sp-d{font-size:11.5px;color:rgba(239,233,219,.85);margin-top:5px;line-height:1.45}
+
+/* ─── домашка от тренера ─── */
+.hwcard{background:linear-gradient(180deg,#1d1a10,#141209);border:1px solid rgba(212,175,55,.45);
+  border-radius:13px;padding:14px 16px;margin-bottom:12px;cursor:pointer}
+.hwcard .t{font:700 17px/1.3 Inter,Arial,sans-serif;color:var(--ink);margin-top:6px}
+.hwcard .d{font-size:12.5px;color:var(--gold);margin-top:5px}
+.hwcard.done{background:linear-gradient(180deg,#101a12,#0d140f);border-color:rgba(63,185,104,.4)}
+.hwcard.done .d{color:#8fe0aa}
