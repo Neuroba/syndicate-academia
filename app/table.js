@@ -185,7 +185,9 @@
       // На плашке остаётся только СЛОВО действия. Сумма уезжает на сукно
       // фишками перед игроком — так за столом и выглядит.
       const act = s.folded ? 'пас'
-        : last ? last.text.replace(s.name + ' ', '').replace(/\s*\d+$/, '').trim()
+        : last ? last.text.replace(s.name + ' ', '')
+            .replace(/^до\s*\d*$/, 'рейз')
+            .replace(/^колл\s*\d*$/, 'колл').trim()
           : '';
 
       /* Вскрытие прямо на столе. Раньше чужие карты показывались только списком
@@ -239,7 +241,9 @@
 
     // борд
     el('tb-board').innerHTML = showBoard().map(c => cardHtml(c)).join('') ||
-      '<div class="pt-bnote">карты стола откроются после торговли</div>';
+      (H.done
+        ? '<div class="pt-bnote">карты стола не открывались — нажми «досдать», чтобы увидеть</div>'
+        : '<div class="pt-bnote">карты стола откроются после торговли</div>');
 
     // моя рука
     el('tb-hand').innerHTML = me.cards.map(c => cardHtml(c)).join('');

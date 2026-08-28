@@ -464,7 +464,8 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .pt-body{gap:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
 /* Лента после раздачи разворачивается: тренер разбирает всю руку целиком */
 .pt-log{transition:height .15s ease}
-.screen[data-screen="table"] .pt-log.full{height:auto;min-height:110px;max-height:190px}
+.screen[data-screen="table"] .pt-log.full{height:auto;min-height:110px;max-height:none;
+  justify-content:flex-start;overflow:visible}
 .pt-posrow{display:flex;gap:3px;margin-bottom:6px}
 .pt-ps{flex:1;text-align:center;font-size:10px;font-weight:700;letter-spacing:.02em;
   padding:5px 1px;border-radius:6px;background:#17171c;color:var(--muted);border:1px solid #1f1f26}
