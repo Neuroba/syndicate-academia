@@ -45,9 +45,9 @@
   function el(id) { return document.getElementById(id); }
 
   function cardHtml(c, hidden) {
-    if (hidden) return '<div class="pc back">♠</div>';
+    if (hidden) return '<div class="pt-card back">♠</div>';
     const red = (c.s === '♥' || c.s === '♦') ? ' red' : '';
-    return '<div class="pc' + red + '"><b>' + c.r + '</b><i>' + c.s + '</i></div>';
+    return '<div class="pt-card' + red + '"><b>' + c.r + '</b><i>' + c.s + '</i></div>';
   }
 
   /* Лента позиций и подсказка, где она в очереди ХОДА.
@@ -76,17 +76,21 @@
     const names = B.positions(H.seats.length);
     const mine = B.posOf(H, hero().i);
     const cells = names.map(n =>
-      '<span class="ps' + (n === mine ? ' on' : '') + '">' + n + '</span>').join('');
+      '<span class="pt-ps' + (n === mine ? ' on' : '') + '">' + n + '</span>').join('');
 
     const order = actingOrder();
     const place = order.indexOf(hero().i);
     const after = order.length - place - 1;
+    if (H.done) {
+      return '<div class="pt-posrow">' + cells + '</div>' +
+        '<div class="pt-poshint">в этой раздаче ты была <b>' + mine + '</b></div>';
+    }
     const улица = H.street === 0 ? 'до флопа' : 'на этой улице';
     const word = place === 0 ? 'ходишь первой из ' + order.length
       : after === 0 ? 'говоришь последней — лучшее место'
         : 'за тобой ещё ' + after + ' ' + plural(after, 'игрок', 'игрока', 'игроков');
-    return '<div class="posrow">' + cells + '</div>' +
-      '<div class="poshint">ты <b>' + mine + '</b>, ' + улица + ' ' + word + '</div>';
+    return '<div class="pt-posrow">' + cells + '</div>' +
+      '<div class="pt-poshint">ты <b>' + mine + '</b>, ' + улица + ' ' + word + '</div>';
   }
 
   function plural(n, a, b, c) {
@@ -104,29 +108,47 @@
     el('tb-pot').textContent = H.pot;
     el('tb-street').textContent = P.STREETS[Math.min(H.street, 4)];
 
-    // соперники
-    el('tb-seats').innerHTML = H.seats.filter(s => !s.hero).map(s => {
-      const cls = s.folded ? ' out' : (H.toAct === s.i ? ' act' : '');
+    // Места по овалу. Герой всегда внизу по центру — так стол читается
+    // одинаково независимо от того, какая позиция ему досталась в этой раздаче.
+    // Координаты считаем по эллипсу: угол от нижней точки, по часовой стрелке.
+    const n = H.seats.length;
+    const meIdx = me.i;
+    el('tb-seats').innerHTML = H.seats.map(s => {
+      const k = (s.i - meIdx + n) % n;                 // 0 — герой, дальше по кругу
+      const ang = (90 + k * (360 / n)) * Math.PI / 180;
+      const x = 50 + 44 * Math.cos(ang);
+      const y = 50 + 46 * Math.sin(ang);
+      const cls = s.hero ? ' me' : (s.folded ? ' out' : (H.toAct === s.i ? ' act' : ''));
+      const btn = s.i === H.button ? '<span class="pt-dlr">D</span>' : '';
+      // Последнее действие этого игрока на текущей улице — то, что тренер
+      // и ученица читают в первую очередь: «кто что сделал».
       const last = [...H.log].reverse().find(l => l.seat === s.i && l.street === H.street);
-      return '<div class="op' + cls + '">' +
-        '<div class="opn">' + s.name + ' <em>' + B.posOf(H, s.i) + '</em></div>' +
-        '<div class="ops">' + (s.folded ? 'пас' : s.stack) + '</div>' +
-        (last && !s.folded ? '<div class="opa">' + last.text.replace(s.name + ' ', '') + '</div>' : '') +
+      const act = s.folded ? 'пас'
+        : last ? last.text.replace(s.name + ' ', '')
+          : (s.put > 0 ? String(s.put) : '');
+      return '<div class="pt-seat' + cls + '" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1) + '%">' +
+        btn +
+        '<div class="pt-sn">' + (s.hero ? 'Ты' : s.name.replace('Игрок ', '')) +
+          ' <em>' + B.posOf(H, s.i) + '</em></div>' +
+        '<div class="pt-ss">' + s.stack + '</div>' +
+        (act ? '<div class="pt-sa' + (/до |колл/.test(act) ? ' bet' : '') + '">' + act + '</div>' : '') +
         '</div>';
     }).join('');
 
-    // Лента раздачи. Боты ходят быстрее, чем она успевает посмотреть,
-    // и без ленты «кто поставил и сколько» разбор невозможен: тренер спросит
-    // «почему не сбросила против рейза с ранней», а она не видела, что был рейз.
-    const lines = H.log.filter(l => l.text).slice(-7);
+    /* Лента раздачи. Боты ходят быстрее, чем она успевает посмотреть, и без строки
+       «кто поставил и сколько» разбор невозможен: тренер спросит «почему не сбросила
+       против рейза с ранней», а она не видела, что был рейз.
+       В конце раздачи лента разворачивается — руку разбирают целиком. */
+    const lines = H.log.filter(l => l.text).slice(H.done ? 0 : -7);
     const logBox = el('tb-log');
+    logBox.classList.toggle('full', !!H.done);
     logBox.innerHTML = lines.map(l =>
-      '<div class="lg' + (l.seat === hero().i ? ' me' : '') + '">' + l.text + '</div>').join('');
-    logBox.scrollTop = logBox.scrollHeight;   // последняя строка всегда видна
+      '<div class="pt-lg' + (l.seat === me.i ? ' me' : '') + '">' + l.text + '</div>').join('');
+    logBox.scrollTop = logBox.scrollHeight;
 
     // борд
     el('tb-board').innerHTML = H.board.map(c => cardHtml(c)).join('') ||
-      '<div class="bnote">карты стола откроются после торговли</div>';
+      '<div class="pt-bnote">карты стола откроются после торговли</div>';
 
     // моя рука
     el('tb-hand').innerHTML = me.cards.map(c => cardHtml(c)).join('');
@@ -138,20 +160,31 @@
     const box = el('tb-acts');
     box.innerHTML = '';
     if (H.done) {
+      el('tb-hint').hidden = true;
+      выбор = null;
       el('tb-main').hidden = false;
       el('tb-main').textContent = 'Следующая раздача';
       el('tb-main').onclick = () => start();
       el('tb-res').hidden = false;
-      el('tb-res').innerHTML = '<b>' + H.result.text + '</b>' +
-        (H.result.showdown ? '<div class="sd">' + H.seats.filter(s => !s.folded).map(s =>
-          s.name + ': ' + s.cards.map(c => c.r + c.s).join(' ')).join(' · ') + '</div>' : '');
+      const R = review();
+      el('tb-res').innerHTML =
+        '<div class="pt-verd">' + R.verdict + '</div>' +
+        '<div class="pt-sd"><div class="pt-sdh">что было у кого</div>' +
+        R.rows.map(r =>
+          '<div class="pt-sdr' + (r.hero ? ' me' : '') + (r.folded ? ' out' : '') +
+            (r.seat === R.best.seat ? ' win' : '') + '">' +
+            '<span class="pt-who">' + r.name + ' <em>' + r.pos + '</em></span>' +
+            '<span class="pt-cds">' + r.cards.map(c =>
+              '<i class="' + (c.s === '♥' || c.s === '♦' ? 'r' : '') + '">' + c.r + c.s + '</i>').join('') + '</span>' +
+            '<span class="pt-cmb">' + r.ev.name + (r.folded ? ' · сбросил' : '') + '</span>' +
+          '</div>').join('') + '</div>';
       return;
     }
     el('tb-res').hidden = true;
     el('tb-main').hidden = true;
 
     if (H.toAct !== hero().i || думает) {
-      box.innerHTML = '<div class="waiting">ход соперника…</div>';
+      box.innerHTML = '<div class="pt-wait">ход соперника…</div>';
       return;
     }
 
@@ -165,7 +198,7 @@
     P.options(H).forEach(o => {
       const b = document.createElement('button');
       const sel = выбор && выбор.act === o.act;
-      b.className = 'tact' + (o.act === 'fold' ? ' fold' : o.act === 'raise' ? ' raise' : '') + (sel ? ' sel' : '');
+      b.className = 'pt-act' + (o.act === 'fold' ? ' fold' : o.act === 'raise' ? ' raise' : '') + (sel ? ' sel' : '');
       b.textContent = o.label;
       b.onclick = () => {
         выбор = { act: o.act, to: o.act === 'raise' ? askRaise(o) : undefined, o: o };
@@ -227,9 +260,15 @@
     if (H.done || H.toAct === hero().i) { finishIfDone(); return; }
     думает = true;
     paint();
+    /* Пауза разной длины. Восемь мест по 700 мс — это до 25 секунд на раздачу,
+       и половина из них уходит на чужие пасы, где ничего не происходит.
+       Пас проскакивает быстро, ставка держится: внимание достаётся тому,
+       что тренер потом и будет разбирать. */
+    const решение = B.botAct(H);
+    const пауза = (решение.act === 'fold' || решение.act === 'check') ? 380 : 900;
     setTimeout(() => {
       if (H.done) { думает = false; finishIfDone(); return; }
-      const d = B.botAct(H);
+      const d = решение;
       // Запись в ленту делает движок — своей второй мы задваивали каждый ход.
       // Наше дело только прицепить к ней причину: тренеру она нужна на разборе,
       // ученице не показываем, иначе стол превращается в подсказку.
@@ -242,7 +281,7 @@
       думает = false;
       paint();
       runBots();
-    }, 700);
+    }, пауза);
   }
 
   function finishIfDone() {
@@ -259,6 +298,65 @@
         H.log.filter(l => l.seat === me.i).map(l => l.text).join(' → '),
         H.result.text, null, null);
     }
+  }
+
+
+  /* Разбор раздачи. Отвечает на первый вопрос новичка: «а правильно ли я сбросила?»
+
+     До этого после сброса была тишина: раздача уезжала без неё, чужие карты
+     не показывались, и понять, что произошло, было нельзя. Учиться на таком
+     невозможно — человек просто нажимает наугад.
+
+     Показываем три вещи:
+     1. что было у КАЖДОГО — в учебном столе прятать нечего;
+     2. чем закончилась раздача;
+     3. что было бы у неё, если бы осталась.
+
+     И обязательную оговорку про результат. Новичок, увидев «твоя рука выиграла бы»,
+     делает вывод «зря сбросила» — это и есть результат-ориентированное мышление,
+     главная ловушка на дистанции. Сброс мусора остаётся верным, даже когда
+     этот мусор один раз выиграл. */
+  function review() {
+    const P = global.Poker, B = global.Bots;
+    const me = hero();
+
+    // Доводим борд до пяти карт ВИРТУАЛЬНО — состояние раздачи не трогаем.
+    // Порядок колоды тот же, поэтому «что было бы» honest, а не выдуманное.
+    const board = H.board.slice();
+    const deck = H.deck.slice();
+    const used = {};
+    board.forEach(c => { used[c.r + c.s] = 1; });
+    H.seats.forEach(s => s.cards.forEach(c => { used[c.r + c.s] = 1; }));
+    while (board.length < 5 && deck.length) {
+      const c = deck.pop();
+      if (!used[c.r + c.s]) { used[c.r + c.s] = 1; board.push(c); }
+    }
+    const дораздали = board.length > H.board.length;
+
+    const rows = H.seats.map(s => ({
+      seat: s.i, name: s.hero ? 'Ты' : s.name.replace('Игрок ', 'И'),
+      pos: B.posOf(H, s.i), hero: s.hero, folded: s.folded,
+      cards: s.cards, ev: P.evaluate(s.cards.concat(board))
+    }));
+    const best = rows.reduce((a, r) => r.ev.score > a.ev.score ? r : a, rows[0]);
+    const myEv = rows.find(r => r.hero).ev;
+
+    let verdict = '';
+    if (me.folded) {
+      const меБыЛучше = myEv.score === best.ev.score;
+      verdict = 'Ты сбросила. На полном борде твоя рука — <b>' + myEv.name + '</b>. ' +
+        (меБыЛучше
+          ? 'Это лучшая рука за столом.<br><span class="pt-cav">И всё же: одна раздача ничего не доказывает. ' +
+            'Сброс слабой руки остаётся верным решением, даже когда она один раз выиграла бы — ' +
+            'иначе придётся платить за неё и во все остальные разы.</span>'
+          : 'Сильнее всех — у ' + best.name + ': ' + best.ev.name + '. Сброс сберёг фишки.');
+    } else {
+      verdict = H.result.text;
+    }
+    if (дораздали) verdict += '<br><span class="pt-cav">Борд после «' +
+      P.STREETS[Math.min(H.street, 4)] + '» дораздан, чтобы было видно, чем бы всё кончилось.</span>';
+
+    return { rows: rows, best: best, verdict: verdict };
   }
 
   // ─────────── сохранение ───────────

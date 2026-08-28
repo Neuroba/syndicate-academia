@@ -6,6 +6,15 @@
    один телефон. Когда появится второй — переносим состояние в Supabase как есть. */
 
 const TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+/* Кто видит недоделанное. Стол работает, но ученикам его показывать рано:
+   решает тренер, а не готовность кода. Открыть всем — убрать проверку
+   в renderHome, одна строка. */
+const COACHES = [354703308];
+function isCoach() {
+  try { return COACHES.indexOf(window.Telegram.WebApp.initDataUnsafe.user.id) >= 0; }
+  catch (e) { return false; }
+}
 // ?demo=1 — витрина для скриншотов и показа: состояние живёт только в памяти
 const DEMO = new URLSearchParams(location.search).get('demo') === '1';
 const QUIZ = window.QUIZ || { cards: [] };
@@ -226,6 +235,10 @@ function renderHome() {
   main.textContent = !pl || !pl.done.length ? 'Начать занятие дня'
     : pl.done.length >= total ? 'Занятие дня закрыто · повторить'
     : `Продолжить · блок ${pl.done.length + 1} из ${total}`;
+  // Стол пока только для тренера — до согласования показа ученикам.
+  const tbBtn = document.querySelector('[data-go="table"]');
+  if (tbBtn) tbBtn.hidden = !isCoach();
+
   paintHwCard();
 }
 function plural(n, a, b, c) {
@@ -785,7 +798,11 @@ async function loadHomework() {
     HW = d.items || [];
     S.hw = HW;
     save();
-    paintHwCard();
+    // Стол пока только для тренера — до согласования показа ученикам.
+  const tbBtn = document.querySelector('[data-go="table"]');
+  if (tbBtn) tbBtn.hidden = !isCoach();
+
+  paintHwCard();
   } catch (e) { /* нет сети — остаётся сохранённое */ }
 }
 
@@ -842,7 +859,11 @@ function renderHw() {
       h.done_at = Math.floor(Date.now() / 1000);
       S.hw = HW; save();
       btn.textContent = 'Отмечено';
-      paintHwCard();
+      // Стол пока только для тренера — до согласования показа ученикам.
+  const tbBtn = document.querySelector('[data-go="table"]');
+  if (tbBtn) tbBtn.hidden = !isCoach();
+
+  paintHwCard();
       setTimeout(() => go('home'), 800);
     } catch (e) {
       btn.disabled = false; btn.textContent = 'не вышло — ещё раз';

@@ -461,65 +461,108 @@ tr.hi td{background:rgba(212,175,55,.07)}
 .hwcard.done .d{color:#8fe0aa}
 
 /* ─── покерный стол ─── */
-.tbody{gap:0}
-.posrow{display:flex;gap:4px;margin-bottom:6px}
-.ps{flex:1;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.04em;
-  padding:5px 2px;border-radius:6px;background:#17171c;color:var(--muted);border:1px solid #1f1f26}
-.ps.on{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
-.poshint{font-size:12.5px;color:var(--muted);margin-bottom:12px}
-.poshint b{color:var(--gold)}
-.felt{background:radial-gradient(ellipse at 50% 45%,#3d5c2e,#263a1c);border:5px solid #15151a;
-  border-radius:80px/56px;padding:11px 10px 13px;margin-bottom:11px;box-shadow:inset 0 0 40px rgba(0,0,0,.55)}
-.felt .ops{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:12px}
-.op{background:rgba(11,11,13,.72);border:1px solid #2a2a30;border-radius:7px;padding:4px 7px;min-width:70px}
-.op.act{border-color:var(--gold);box-shadow:0 0 0 1px rgba(212,175,55,.35)}
-.op.out{opacity:.38}
-.opn{font-size:11px;color:var(--ink);font-weight:600;white-space:nowrap}
-.opn em{color:var(--gold);font-style:normal;font-size:9.5px;letter-spacing:.06em}
-.op .ops{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:2px 0 0}
-.opa{font-size:10px;color:#d8cfa8;margin-top:2px}
-.felt .mid{text-align:center}
-.pot{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
-.pot em{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(255,255,255,.55);font-style:normal;margin-top:1px}
-.board{display:flex;gap:5px;justify-content:center;margin-top:8px;min-height:48px;align-items:center}
-.bnote{font-size:11.5px;color:rgba(255,255,255,.5)}
-.pc{width:38px;height:54px;background:#f4f1ea;border-radius:5px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;color:#0b0b0d;box-shadow:0 2px 7px rgba(0,0,0,.45)}
-.pc b{font-size:17px;line-height:1}.pc i{font-size:15px;font-style:normal;line-height:1;margin-top:1px}
-.pc.red{color:#b5292a}
-.pc.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold);
-  align-items:center;justify-content:center;font-size:18px}
-.mine{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.mycards{display:flex;gap:5px}
-.mycards .pc{width:50px;height:70px}.mycards .pc b{font-size:22px}.mycards .pc i{font-size:19px}
-.mystack{font-size:12.5px;color:var(--muted)}.mystack b{color:var(--ink);font-size:15px}
-.mymade{font-size:13px;color:var(--gold);margin-top:3px;font-weight:600}
-.tacts{display:flex;gap:7px;margin-bottom:10px;min-height:46px}
-.tact{flex:1;padding:13px 6px;border-radius:10px;border:1px solid var(--line);background:#1a1a20;
-  color:var(--ink);font:700 14px Inter,Arial,sans-serif;cursor:pointer}
-.tact.fold{background:#1a1214;border-color:#3a2226;color:#e6a6a6}
-.tact.raise{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
-.waiting{flex:1;display:grid;place-items:center;font-size:13px;color:var(--muted)}
-.tres{background:linear-gradient(180deg,#1d1a10,#141209);border:1px solid rgba(212,175,55,.45);
-  border-radius:11px;padding:12px 14px;font-size:14.5px;color:var(--ink);margin-bottom:10px}
-.tres .sd{font-size:12px;color:var(--muted);margin-top:6px}
+.pt-body{gap:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+/* Лента после раздачи разворачивается: тренер разбирает всю руку целиком */
+.pt-log{transition:height .15s ease}
+.screen[data-screen="table"] .pt-log.full{height:auto;max-height:150px}
+.pt-posrow{display:flex;gap:3px;margin-bottom:6px}
+.pt-ps{flex:1;text-align:center;font-size:10px;font-weight:700;letter-spacing:.02em;
+  padding:5px 1px;border-radius:6px;background:#17171c;color:var(--muted);border:1px solid #1f1f26}
+.pt-ps.on{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.pt-poshint{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.pt-poshint b{color:var(--gold)}
 
-/* Шире 520 px — занятие идёт с ноутбука, места хватает: стол крупнее и по центру */
-@media (min-width:520px){
-  .tbody{max-width:640px;margin:0 auto}
-  .felt{border-radius:150px/96px;padding:22px 24px 26px}
-  .op{min-width:96px;padding:7px 10px}
-  .opn{font-size:12.5px}.op .ops{font-size:14px}
-  .pc{width:46px;height:64px}.pc b{font-size:20px}.pc i{font-size:18px}
-  .mycards .pc{width:62px;height:86px}.mycards .pc b{font-size:27px}.mycards .pc i{font-size:23px}
-  .pot{font-size:28px}
-}
-.tlog{background:#101014;border:1px solid #1c1c22;border-radius:9px;padding:7px 10px;
-  margin-bottom:9px;height:58px;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-end}
-.lg{font-size:11.5px;color:var(--muted);line-height:1.65;white-space:nowrap;
+/* Овал. Места лежат ПОВЕРХ сукна абсолютом в процентах — так стол остаётся
+   овальным на любой ширине, а не рассыпается сеткой. Герой всегда внизу. */
+.pt-wrap{position:relative;width:100%;padding-bottom:96%;margin-bottom:10px}
+.pt-felt{position:absolute;left:11%;right:11%;top:13%;bottom:13%;
+  background:radial-gradient(ellipse at 50% 42%,#3f5f30,#24371a);
+  border:6px solid #15151a;border-radius:50%;
+  box-shadow:inset 0 0 44px rgba(0,0,0,.6),0 4px 18px rgba(0,0,0,.5);
+  display:grid;place-items:center}
+.pt-mid{text-align:center}
+.pt-pot{font-size:23px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.pt-pot em{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);font-style:normal;margin-top:3px}
+.pt-board{display:flex;gap:4px;justify-content:center;margin-top:9px;min-height:46px;align-items:center}
+.pt-bnote{font-size:10.5px;color:rgba(255,255,255,.45);max-width:150px;line-height:1.4}
+
+.pt-seats{position:absolute;inset:0;pointer-events:none}
+.pt-seat{position:absolute;transform:translate(-50%,-50%);width:74px;text-align:center;
+  background:rgba(10,10,12,.92);border:1px solid #2b2b33;border-radius:9px;padding:4px 3px}
+.pt-seat.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.28)}
+.pt-seat.out{opacity:.34}
+.pt-seat.me{border-color:rgba(212,175,55,.55);background:rgba(20,17,9,.95);width:80px}
+.pt-sn{font-size:10.5px;font-weight:700;color:var(--ink);line-height:1.2;white-space:nowrap}
+.pt-sn em{font-style:normal;color:var(--gold);font-size:9px;letter-spacing:.04em}
+.pt-ss{font-size:12px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1.3}
+.pt-sa{font-size:9.5px;color:#cfc59c;margin-top:1px;line-height:1.25;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
-.lg.me{color:var(--gold);font-weight:600}
-.tact.sel{outline:2px solid var(--gold);outline-offset:1px}
-.thint{background:#15150f;border:1px solid rgba(212,175,55,.35);border-radius:9px;
-  padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:10px}
+.pt-sa.bet{color:var(--gold);font-weight:700}
+.pt-dlr{position:absolute;right:-5px;top:-5px;width:16px;height:16px;border-radius:50%;
+  background:var(--gold);color:#0b0b0d;font-size:9.5px;font-weight:800;line-height:16px}
+
+.pt-card{width:34px;height:48px;background:#f4f1ea;border-radius:4px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#0b0b0d;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+.pt-card b{font-size:15px;line-height:1}.pt-card i{font-size:13px;font-style:normal;line-height:1;margin-top:1px}
+.pt-card.red{color:#b5292a}
+.pt-card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold);
+  align-items:center;justify-content:center;font-size:16px}
+
+.pt-mine{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.pt-mycards{display:flex;gap:5px}
+.pt-mycards .pt-card{width:48px;height:67px}.pt-mycards .pt-card b{font-size:21px}.pt-mycards .pt-card i{font-size:18px}
+.pt-mystack{font-size:12.5px;color:var(--muted)}.pt-mystack b{color:var(--ink);font-size:15px}
+.pt-mymade{font-size:13px;color:var(--gold);margin-top:3px;font-weight:600}
+
+.pt-log{background:#101014;border:1px solid #1c1c22;border-radius:9px;padding:7px 10px;
+  margin-bottom:9px;height:54px;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-end}
+.pt-lg{font-size:11.5px;color:var(--muted);line-height:1.6;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pt-lg.me{color:var(--gold);font-weight:600}
+
+.pt-acts{display:flex;gap:7px;margin-bottom:9px;min-height:46px}
+.pt-act{flex:1;padding:13px 6px;border-radius:10px;border:1px solid var(--line);background:#1a1a20;
+  color:var(--ink);font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+.pt-act.fold{background:#1a1214;border-color:#3a2226;color:#e6a6a6}
+.pt-act.raise{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.pt-act.sel{outline:2px solid var(--gold);outline-offset:1px}
+.pt-wait{flex:1;display:grid;place-items:center;font-size:13px;color:var(--muted)}
+.pt-hint{background:#15150f;border:1px solid rgba(212,175,55,.35);border-radius:9px;
+  padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:9px}
+
+/* Ноутбук: овал крупнее и по центру, места просторнее */
+@media (min-width:520px){
+  .pt-body{max-width:600px;margin:0 auto}
+  .pt-wrap{padding-bottom:74%}
+  .pt-seat{width:92px;padding:6px 5px}
+  .pt-seat.me{width:100px}
+  .pt-sn{font-size:12px}.pt-sn em{font-size:10px}.pt-ss{font-size:14px}.pt-sa{font-size:11px}
+  .pt-card{width:42px;height:58px}.pt-card b{font-size:18px}.pt-card i{font-size:16px}
+  .pt-mycards .pt-card{width:58px;height:80px}.pt-mycards .pt-card b{font-size:25px}.pt-mycards .pt-card i{font-size:21px}
+  .pt-pot{font-size:30px}
+}
+.pt-res{background:linear-gradient(180deg,#1d1a10,#141209);border:1px solid rgba(212,175,55,.45);
+  border-radius:11px;padding:12px 13px;margin-bottom:10px}
+.pt-verd{font-size:14px;color:var(--ink);line-height:1.5}
+.pt-verd b{color:var(--gold)}
+.pt-cav{display:block;font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+.pt-sd{margin-top:11px;border-top:1px solid #2a2620;padding-top:9px}
+.pt-sdh{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  font-weight:600;margin-bottom:6px}
+.pt-sdr{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11.5px}
+.pt-sdr.out{opacity:.5}
+.pt-sdr.win .pt-cmb{color:#8fe0aa;font-weight:700}
+.pt-sdr.me .pt-who{color:var(--gold);font-weight:700}
+.pt-sdr .pt-who{width:66px;flex-shrink:0;color:var(--ink)}
+.pt-sdr .pt-who em{font-style:normal;color:var(--muted);font-size:9.5px}
+.pt-sdr .pt-cds{display:flex;gap:3px;flex-shrink:0}
+.pt-sdr .pt-cds i{font-style:normal;background:#f4f1ea;color:#0b0b0d;border-radius:3px;
+  padding:1px 4px;font-size:10.5px;font-weight:700}
+.pt-sdr .pt-cds i.r{color:#b5292a}
+.pt-sdr .pt-cmb{color:var(--muted);flex:1;text-align:right}
+
+/* Скрытое должно быть скрытым. Классы вроде .mainbtn задают display,
+   а он бьёт атрибут hidden из стилей браузера — кнопка «Следующая раздача»
+   так и висела посреди живой раздачи. */
+[hidden]{display:none !important}

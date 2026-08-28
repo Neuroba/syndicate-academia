@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="app.css?v=202608281243">
+<link rel="stylesheet" href="app.css?v=202608281314">
 </head>
 <body>
 
@@ -200,29 +200,31 @@
   <!-- ═══ СПОТ ДНЯ ═══ -->
   <!-- ═══ СТОЛ ═══ -->
   <section class="screen" data-screen="table">
-    <div class="body tbody">
+    <div class="body pt-body">
       <div id="tb-pos"></div>
 
-      <div class="felt">
-        <div class="ops" id="tb-seats"></div>
-        <div class="mid">
-          <div class="pot"><span id="tb-pot">0</span><em id="tb-street">префлоп</em></div>
-          <div class="board" id="tb-board"></div>
+      <div class="pt-wrap">
+        <div class="pt-felt">
+          <div class="pt-mid">
+            <div class="pt-pot"><span id="tb-pot">0</span><em id="tb-street">префлоп</em></div>
+            <div class="pt-board" id="tb-board"></div>
+          </div>
+        </div>
+        <div class="pt-seats" id="tb-seats"></div>
+      </div>
+
+      <div class="pt-mine">
+        <div class="pt-mycards" id="tb-hand"></div>
+        <div class="pt-myinfo">
+          <div class="pt-mystack">твой стек <b id="tb-stack">0</b></div>
+          <div class="pt-mymade" id="tb-made"></div>
         </div>
       </div>
 
-      <div class="mine">
-        <div class="mycards" id="tb-hand"></div>
-        <div class="myinfo">
-          <div class="mystack">твой стек <b id="tb-stack">0</b></div>
-          <div class="mymade" id="tb-made"></div>
-        </div>
-      </div>
-
-      <div class="tlog" id="tb-log"></div>
-      <div class="tacts" id="tb-acts"></div>
-      <div class="thint" id="tb-hint" hidden></div>
-      <div class="tres" id="tb-res" hidden></div>
+      <div class="pt-log" id="tb-log"></div>
+      <div class="pt-acts" id="tb-acts"></div>
+      <div class="pt-hint" id="tb-hint" hidden></div>
+      <div class="pt-res" id="tb-res" hidden></div>
 
       <div class="foot-note">Соперники — простые боты: они не блефуют и не наказывают за ошибку.
         Здесь отрабатывают порядок хода, позиции и дисциплину фолда. Читать соперника учатся на живых людях.</div>
@@ -378,14 +380,14 @@
      (file://, где fetch запрещён), и с хостинга. Генерируются build-data.py из JSON. -->
 <!-- ?v= — метка версии: deploy.sh подставляет в неё дату сборки, иначе телефон
      ученика месяцами показывает старый app.js из кэша. -->
-<script src="data/quiz.js?v=202608281243"></script>
-<script src="data/content.js?v=202608281243"></script>
-<script src="data/drills.js?v=202608281243"></script>
-<script src="data/glossary.js?v=202608281243"></script>
-<script src="app.js?v=202608281243"></script>
-<script src="vendor/pokersolver.js?v=202608281243"></script>
-<script src="poker.js?v=202608281243"></script>
-<script src="bots.js?v=202608281243"></script>
-<script src="table.js?v=202608281243"></script>
+<script src="data/quiz.js?v=202608281314"></script>
+<script src="data/content.js?v=202608281314"></script>
+<script src="data/drills.js?v=202608281314"></script>
+<script src="data/glossary.js?v=202608281314"></script>
+<script src="app.js?v=202608281314"></script>
+<script src="vendor/pokersolver.js?v=202608281314"></script>
+<script src="poker.js?v=202608281314"></script>
+<script src="bots.js?v=202608281314"></script>
+<script src="table.js?v=202608281314"></script>
 </body>
 </html>
