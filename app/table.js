@@ -34,6 +34,30 @@
   // про LJ и UTG+1 — за шестиместным столом таких мест нет вовсе.
   // Шпаргалка, словарь и заученные цифры открытия — тоже про восемь.
   // Разночтение между экранами дороже двух лишних ботов.
+  /* Имена соперников. «Игрок 3» не запоминается, и разбор превращается
+     в перечисление номеров: «третий поднял, пятый сбросил». С именем человек
+     держит стол в голове: «Кракен опять пошёл в атаку с ранней».
+
+     Короткие намеренно — плашка места на телефоне шириной 74 px, длинное имя
+     вытеснит позицию и стек в многоточие. Восемь символов — потолок. */
+  const ИМЕНА = ['Барон', 'Шаман', 'Оракул', 'Призрак', 'Кракен', 'Гудини',
+                 'Локи', 'Ворон', 'Сфинкс', 'Голем', 'Феникс', 'Ронин',
+                 'Джокер', 'Мамба', 'Дзен', 'Магистр'];
+
+  /* Раскладываем имена от seed — тогда «та же раздача ещё раз» вернёт
+     и тех же соперников, а не новую компанию. */
+  function именаМест(seed, n) {
+    const rnd = global.Poker.rng(seed ^ 0x5EED);
+    const pool = ИМЕНА.slice();
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+    }
+    const out = { 0: 'Ты' };
+    for (let i = 1; i < n; i++) out[i] = pool[i - 1];
+    return out;
+  }
+
   const SEATS = 8;
   const BB = 20;
   const STACK = 100 * BB;
@@ -43,6 +67,24 @@
   let выбор = null;        // выбранное, но ещё не подтверждённое действие
 
   function el(id) { return document.getElementById(id); }
+
+  /* Фишки. Номиналы условные — по ним не считают, их читают глазом:
+     чем крупнее ставка, тем темнее и старше стопка. Число рядом остаётся,
+     фишки его не заменяют, а делают понятным до чтения. */
+  const НОМИНАЛЫ = [[1000, 'c5'], [500, 'c4'], [100, 'c3'], [25, 'c2'], [1, 'c1']];
+
+  function chips(amount, максимум) {
+    if (!amount) return '';
+    const out = [];
+    let rest = amount;
+    for (const [цена, кл] of НОМИНАЛЫ) {
+      while (rest >= цена && out.length < (максимум || 4)) { out.push(кл); rest -= цена; }
+      if (out.length >= (максимум || 4)) break;
+    }
+    if (!out.length) out.push('c1');
+    return '<span class="pt-chips">' +
+      out.map(k => '<span class="pt-chip ' + k + '"></span>').join('') + '</span>';
+  }
 
   function cardHtml(c, hidden) {
     if (hidden) return '<div class="pt-card back">♠</div>';
@@ -83,12 +125,12 @@
     const after = order.length - place - 1;
     if (H.done) {
       return '<div class="pt-posrow">' + cells + '</div>' +
-        '<div class="pt-poshint">в этой раздаче ты была <b>' + mine + '</b></div>';
+        '<div class="pt-poshint">в этой раздаче твоё место — <b>' + mine + '</b></div>';
     }
     const улица = H.street === 0 ? 'до флопа' : 'на этой улице';
-    const word = place === 0 ? 'ходишь первой из ' + order.length
-      : after === 0 ? 'говоришь последней — лучшее место'
-        : 'за тобой ещё ' + after + ' ' + plural(after, 'игрок', 'игрока', 'игроков');
+    const word = place === 0 ? 'твой ход первый из ' + order.length
+      : after === 0 ? 'твой ход последний — лучшее место'
+        : 'после тебя ещё ' + after + ' ' + plural(after, 'игрок', 'игрока', 'игроков');
     return '<div class="pt-posrow">' + cells + '</div>' +
       '<div class="pt-poshint">ты <b>' + mine + '</b>, ' + улица + ' ' + word + '</div>';
   }
@@ -105,49 +147,90 @@
     const me = hero();
 
     el('tb-pos').innerHTML = posStrip();
-    el('tb-pot').textContent = H.pot;
-    el('tb-street').textContent = P.STREETS[Math.min(H.street, 4)];
+    el('tb-pot').innerHTML = '<span class="pt-potrow">' + chips(H.pot, 4) +
+      '<span>' + H.pot + '</span></span>';
+    el('tb-street').textContent = H.done
+      ? (H.result && H.result.showdown ? 'вскрытие' : 'раздача окончена')
+      : P.STREETS[Math.min(H.street, 4)];
 
     // Места по овалу. Герой всегда внизу по центру — так стол читается
     // одинаково независимо от того, какая позиция ему досталась в этой раздаче.
     // Координаты считаем по эллипсу: угол от нижней точки, по часовой стрелке.
     const n = H.seats.length;
     const meIdx = me.i;
+    const ставки = [];
     el('tb-seats').innerHTML = H.seats.map(s => {
       const k = (s.i - meIdx + n) % n;                 // 0 — герой, дальше по кругу
       const ang = (90 + k * (360 / n)) * Math.PI / 180;
-      const x = 50 + 44 * Math.cos(ang);
-      const y = 50 + 46 * Math.sin(ang);
+      const x = 50 + 43 * Math.cos(ang);
+      const y = 50 + 41 * Math.sin(ang);
       const cls = s.hero ? ' me' : (s.folded ? ' out' : (H.toAct === s.i ? ' act' : ''));
-      const btn = s.i === H.button ? '<span class="pt-dlr">D</span>' : '';
+      const n2 = H.seats.length;
+      const sbSeat = n2 === 2 ? H.button : (H.button + 1) % n2;
+      const bbSeat = n2 === 2 ? (H.button + 1) % n2 : (H.button + 2) % n2;
+      const btn = s.i === H.button ? '<span class="pt-dlr">D</span>'
+        : s.i === sbSeat ? '<span class="pt-dlr sb">SB</span>'
+          : s.i === bbSeat ? '<span class="pt-dlr bb">BB</span>' : '';
       // Последнее действие этого игрока на текущей улице — то, что тренер
       // и ученица читают в первую очередь: «кто что сделал».
       const last = [...H.log].reverse().find(l => l.seat === s.i && l.street === H.street);
+      // На плашке остаётся только СЛОВО действия. Сумма уезжает на сукно
+      // фишками перед игроком — так за столом и выглядит.
       const act = s.folded ? 'пас'
-        : last ? last.text.replace(s.name + ' ', '')
-          : (s.put > 0 ? String(s.put) : '');
+        : last ? last.text.replace(s.name + ' ', '').replace(/\s*\d+$/, '').trim()
+          : '';
+
+      /* Вскрытие прямо на столе. Раньше чужие карты показывались только списком
+         под столом — а вопрос «что было у ботов?» человек задаёт, глядя на стол.
+         Поэтому в конце раздачи каждое место открывает свои две карты и называет
+         комбинацию, как при настоящем вскрытии. Сбросившие показываются бледнее:
+         видно, что они в раздаче не участвовали, но карты всё равно видно —
+         это учебный стол, прятать нечего. */
+      let вскрытие = '';
+      if (H.done && !s.hero) {
+        const ev = P.evaluate(s.cards.concat(showBoard()));
+        вскрытие = '<div class="pt-open">' +
+          s.cards.map(c => '<i class="' + (c.s === '♥' || c.s === '♦' ? 'r' : '') + '">' +
+            c.r + c.s + '</i>').join('') + '</div>' +
+          '<div class="pt-cmbs">' + ev.name + '</div>';
+      }
+      // Ставка этого игрока — фишками между ним и центром стола
+      if (s.put > 0 && !H.done) {
+        const bx = 50 + 25 * Math.cos(ang);
+        const by = 50 + 24 * Math.sin(ang);
+        ставки.push('<div class="pt-bet" style="left:' + bx.toFixed(1) + '%;top:' + by.toFixed(1) +
+          '%">' + chips(s.put, 3) + '<span class="v">' + s.put + '</span></div>');
+      }
       return '<div class="pt-seat' + cls + '" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1) + '%">' +
         btn +
-        '<div class="pt-sn">' + (s.hero ? 'Ты' : s.name.replace('Игрок ', '')) +
+        '<div class="pt-sn">' + s.name +
           ' <em>' + B.posOf(H, s.i) + '</em></div>' +
         '<div class="pt-ss">' + s.stack + '</div>' +
         (act ? '<div class="pt-sa' + (/до |колл/.test(act) ? ' bet' : '') + '">' + act + '</div>' : '') +
+        вскрытие +
         '</div>';
-    }).join('');
+    }).join('') + ставки.join('');
 
     /* Лента раздачи. Боты ходят быстрее, чем она успевает посмотреть, и без строки
        «кто поставил и сколько» разбор невозможен: тренер спросит «почему не сбросила
        против рейза с ранней», а она не видела, что был рейз.
        В конце раздачи лента разворачивается — руку разбирают целиком. */
-    const lines = H.log.filter(l => l.text).slice(H.done ? 0 : -7);
+    const lines = H.log.filter(l => l.text).slice(H.done ? 0 : -6);
     const logBox = el('tb-log');
     logBox.classList.toggle('full', !!H.done);
-    logBox.innerHTML = lines.map(l =>
-      '<div class="pt-lg' + (l.seat === me.i ? ' me' : '') + '">' + l.text + '</div>').join('');
+    logBox.innerHTML = lines.map(l => {
+      // Строки улиц движок пишет без места — они и служат разделителями:
+      // без них лента сливается в кашу, и непонятно, что было до флопа,
+      // а что после. Их набирают золотом и вразрядку.
+      if (l.seat === undefined) {
+        return '<div class="pt-lgs">' + l.text.replace(/^(\S+):/, '$1 ·') + '</div>';
+      }
+      return '<div class="pt-lg' + (l.seat === me.i ? ' me' : '') + '">' + l.text + '</div>';
+    }).join('');
     logBox.scrollTop = logBox.scrollHeight;
 
     // борд
-    el('tb-board').innerHTML = H.board.map(c => cardHtml(c)).join('') ||
+    el('tb-board').innerHTML = showBoard().map(c => cardHtml(c)).join('') ||
       '<div class="pt-bnote">карты стола откроются после торговли</div>';
 
     // моя рука
@@ -176,7 +259,7 @@
             '<span class="pt-who">' + r.name + ' <em>' + r.pos + '</em></span>' +
             '<span class="pt-cds">' + r.cards.map(c =>
               '<i class="' + (c.s === '♥' || c.s === '♦' ? 'r' : '') + '">' + c.r + c.s + '</i>').join('') + '</span>' +
-            '<span class="pt-cmb">' + r.ev.name + (r.folded ? ' · сбросил' : '') + '</span>' +
+            '<span class="pt-cmb">' + r.ev.name + (r.folded ? ' · пас' : '') + '</span>' +
           '</div>').join('') + '</div>';
       return;
     }
@@ -227,13 +310,13 @@
     const need = H.bet - me.put;
     if (v.act === 'fold') {
       return me.total > 0
-        ? 'Сбросишь — ' + me.total + ', которые уже в банке, останутся соперникам.'
-        : 'Сбросишь — ничего не теряешь, ждём следующую раздачу.';
+        ? 'Пас — ' + me.total + ', которые уже в банке, останутся соперникам.'
+        : 'Пас — терять нечего, ждём следующую раздачу.';
     }
-    if (v.act === 'check') return 'Чек — платить не надо, смотрим следующую карту бесплатно.';
-    if (v.act === 'call') return 'Заплатишь ' + need + ', в банке станет ' + (H.pot + need) + '. Останется ' + (me.stack - need) + '.';
+    if (v.act === 'check') return 'Чек — платить не надо, следующая карта бесплатно.';
+    if (v.act === 'call') return 'Колл ' + need + ' — в банке станет ' + (H.pot + need) + '. Останется ' + (me.stack - need) + '.';
     const add = v.to - me.put;
-    return 'Поднимешь до ' + v.to + ' — это ' + add + ' из твоих. В банке станет ' + (H.pot + add) + ', соперникам придётся платить ' + (v.to - H.bet) + ' сверху.';
+    return 'Рейз до ' + v.to + ' — это ' + add + ' из твоих. В банке станет ' + (H.pot + add) + ', соперникам придётся платить ' + (v.to - H.bet) + ' сверху.';
   }
 
   /* Размер повышения. Не ползунок: новичку он не говорит ничего.
@@ -316,13 +399,12 @@
      делает вывод «зря сбросила» — это и есть результат-ориентированное мышление,
      главная ловушка на дистанции. Сброс мусора остаётся верным, даже когда
      этот мусор один раз выиграл. */
-  function review() {
-    const P = global.Poker, B = global.Bots;
-    const me = hero();
-
-    // Доводим борд до пяти карт ВИРТУАЛЬНО — состояние раздачи не трогаем.
-    // Порядок колоды тот же, поэтому «что было бы» honest, а не выдуманное.
+  /* Борд для вскрытия: если раздача кончилась раньше ривера, доводим его
+     до пяти карт из той же колоды. Одна функция на стол и на разбор —
+     иначе на экране и в списке оказались бы разные комбинации. */
+  function showBoard() {
     const board = H.board.slice();
+    if (board.length >= 5 || !H.done) return board;
     const deck = H.deck.slice();
     const used = {};
     board.forEach(c => { used[c.r + c.s] = 1; });
@@ -331,10 +413,20 @@
       const c = deck.pop();
       if (!used[c.r + c.s]) { used[c.r + c.s] = 1; board.push(c); }
     }
+    return board;
+  }
+
+  function review() {
+    const P = global.Poker, B = global.Bots;
+    const me = hero();
+
+    // Борд тот же, что показан на столе при вскрытии, — иначе комбинации
+    // на овале и в списке разошлись бы, и верить было бы нечему.
+    const board = showBoard();
     const дораздали = board.length > H.board.length;
 
     const rows = H.seats.map(s => ({
-      seat: s.i, name: s.hero ? 'Ты' : s.name.replace('Игрок ', 'И'),
+      seat: s.i, name: s.name,
       pos: B.posOf(H, s.i), hero: s.hero, folded: s.folded,
       cards: s.cards, ev: P.evaluate(s.cards.concat(board))
     }));
@@ -344,14 +436,20 @@
     let verdict = '';
     if (me.folded) {
       const меБыЛучше = myEv.score === best.ev.score;
-      verdict = 'Ты сбросила. На полном борде твоя рука — <b>' + myEv.name + '</b>. ' +
+      verdict = 'Рука сброшена. На полном борде у тебя было бы: <b>' + myEv.name + '</b>. ' +
         (меБыЛучше
           ? 'Это лучшая рука за столом.<br><span class="pt-cav">И всё же: одна раздача ничего не доказывает. ' +
             'Сброс слабой руки остаётся верным решением, даже когда она один раз выиграла бы — ' +
             'иначе придётся платить за неё и во все остальные разы.</span>'
           : 'Сильнее всех — у ' + best.name + ': ' + best.ev.name + '. Сброс сберёг фишки.');
     } else {
-      verdict = H.result.text;
+      // Движок пишет «Ты забирает 260» — он не знает про лицо и род.
+      // Здесь текст уже показывается человеку, поэтому правим на его языке.
+      verdict = H.result.text
+        .replace(/^Ты забирает /, 'Банк твой: ')
+        .replace(/^Ты делят /, 'Банк делится: ')
+        .replace(/^Ты и /, 'Ты и ')
+        .replace(/ и Ты делят /, ' и ты делите ');
     }
     if (дораздали) verdict += '<br><span class="pt-cav">Борд после «' +
       P.STREETS[Math.min(H.street, 4)] + '» дораздан, чтобы было видно, чем бы всё кончилось.</span>';
@@ -382,11 +480,17 @@
     } catch (e) { return null; }
   }
 
+  /* Кнопка едет по кругу — на одно место влево каждую раздачу, как за живым
+     столом. Раньше она прыгала случайно, и было не понять, что позиции вообще
+     сменяются: человек видел «я BB», потом «я CO» и не связывал это с кнопкой. */
   function start(opts) {
+    const prev = H;
+    const btn = prev ? (prev.button + 1) % SEATS : Math.floor(Math.random() * SEATS);
+    const seed = (opts && opts.seed) || global.Poker.newSeed();
     H = global.Poker.newHand(Object.assign({
       seats: SEATS, bb: BB, stack: STACK,
-      button: Math.floor(Math.random() * SEATS),
-      names: { 0: 'Ты' }
+      button: btn, seed: seed,
+      names: именаМест(seed, SEATS)
     }, opts || {}));
     думает = false;
     выбор = null;
