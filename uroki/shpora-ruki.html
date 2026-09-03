@@ -1,71 +1,195 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<title>SYNDICATE — Шпаргалка: комбинации</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
-:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;--line:#2a2a30;--panel:#151519}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;--line:#2a2a30;--panel:#151519;
+  --red:#c8102e;--black:#111114;--paper:#f7f3e8}
 @page{size:A4;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:#000}
 body{font-family:'Inter',Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:210mm;min-height:297mm;position:relative;overflow:hidden;
-  background:radial-gradient(1100px 480px at 82% -8%,rgba(212,175,55,.13),transparent 60%),linear-gradient(180deg,#0e0e11,#0b0b0d);padding:14mm 16mm 12mm}
+  background:radial-gradient(1100px 480px at 82% -8%,rgba(212,175,55,.13),transparent 60%),linear-gradient(180deg,#0e0e11,#0b0b0d);padding:11mm 13mm 9mm}
 .suit-bg{position:absolute;font-family:'Playfair Display',serif;color:rgba(212,175,55,.04);font-size:300px;bottom:-30px;right:-20px;transform:rotate(-10deg);font-weight:800}
 .kicker{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
-.brand{font-family:'Playfair Display',serif;font-weight:900;font-size:26px;color:#fff;margin:5px 0 1px}
+.brand{font-family:'Playfair Display',serif;font-weight:900;font-size:24px;color:#fff;margin:4px 0 0}
 .brand .s{color:var(--gold);font-size:13px;vertical-align:super;margin-left:7px}
-.h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:800;margin:9px 0 3px}
-.sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.top{display:block}
+.brand,.kicker,.h1{white-space:nowrap}
+.h1{font-family:'Playfair Display',serif;font-size:21px;color:var(--gold);font-weight:800;margin:6px 0 2px}
+.sub{font-size:11px;color:var(--muted)}
 
-.row{display:flex;align-items:center;gap:13px;padding:9px 0;border-bottom:1px solid var(--line)}
-.rank{font-family:'Playfair Display',serif;font-weight:800;color:var(--gold);font-size:17px;width:20px;text-align:center}
-.info{width:52mm;flex-shrink:0}
-.info .nm{font-size:14px;color:#fff;font-weight:700}
-.info .d{font-size:10.5px;color:var(--muted);line-height:1.35;margin-top:1px}
-.cards{display:flex;gap:4px}
-.card{width:26px;height:36px;border-radius:4px;background:#f4efe2;color:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:12px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.5);position:relative}
-.card.r{color:#c0392b}
-.card .su{font-size:12px;margin-top:1px}
-.foot{margin-top:12px;padding-top:9px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+/* легенда: масти и порядок номиналов — во всю ширину под заголовком */
+.legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:10px;color:var(--muted);
+  margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center}
+.legend b{color:var(--ink);font-weight:600}
+.legend .suits{display:flex;gap:9px;margin-bottom:0;font-size:15px;line-height:1;align-items:center}
+.legend .suits .r{color:#ff5a6a}.legend .suits .k{color:#fff}
+.legend .ord{letter-spacing:.06em;font-weight:600;color:var(--ink)}
+.legend .ord i{font-style:normal;color:var(--gold)}
+
+/* строки */
+.list{margin-top:9px}
+.row{display:grid;grid-template-columns:22px 48mm 1fr;align-items:center;gap:0 10px;padding:6.2px 0;border-bottom:1px solid var(--line)}
+.rank{font-family:'Playfair Display',serif;font-weight:800;color:var(--gold);font-size:16px;text-align:center}
+.info .nm{font-size:13.5px;color:#fff;font-weight:700;letter-spacing:-.01em}
+.info .d{font-size:9.6px;color:var(--muted);line-height:1.3;margin-top:1px}
+.info .w{font-size:9px;color:var(--gold-soft);line-height:1.3;margin-top:2px}
+.info .w b{color:var(--gold);font-weight:600}
+.hand{display:flex;gap:5px;align-items:flex-end}
+
+/* карта: крупный номинал в углу, масть по центру — как настоящая */
+.c{width:38px;height:54px;border-radius:5px;background:var(--paper);position:relative;
+   box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 2px 5px rgba(0,0,0,.6);color:var(--black);
+   font-family:'Inter',Arial,sans-serif;font-weight:800;flex-shrink:0}
+.c .n{position:absolute;left:4px;top:3px;font-size:13px;line-height:1;letter-spacing:-.03em}
+.c .n small{display:block;font-size:9px;line-height:1;margin-top:1px;font-weight:700}
+.c .m{position:absolute;right:4px;bottom:2px;font-size:22px;line-height:1}
+.c.r{color:var(--red)}
+.c.in{outline:2px solid var(--gold);outline-offset:1px;box-shadow:0 0 0 1px #0b0b0d,0 0 12px rgba(212,175,55,.35),0 2px 5px rgba(0,0,0,.6)}
+.c.k{opacity:.42;filter:saturate(.6)}
+.c.k::after{content:"кикер";position:absolute;left:0;right:0;bottom:-11px;font-size:7px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;font-weight:600;opacity:1}
+.hand.has-k{padding-bottom:9px}
+.plus{color:var(--muted);font-size:12px;font-weight:700;margin:0 1px 18px;align-self:center}
+
+/* шкала силы слева */
+.scale{position:absolute;left:5.5mm;top:60mm;bottom:22mm;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,var(--gold),rgba(212,175,55,.08))}
+.scale i{position:absolute;left:-14px;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);font-style:normal;font-weight:700;transform:rotate(-90deg);transform-origin:left top;white-space:nowrap}
+.scale i.t{top:34px}.scale i.b{bottom:-30px;color:var(--muted)}
+
+.foot{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 .foot .l{font-family:'Playfair Display',serif;font-size:12px;color:var(--muted)}.foot .l b{color:var(--gold)}
 .foot .m{font-size:9px;color:#6c6860;letter-spacing:.1em;text-transform:uppercase}
+.rule{margin-top:7px;background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25);border-radius:9px;padding:6px 10px;font-size:9.6px;color:var(--ink);line-height:1.35}
+.rule b{color:var(--gold)}
 </style></head>
 <body>
 <div class="page">
-  <div class="suit-bg">♥</div>
-  <div class="kicker">Академия · Шпаргалка 1/4</div>
-  <div class="brand">SYNDICATE<span class="s">♠ ♥ ♦ ♣</span></div>
-  <div class="h1">Рейтинг рук</div>
-  <div class="sub">От самой сильной к слабой. Побеждает более высокая комбинация из 5 карт.</div>
+  <div class="suit-bg">♠</div>
+  <div class="scale"><i class="t">сильнее</i><i class="b">слабее</i></div>
+  <div class="top">
+    <div>
+      <div class="kicker">Академия · Шпаргалка 1/4</div>
+      <div class="brand">SYNDICATE<span class="s">♠ ♥ ♦ ♣</span></div>
+      <div class="h1">Комбинации: что бьёт что</div>
+      <div class="sub">Сверху — самая сильная. Считаются <b style="color:var(--ink)">лучшие 5 карт</b> из своих двух и пяти общих.</div>
+    </div>
+    <div class="legend">
+      <div class="suits"><span class="k">♠</span><span class="r">♥</span><span class="r">♦</span><span class="k">♣</span> <span style="font-size:10px;align-self:center;color:var(--muted)">масти равны — ни одна не старше</span></div>
+      <div>Старшинство карт: <span class="ord">2 3 4 5 6 7 8 9 10 J Q K <i>A</i></span></div>
+      <div style="margin-top:3px"><b>Золотая рамка</b> — карты, из которых сложена комбинация. <b>Кикер</b> — остальные, решают при равной комбинации.</div>
+    </div>
+  </div>
 
-  <div class="row"><div class="rank">1</div><div class="info"><div class="nm">Роял-флеш</div><div class="d">Старшая возможная. A-K-Q-J-10 одной масти.</div></div>
-    <div class="cards"><div class="card">A<span class="su">♠</span></div><div class="card">K<span class="su">♠</span></div><div class="card">Q<span class="su">♠</span></div><div class="card">J<span class="su">♠</span></div><div class="card">10<span class="su">♠</span></div></div></div>
+  <div class="list">
 
-  <div class="row"><div class="rank">2</div><div class="info"><div class="nm">Стрит-флеш</div><div class="d">5 подряд одной масти.</div></div>
-    <div class="cards"><div class="card r">9<span class="su">♥</span></div><div class="card r">8<span class="su">♥</span></div><div class="card r">7<span class="su">♥</span></div><div class="card r">6<span class="su">♥</span></div><div class="card r">5<span class="su">♥</span></div></div></div>
+  <div class="row"><div class="rank">1</div>
+    <div class="info"><div class="nm">Роял-флеш</div><div class="d">Десятка, валет, дама, король, туз — все одной масти.</div><div class="w">Сильнее ничего нет. Две таких за столом — <b>делят банк</b>.</div></div>
+    <div class="hand">
+      <div class="c in"><span class="n">A<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c in"><span class="n">K<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c in"><span class="n">Q<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c in"><span class="n">J<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c in"><span class="n">10<small>♠</small></span><span class="m">♠</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">3</div><div class="info"><div class="nm">Каре</div><div class="d">4 карты одного номинала.</div></div>
-    <div class="cards"><div class="card">K<span class="su">♣</span></div><div class="card r">K<span class="su">♦</span></div><div class="card r">K<span class="su">♥</span></div><div class="card">K<span class="su">♠</span></div><div class="card">4<span class="su">♣</span></div></div></div>
+  <div class="row"><div class="rank">2</div>
+    <div class="info"><div class="nm">Стрит-флеш</div><div class="d">Пять карт подряд, все одной масти.</div><div class="w">При двух — побеждает та, где <b>старшая карта выше</b>.</div></div>
+    <div class="hand">
+      <div class="c r in"><span class="n">9<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">8<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">7<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">6<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">5<small>♥</small></span><span class="m">♥</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">4</div><div class="info"><div class="nm">Фулл-хаус</div><div class="d">Тройка + пара.</div></div>
-    <div class="cards"><div class="card">Q<span class="su">♠</span></div><div class="card r">Q<span class="su">♥</span></div><div class="card r">Q<span class="su">♦</span></div><div class="card">7<span class="su">♣</span></div><div class="card">7<span class="su">♠</span></div></div></div>
+  <div class="row"><div class="rank">3</div>
+    <div class="info"><div class="nm">Каре</div><div class="d">Четыре карты одного номинала.</div><div class="w">Старшее каре побеждает: <b>четыре короля бьют четыре десятки</b>.</div></div>
+    <div class="hand has-k">
+      <div class="c in"><span class="n">K<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r in"><span class="n">K<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c r in"><span class="n">K<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c in"><span class="n">K<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c k"><span class="n">4<small>♣</small></span><span class="m">♣</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">5</div><div class="info"><div class="nm">Флеш</div><div class="d">5 карт одной масти (не подряд).</div></div>
-    <div class="cards"><div class="card r">A<span class="su">♦</span></div><div class="card r">J<span class="su">♦</span></div><div class="card r">8<span class="su">♦</span></div><div class="card r">6<span class="su">♦</span></div><div class="card r">3<span class="su">♦</span></div></div></div>
+  <div class="row"><div class="rank">4</div>
+    <div class="info"><div class="nm">Фулл-хаус</div><div class="d">Тройка и пара вместе.</div><div class="w">Сначала сравнивают <b>тройки</b>, пары — только если тройки равны.</div></div>
+    <div class="hand">
+      <div class="c in"><span class="n">Q<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c r in"><span class="n">Q<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">Q<small>♦</small></span><span class="m">♦</span></div>
+      <span class="plus">+</span>
+      <div class="c in"><span class="n">7<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c in"><span class="n">7<small>♠</small></span><span class="m">♠</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">6</div><div class="info"><div class="nm">Стрит</div><div class="d">5 подряд, масти любые.</div></div>
-    <div class="cards"><div class="card">10<span class="su">♣</span></div><div class="card r">9<span class="su">♦</span></div><div class="card">8<span class="su">♠</span></div><div class="card r">7<span class="su">♥</span></div><div class="card">6<span class="su">♣</span></div></div></div>
+  <div class="row"><div class="rank">5</div>
+    <div class="info"><div class="nm">Флеш</div><div class="d">Пять карт одной масти, порядок любой.</div><div class="w">Побеждает флеш со <b>старшей картой выше</b>; масть значения не имеет.</div></div>
+    <div class="hand">
+      <div class="c r in"><span class="n">A<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c r in"><span class="n">J<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c r in"><span class="n">8<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c r in"><span class="n">6<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c r in"><span class="n">3<small>♦</small></span><span class="m">♦</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">7</div><div class="info"><div class="nm">Тройка (сет)</div><div class="d">3 карты одного номинала.</div></div>
-    <div class="cards"><div class="card">5<span class="su">♠</span></div><div class="card r">5<span class="su">♥</span></div><div class="card r">5<span class="su">♦</span></div><div class="card">K<span class="su">♣</span></div><div class="card r">2<span class="su">♦</span></div></div></div>
+  <div class="row"><div class="rank">6</div>
+    <div class="info"><div class="nm">Стрит</div><div class="d">Пять карт подряд, масти любые.</div><div class="w">Побеждает стрит со <b>старшей картой выше</b>. Туз может быть и первым: A-2-3-4-5 — младший стрит.</div></div>
+    <div class="hand">
+      <div class="c in"><span class="n">10<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r in"><span class="n">9<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c in"><span class="n">8<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c r in"><span class="n">7<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c in"><span class="n">6<small>♣</small></span><span class="m">♣</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">8</div><div class="info"><div class="nm">Две пары</div><div class="d">Две разные пары.</div></div>
-    <div class="cards"><div class="card">A<span class="su">♣</span></div><div class="card r">A<span class="su">♦</span></div><div class="card">9<span class="su">♠</span></div><div class="card r">9<span class="su">♥</span></div><div class="card">4<span class="su">♣</span></div></div></div>
+  <div class="row"><div class="rank">7</div>
+    <div class="info"><div class="nm">Тройка (сет)</div><div class="d">Три карты одного номинала.</div><div class="w">Старшая тройка побеждает; при равных — <b>старший кикер</b>.</div></div>
+    <div class="hand has-k">
+      <div class="c in"><span class="n">5<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c r in"><span class="n">5<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c r in"><span class="n">5<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c k"><span class="n">K<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r k"><span class="n">2<small>♦</small></span><span class="m">♦</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">9</div><div class="info"><div class="nm">Пара</div><div class="d">Две карты одного номинала.</div></div>
-    <div class="cards"><div class="card r">J<span class="su">♦</span></div><div class="card">J<span class="su">♠</span></div><div class="card">Q<span class="su">♣</span></div><div class="card r">7<span class="su">♦</span></div><div class="card">3<span class="su">♠</span></div></div></div>
+  <div class="row"><div class="rank">8</div>
+    <div class="info"><div class="nm">Две пары</div><div class="d">Две пары разного номинала.</div><div class="w">Сравнивают <b>старшие пары</b>, потом младшие, потом кикер.</div></div>
+    <div class="hand has-k">
+      <div class="c in"><span class="n">A<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r in"><span class="n">A<small>♦</small></span><span class="m">♦</span></div>
+      <span class="plus">+</span>
+      <div class="c in"><span class="n">9<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c r in"><span class="n">9<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c k"><span class="n">4<small>♣</small></span><span class="m">♣</span></div>
+    </div></div>
 
-  <div class="row"><div class="rank">10</div><div class="info"><div class="nm">Старшая карта</div><div class="d">Нет комбинации — решает старшая карта.</div></div>
-    <div class="cards"><div class="card">A<span class="su">♠</span></div><div class="card r">Q<span class="su">♦</span></div><div class="card">9<span class="su">♣</span></div><div class="card r">6<span class="su">♥</span></div><div class="card">2<span class="su">♠</span></div></div></div>
+  <div class="row"><div class="rank">9</div>
+    <div class="info"><div class="nm">Пара</div><div class="d">Две карты одного номинала.</div><div class="w">Старшая пара побеждает; при равных парах — <b>старший кикер</b>.</div></div>
+    <div class="hand has-k">
+      <div class="c r in"><span class="n">J<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c in"><span class="n">J<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c k"><span class="n">Q<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r k"><span class="n">7<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c k"><span class="n">3<small>♠</small></span><span class="m">♠</span></div>
+    </div></div>
 
-  <div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера</div><div class="m">Шпаргалка · рейтинг рук</div></div>
+  <div class="row"><div class="rank">10</div>
+    <div class="info"><div class="nm">Старшая карта</div><div class="d">Ничего не сложилось — считается самая высокая карта.</div><div class="w">Туз бьёт короля. При равной старшей — <b>следующая по старшинству</b>.</div></div>
+    <div class="hand has-k">
+      <div class="c in"><span class="n">A<small>♠</small></span><span class="m">♠</span></div>
+      <div class="c r k"><span class="n">Q<small>♦</small></span><span class="m">♦</span></div>
+      <div class="c k"><span class="n">9<small>♣</small></span><span class="m">♣</span></div>
+      <div class="c r k"><span class="n">6<small>♥</small></span><span class="m">♥</span></div>
+      <div class="c k"><span class="n">2<small>♠</small></span><span class="m">♠</span></div>
+    </div></div>
+
+  </div>
+
+  <div class="rule"><b>Как читать вскрытие.</b> Сначала смотри, у кого комбинация выше по списку — она побеждает всегда, даже если у соперника карты «красивее». Только при <b>одинаковой</b> комбинации сравнивают её старшинство, а потом кикеры. Флеш из мелких карт бьёт стрит из старших; тройка двоек бьёт две пары тузов и королей.</div>
+
+  <div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера</div><div class="m">Шпаргалка · комбинации</div></div>
 </div>
 </body></html>
