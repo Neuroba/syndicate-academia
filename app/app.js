@@ -281,6 +281,12 @@ function renderLesson(n) {
   if (l.n <= S.lesson) q.onclick = () => go('quiz');
   mat.appendChild(q);
 
+  const pz = document.createElement('button');
+  pz.className = 'mt';
+  pz.innerHTML = `<div class="mi">▶</div><div class="mn">Презентация</div><div class="md">слайды занятия</div>`;
+  pz.onclick = () => openOut(UROKI + 'urok-' + l.n + '.html');
+  mat.appendChild(pz);
+
   const hw = document.getElementById('ls-hw');
   hw.innerHTML = `Домашка: <b>${l.homework}</b>`;
   if (l.n === S.lesson) {
@@ -321,6 +327,26 @@ function sheetKeys() {
   return known.concat(all.filter(k => !known.includes(k)));
 }
 
+
+/* Презентации занятий и раздатки лежат рядом с приложением: на сайте — в /uroki/,
+   на диске — в папке SYNDICATE-Академия. Открываем внешним браузером: внутри
+   Telegram слайды не дают полного экрана и клавиш. */
+const UROKI = location.hostname.endsWith('github.io') ? '../uroki/' : '../';
+function openOut(url) { if (TG && TG.openLink) TG.openLink(url); else window.open(url, '_blank'); }
+const PREZ = [
+  ['kurs.html', 'Все занятия — оболочка курса', 'стрелки — слайды · F — полный экран'],
+  ['urok-1.html', 'Занятие 1', 'карта мира покера, механика'],
+  ['urok-2.html', 'Занятие 2', 'ход раздачи, позиция'],
+  ['urok-3.html', 'Занятие 3', 'стартовые руки'],
+  ['urok-4.html', 'Занятие 4', 'флоп и шансы'],
+  ['urok-5.html', 'Занятие 5', 'постфлоп'],
+  ['urok-6.html', 'Занятие 6', 'кеш'],
+  ['urok-7.html', 'Занятие 7', 'турнир'],
+  ['urok-8.html', 'Занятие 8', 'сборка и разбор'],
+  ['plany.html', 'Планы занятий', 'тайминг и что делаем'],
+  ['kviz-kartochki.pdf', 'Квиз-карточки', 'PDF для печати'],
+];
+
 function renderSheets() {
   const box = document.getElementById('sh-list');
   box.innerHTML = '';
@@ -345,6 +371,23 @@ function renderSheets() {
     <span class="ts">${GLOSSARY.length} слов с объяснением и примером</span></span><span class="ar">›</span>`;
   g.onclick = () => go('glossary');
   box.appendChild(g);
+
+  // Презентации занятий — те же слайды, что показывает тренер. Не секрет:
+  // ученик может пересмотреть занятие сам, тренер — открыть с любого телефона.
+  const h = document.createElement('div');
+  h.className = 'sechead';
+  h.style.marginTop = '18px';
+  h.textContent = 'Презентации занятий';
+  box.appendChild(h);
+  PREZ.forEach(([file, title, sub]) => {
+    const b = document.createElement('button');
+    b.className = 'sh';
+    const n = (file.match(/urok-(\d)/) || [])[1];
+    b.innerHTML = `<span class="prev">${n ? n : file.endsWith('.pdf') ? 'PDF' : '▶'}</span><span class="tx"><span class="tt">${title}</span>
+      <span class="ts">${sub}</span></span><span class="ar">↗</span>`;
+    b.onclick = () => openOut(UROKI + file);
+    box.appendChild(b);
+  });
 }
 function miniCells() {
   // мини-превью матрицы: те же три зоны, 4×4
