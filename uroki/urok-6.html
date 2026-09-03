@@ -1,0 +1,138 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — Занятие 6</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;
+  --line:#2a2a30;--panel:#151519;--panel2:#1c1c22;--felt:#355129;--red:#b5292a;--ok:#3fb968}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:64px 84px;display:none;
+  background:radial-gradient(1200px 520px at 84% -10%,rgba(212,175,55,.13),transparent 60%),
+             linear-gradient(180deg,#0e0e11,#0b0b0d)}
+.slide.on{display:flex;flex-direction:column}
+@media (prefers-reduced-motion: no-preference){
+  .slide.on{animation:fade .22s ease}@keyframes fade{from{opacity:.35}to{opacity:1}}}
+.slide::after{content:attr(data-suit);position:absolute;right:-40px;bottom:-140px;font-size:520px;
+  line-height:1;color:rgba(212,175,55,.045);transform:rotate(-14deg);pointer-events:none}
+.kicker{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-weight:900;font-size:74px;line-height:1.04;color:#fff;margin:14px 0 0}
+h2{font-family:'Playfair Display',serif;font-weight:800;font-size:50px;color:var(--gold);margin:10px 0 6px;line-height:1.12}
+.rule{height:2px;width:210px;background:linear-gradient(90deg,var(--gold),transparent);margin:16px 0 26px}
+.lead{font-size:23px;color:var(--muted);line-height:1.55;max-width:1120px}
+.big{font-family:'Playfair Display',serif;font-size:42px;color:#fff;line-height:1.25}
+.mark{color:var(--gold)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.cards{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.p{background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+.p.hot{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1d1a10,#141209)}
+.p .t{font-family:'Playfair Display',serif;font-size:29px;color:var(--gold);margin-bottom:8px;line-height:1.2}
+.p .t.w{color:#fff}
+.p .d{font-size:19px;color:var(--muted);line-height:1.5}
+.p .n{font-size:40px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.p.dense{padding:20px 22px}.p.dense .t{font-size:25px}.p.dense .d{font-size:18px}
+.tag{display:inline-block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#0b0b0d;
+  background:var(--gold);padding:4px 11px;border-radius:5px;font-weight:700;margin-bottom:10px}
+.tag.dim{background:#2a2a30;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:20px}
+th{text-align:left;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);
+  font-weight:600;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+td{padding:13px 14px;border-bottom:1px solid #1a1a20;color:var(--ink);vertical-align:middle}
+td.m{color:var(--muted);font-size:18px}
+tr.hot td{background:rgba(212,175,55,.07)}tr.hot td:first-child{color:var(--gold);font-weight:700}
+.hand{display:flex;gap:5px}
+.card{width:48px;height:66px;background:#f4f1ea;border-radius:5px;color:#0b0b0d;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:21px;
+  line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.card.r{color:#b5292a}.card .s{font-size:21px;margin-top:2px;line-height:1}
+.card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold)}
+.ladder{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 34px}
+.rk{display:flex;align-items:center;gap:14px;padding:9px 13px;border-radius:9px;background:#131317;border:1px solid #1e1e24}
+.rk .i{width:26px;font-size:15px;color:var(--gold-soft);font-weight:700;text-align:right}
+.rk .nm{flex:1;font-size:19px}.rk .hand{transform:scale(.72);transform-origin:right center}
+.rk.top{background:linear-gradient(90deg,rgba(212,175,55,.16),#131317);border-color:rgba(212,175,55,.4)}
+.felt{position:relative;width:660px;height:320px;margin:0 auto;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:9px solid #17171c;border-radius:170px;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;width:96px}
+.seat .b{display:inline-block;padding:5px 0;width:78px;border-radius:7px;background:#101014;
+  border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.seat .r{font-size:12px;color:var(--muted);margin-top:4px}
+.seat.btn .b{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.seat.bl .b{background:#2b2118;color:var(--gold);border-color:rgba(212,175,55,.45)}
+.seat.early .b{border-color:rgba(181,41,42,.6);color:#e6a6a6}
+.streets{display:flex;align-items:flex-end;gap:26px}
+.st{flex:1;background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);
+  border-radius:12px;padding:20px;text-align:center}
+.st .lb{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.st .hand{justify-content:center}.st .d{font-size:16px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arrow{color:var(--gold);font-size:26px;padding-bottom:44px}
+.board{display:flex;justify-content:center;gap:14px;margin:14px 0}
+.board .card{width:88px;height:120px;font-size:40px;border-radius:9px}
+.board .card .s{font-size:38px;margin-top:5px}
+.foot{position:absolute;left:84px;right:84px;bottom:30px;display:flex;justify-content:space-between;
+  align-items:center;font-size:14px;color:#6c6860;z-index:3}
+.foot .l{font-family:'Playfair Display',serif;color:var(--muted)}.foot .l b{color:var(--gold)}
+#bar{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:0;z-index:4}
+#cue{position:absolute;left:0;right:0;bottom:0;background:#0a0a0c;border-top:2px solid var(--gold);
+  padding:18px 84px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:5}
+#cue.on{display:block}
+#help{position:absolute;right:18px;top:14px;font-size:12px;color:#4a4842;letter-spacing:.1em;z-index:6}
+</style></head><body>
+<div id="stage">
+<section class="slide on" data-suit="♠" data-cue="Скажи прямо в лоб: сегодня напротив живые люди из клуба, и это нормально — волноваться. Спроси её одним словом, что она чувствует перед этим. Не утешай, просто прими ответ и переходи дальше."><div class="body" style="justify-content:center"><div class="kicker">занятие 6 · кеш-игра</div><h1>Живые люди</h1><div class="rule"></div><div class="lead">Сегодня первый раз за столом не боты, а игроки клуба. Те, кто замечает ошибку и берёт за неё деньги.</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Признай честно: пять занятий она била ботов, и это ничего не доказывает. Скажи, что стратегию с ботов снимать нельзя, мы брали с них только руки и позиции. Пусть не расстраивается, если сегодня будет проигрывать — это первый вечер против людей."><div class="body"><div class="kicker">что меняется</div><h2>Боты и люди</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="tag dim">занятия 1–5</div><div class="t w">Боты PokerTH</div><div class="d">Играли одинаково, не смотрели на тебя, прощали любую ошибку. Годились для механики и позиции.</div></div><div class="p hot"><div class="tag">с сегодня</div><div class="t">Игроки клуба</div><div class="d">Замечают, что ты играешь мало рук. Видят, что чекаешь на слабой. Наказывают за то, что бот пропускал.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Механику ты сдала. Теперь начинается <span class="mark">игра против людей</span>.</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Проговори все три и предупреди: сегодня это случится, и это не значит, что она играет плохо. Спроси, какой из трёх пугает больше. Ответ пригодится тебе в разборе через 45 минут."><div class="body"><div class="kicker">чего ждать</div><h2>Три сюрприза</h2><div class="rule"></div><div class="cards c3"><div class="p"><div class="t w">Тебя посчитают</div><div class="d">Через полчаса кто-то заметит, что ты входишь редко, и начнёт красть у тебя блайнды.</div></div><div class="p"><div class="t w">Тебя переставят</div><div class="d">Ты поставишь на флопе, тебе ответят рейзом. Бот так не делал.</div></div><div class="p"><div class="t w">Тебя переждут</div><div class="d">Люди умеют пасовать. Твоя сильная рука иногда просто не получит денег.</div></div></div></div></section>
+<section class="slide" data-suit="♥" data-cue="Главное отличие, ради которого весь слайд: в кеше время на её стороне, спешить некуда. Спроси, что она сделает, если час не приходит ни одной руки. Правильный ответ — ничего, продолжит пасовать."><div class="body"><div class="kicker">формат</div><h2>Кеш против турнира</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="tag dim">кеш</div><div class="t w">Фишка = доллар</div><div class="d">Села когда хочешь, встала когда хочешь, забрала со стола сколько есть. Стек можно долить обратно до полного.</div></div><div class="p"><div class="tag dim">турнир</div><div class="t w">Фишки не деньги</div><div class="d">Вылетела — вылетела, долить нельзя. Блайнды растут и выгоняют тебя из-за стола. Это занятие 7.</div></div></div><div class="big" style="margin-top:36px;text-align:center">В кеше у тебя есть право <span class="mark">ждать</span>.</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Покажи руками: сто больших блайндов против двадцати — это в пять раз больше денег за одно и то же решение. Скажи, что от глубины меняется сам список рук, которыми стоит входить. Дальше слайд с таблицей, не забегай вперёд."><div class="body"><div class="kicker">глубина стека</div><h2>Сто и двадцать</h2><div class="rule"></div><div class="cards c3"><div class="p"><div class="n">100 бб</div><div class="t w">Полный стек</div><div class="d">так мы садимся в кеш</div></div><div class="p"><div class="n">20 бб</div><div class="t w">Короткий стек</div><div class="d">так бывает в конце турнира</div></div><div class="p hot"><div class="n">×5</div><div class="t">Разница</div><div class="d">и играют их по-разному</div></div></div></div></section>
+<section class="slide" data-suit="♣" data-cue="Объясни через T9: вдвоём это почти монетка, но при глубоком стеке рука иногда собирает стрит и забирает большой банк. При двадцати блайндах такой руке негде развернуться — денег не хватит доиграть. Спроси, почему тогда при глубоком стеке позиция стоит дороже."><div class="body"><div class="kicker">глубина решает</div><h2>Чем входить</h2><div class="rule"></div><table><tr><th>Стек</th><th>Что важно</th><th>Пример</th></tr><tr class="hot"><td>100 бб</td><td class="m">Рука, которая может вырасти на четырёх улицах</td><td class="m">T9 одномастные: вдвоём 53,9%, но растут в стрит и флеш</td></tr><tr><td>20 бб</td><td class="m">Всё решается до флопа, улиц почти нет</td><td class="m">Тут работает шпаргалка push/fold, её берём на занятии 7</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Глубокий стек — это <span class="mark">четыре улицы решений</span>, а не одна.</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Это правило клуба, а не догма из интернета — скажи так честно. Смысл один: чтобы один плохой вечер не выносил всю кассу. Спроси, сколько вечеров подряд можно проигрывать по одной закупке, прежде чем коробка кончится."><div class="body"><div class="kicker">банкролл</div><h2>Деньги на покер</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">Одна закупка — <span class="mark">одна двадцатая</span> твоей покерной коробки.</div><div class="lead" style="text-align:center;margin:0 auto">Коробка отдельно от денег на жизнь. Села со 100 бб — значит в коробке лежит ещё девятнадцать таких.</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Не заставляй её зубрить названия — важны только два вопроса из панчлайна. Разбери с ней один пример: сегодня за столом кто-то окажется звонящим, и против него блеф просто сгорает. Скажи, что в разборе спросишь, кого она отнесла к какому типу."><div class="body"><div class="kicker">чтение без статистики</div><h2>Четыре типа</h2><div class="rule"></div><table><tr><th>Тип</th><th>Как выглядит</th><th>Что делать</th></tr><tr><td>Скала — мало рук, редко ставит</td><td class="m">Входит 2 раза из 20, чаще коллом</td><td class="m">Ставит — у него есть. Средние руки сбрасывай</td></tr><tr><td>Звонящий — много рук, редко ставит</td><td class="m">Платит почти всё, но сам не рейзит</td><td class="m">Ставь сильной рукой на всех улицах. Не блефуй</td></tr><tr><td>Регуляр — мало рук, много ставит</td><td class="m">Входит редко, зато всегда рейзом</td><td class="m">Без сильной руки не лезь, особенно из блайндов</td></tr><tr class="hot"><td>Маньяк — много рук, много ставит</td><td class="m">Рейзит по кругу, вошёл 10 раз из 20</td><td class="m">Жди руку и лови. Он сам принесёт деньги</td><td class="m"></td><td class="m"></td></tr></table><div class="big" style="margin-top:36px;text-align:center">Два вопроса: <span class="mark">сколько</span> играет и <span class="mark">как</span> входит.</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Заведи это как обязательный ритуал: без бумажки она к концу вечера ничего не вспомнит. Покажи свой листок, если он есть. Предупреди — считать нужно и те раздачи, где она сама спасовала, наблюдение не прекращается."><div class="body"><div class="kicker">как считать</div><h2>Двадцать раздач</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="t w">Столбик на бумаге</div><div class="d">Пиши ники соперников и ставь палочку каждый раз, когда человек вошёл в банк. Двадцать раздач — и картина есть.</div></div><div class="p hot"><div class="t">Вторая колонка — как вошёл</div><div class="d">Коллом или рейзом. Мало рук и всегда рейз — регуляр. Много рук и почти всегда колл — звонящий.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Тетрадь рядом с ноутбуком — <span class="mark">часть игры</span>, а не школьная привычка.</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Вот главная цифра занятия: J8 против одного человека — фаворит, против пятерых — ровно средний игрок, ноль преимущества. Спроси её, что это значит для решения — и подведи к ответу: не рука сама по себе, а сколько людей осталось в раздаче. Пусть сравнит с тузами, которые держат 49,2% даже впятером."><div class="body"><div class="kicker">сколько народу в банке</div><h2>Вдвоём и впятером</h2><div class="rule"></div><table><tr><th>Рука</th><th>Против одного</th><th>Против пятерых</th><th>Вывод</th></tr><tr><td>AA</td><td class="m">85,6%</td><td class="m">49,2%</td><td class="m">держит любой стол</td></tr><tr><td>A5 разномастные</td><td class="m">57,7%</td><td class="m">18,2%</td><td class="m">вдвоём фаворит, впятером никто</td></tr><tr class="hot"><td>J8 разномастные</td><td class="m">52,1%</td><td class="m">16,8%</td><td class="m">ровно честная доля</td></tr><tr><td>72 разномастные</td><td class="m">34,3%</td><td class="m">8,6%</td><td class="m">мусор в любом составе</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Честная доля впятером — <span class="mark">16,7%</span>. J8 даёт 16,8%.</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Проведи пальцем по кругу и убирай игроков по одному. Скажи: каждый лишний человек в банке съедает её долю и превращает среднюю руку в мусор. Спроси, стоит ли лимпить J8 с ранней позиции, когда за ней ещё шесть человек."><div class="body"><div class="kicker">схема</div><h2>Кто ещё в банке</h2><div class="rule"></div><div class="felt">
+<div class="seat early" style="left:22%;top:2%"><div class="b">UTG</div><div class="r">ходит первым</div></div>
+<div class="seat early" style="left:50%;top:-7%"><div class="b">UTG+1</div><div class="r">рано</div></div>
+<div class="seat early" style="left:78%;top:2%"><div class="b">LJ</div><div class="r">рано</div></div>
+<div class="seat" style="left:99%;top:44%"><div class="b">HJ</div><div class="r">середина</div></div>
+<div class="seat" style="left:86%;top:93%"><div class="b">CO</div><div class="r">поздно</div></div>
+<div class="seat btn" style="left:50%;top:107%"><div class="b">BTN</div><div class="r">лучшее место</div></div>
+<div class="seat bl" style="left:14%;top:93%"><div class="b">SB</div><div class="r">малый блайнд</div></div>
+<div class="seat bl" style="left:1%;top:44%"><div class="b">BB</div><div class="r">большой блайнд</div></div>
+</div><div class="lead" style="margin-top:56px">Показать стол на шесть: сначала все шестеро в раздаче, потом остались двое. Одна и та же рука — <span class="mark">разная ценность</span>.</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Это самый практичный слайд занятия, задержись на нём. Спроси прямо: по какому из трёх признаков она сегодня встанет из-за стола, если вечер пойдёт плохо. Договоритесь об этом до игры, а не во время."><div class="body"><div class="kicker">дисциплина</div><h2>Когда вставать</h2><div class="rule"></div><div class="cards c3"><div class="p hot"><div class="t">Две закупки вниз</div><div class="d">Проиграла две — встала. Не отыгрываемся сегодня, коробка важнее вечера.</div></div><div class="p"><div class="t w">Голова уехала</div><div class="d">Злишься, торопишься, играешь руки, которые обычно пасуешь. Это тильт, лечится только выходом.</div></div><div class="p"><div class="t w">Стол стал хуже</div><div class="d">Звонящие ушли, слева сели агрессивные. Пересесть или встать — обычное решение, а не бегство.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Встать вовремя — <span class="mark">тоже выигрыш</span>.</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Закрой теорию одной фразой и сразу веди её за стол — 45 минут практики важнее ещё одного слайда. Напомни про бумажку с палочками. Скажи, что в разборе первый вопрос будет не про её карты, а про соперников."><div class="body"><div class="kicker">итог</div><h2>Главное</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">Смотри не только в свои карты, но и на <span class="mark">того, кто напротив</span>.</div><div class="lead" style="text-align:center;margin:0 auto">Пять занятий ты училась играть свою руку. С сегодняшнего вечера половина информации сидит на другой стороне стола.</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Показать приложение на экране: где кнопка, что внутри. Договориться о дате следующей встречи прямо сейчас, не откладывая."><div class="body"><div class="kicker">До следующей встречи</div><h2>Домашка</h2><div class="rule"></div><div class="cards c3"><div class="p hot"><div class="tag">каждый день</div><div class="t">Приложение Академии</div><div class="d">t.me/syndicate_academia_bot → «Тренажёр» → карточки занятия 6, три штуки. Плюс каждый день открывать шпаргалку «шансы» и вслух объяснять правило 4 и 2. Готово: пять дней подряд без пропуска, карточки с первой попытки.</div></div><div class="p"><div class="tag dim">один раз, 30 минут</div><div class="t w">Тетрадь соперников на PokerTH</div><div class="d">webclient.pokerth.net, полный стол с ботами, 20 раздач. На бумаге таблица: четыре имени, палочка за каждый вход в банк, вторая колонка — коллом или рейзом. Готово: лист, где напротив каждого из четырёх стоит один из типов — скала, звонящий, регуляр, маньяк — и цифра «вошёл N раз из 20».</div></div><div class="p"><div class="tag dim">один раз, 20 минут</div><div class="t w">Калькулятор эквити</div><div class="d">gipsyteam.ru/tools/poker-equity-calculator. Прогнать A5 разномастные и J8 разномастные сначала против одного случайного соперника, потом против пятерых. Готово: четыре числа выписаны на бумагу рядом с честной долей 16,7% и подписано одной фразой, почему эти руки нельзя разыгрывать в большой компании.</div></div></div><div class="big" style="margin-top:44px;text-align:center">Занятие 7 — <span class="mark">Турниры: блайнды растут каждые несколько минут и сами выгоняют тебя из-за стола — тут ждать уже нельзя.</span></div></div></section>
+</div>
+<div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера · занятие 6</div>
+<div><span id="num">1</span> / <span id="tot"></span></div></div>
+<div id="bar"></div><div id="cue"></div>
+<div id="help">← → слайды · T подсказка тренеру · F во весь экран</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,cueOn=false;
+  var stage=document.getElementById('stage'),cue=document.getElementById('cue'),
+      bar=document.getElementById('bar'),num=document.getElementById('num');
+  document.getElementById('tot').textContent=slides.length;
+  function fit(){var s=Math.min(innerWidth/1600,innerHeight/900);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+  addEventListener('resize',fit);fit();
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    num.textContent=i+1;bar.style.width=((i+1)/slides.length*100)+'%';
+    cue.textContent=slides[i].getAttribute('data-cue')||'';
+    cue.classList.toggle('on',cueOn&&!!cue.textContent);}
+  addEventListener('keydown',function(e){var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();show(i+1);}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();show(i-1);}
+    else if(k==='Home')show(0);else if(k==='End')show(slides.length-1);
+    else if('tTеЕ'.indexOf(k)>=0){cueOn=!cueOn;show(i);}
+    else if('fFаА'.indexOf(k)>=0){document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen();}});
+  addEventListener('click',function(e){e.clientX<innerWidth*.2?show(i-1):show(i+1)});
+  show(0);
+})();
+</script></body></html>

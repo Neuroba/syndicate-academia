@@ -1,0 +1,129 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — Занятие 5</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;
+  --line:#2a2a30;--panel:#151519;--panel2:#1c1c22;--felt:#355129;--red:#b5292a;--ok:#3fb968}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:64px 84px;display:none;
+  background:radial-gradient(1200px 520px at 84% -10%,rgba(212,175,55,.13),transparent 60%),
+             linear-gradient(180deg,#0e0e11,#0b0b0d)}
+.slide.on{display:flex;flex-direction:column}
+@media (prefers-reduced-motion: no-preference){
+  .slide.on{animation:fade .22s ease}@keyframes fade{from{opacity:.35}to{opacity:1}}}
+.slide::after{content:attr(data-suit);position:absolute;right:-40px;bottom:-140px;font-size:520px;
+  line-height:1;color:rgba(212,175,55,.045);transform:rotate(-14deg);pointer-events:none}
+.kicker{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-weight:900;font-size:74px;line-height:1.04;color:#fff;margin:14px 0 0}
+h2{font-family:'Playfair Display',serif;font-weight:800;font-size:50px;color:var(--gold);margin:10px 0 6px;line-height:1.12}
+.rule{height:2px;width:210px;background:linear-gradient(90deg,var(--gold),transparent);margin:16px 0 26px}
+.lead{font-size:23px;color:var(--muted);line-height:1.55;max-width:1120px}
+.big{font-family:'Playfair Display',serif;font-size:42px;color:#fff;line-height:1.25}
+.mark{color:var(--gold)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.cards{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.p{background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+.p.hot{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1d1a10,#141209)}
+.p .t{font-family:'Playfair Display',serif;font-size:29px;color:var(--gold);margin-bottom:8px;line-height:1.2}
+.p .t.w{color:#fff}
+.p .d{font-size:19px;color:var(--muted);line-height:1.5}
+.p .n{font-size:40px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.p.dense{padding:20px 22px}.p.dense .t{font-size:25px}.p.dense .d{font-size:18px}
+.tag{display:inline-block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#0b0b0d;
+  background:var(--gold);padding:4px 11px;border-radius:5px;font-weight:700;margin-bottom:10px}
+.tag.dim{background:#2a2a30;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:20px}
+th{text-align:left;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);
+  font-weight:600;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+td{padding:13px 14px;border-bottom:1px solid #1a1a20;color:var(--ink);vertical-align:middle}
+td.m{color:var(--muted);font-size:18px}
+tr.hot td{background:rgba(212,175,55,.07)}tr.hot td:first-child{color:var(--gold);font-weight:700}
+.hand{display:flex;gap:5px}
+.card{width:48px;height:66px;background:#f4f1ea;border-radius:5px;color:#0b0b0d;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:21px;
+  line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.card.r{color:#b5292a}.card .s{font-size:21px;margin-top:2px;line-height:1}
+.card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold)}
+.ladder{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 34px}
+.rk{display:flex;align-items:center;gap:14px;padding:9px 13px;border-radius:9px;background:#131317;border:1px solid #1e1e24}
+.rk .i{width:26px;font-size:15px;color:var(--gold-soft);font-weight:700;text-align:right}
+.rk .nm{flex:1;font-size:19px}.rk .hand{transform:scale(.72);transform-origin:right center}
+.rk.top{background:linear-gradient(90deg,rgba(212,175,55,.16),#131317);border-color:rgba(212,175,55,.4)}
+.felt{position:relative;width:660px;height:320px;margin:0 auto;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:9px solid #17171c;border-radius:170px;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;width:96px}
+.seat .b{display:inline-block;padding:5px 0;width:78px;border-radius:7px;background:#101014;
+  border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.seat .r{font-size:12px;color:var(--muted);margin-top:4px}
+.seat.btn .b{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.seat.bl .b{background:#2b2118;color:var(--gold);border-color:rgba(212,175,55,.45)}
+.seat.early .b{border-color:rgba(181,41,42,.6);color:#e6a6a6}
+.streets{display:flex;align-items:flex-end;gap:26px}
+.st{flex:1;background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);
+  border-radius:12px;padding:20px;text-align:center}
+.st .lb{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.st .hand{justify-content:center}.st .d{font-size:16px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arrow{color:var(--gold);font-size:26px;padding-bottom:44px}
+.board{display:flex;justify-content:center;gap:14px;margin:14px 0}
+.board .card{width:88px;height:120px;font-size:40px;border-radius:9px}
+.board .card .s{font-size:38px;margin-top:5px}
+.foot{position:absolute;left:84px;right:84px;bottom:30px;display:flex;justify-content:space-between;
+  align-items:center;font-size:14px;color:#6c6860;z-index:3}
+.foot .l{font-family:'Playfair Display',serif;color:var(--muted)}.foot .l b{color:var(--gold)}
+#bar{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:0;z-index:4}
+#cue{position:absolute;left:0;right:0;bottom:0;background:#0a0a0c;border-top:2px solid var(--gold);
+  padding:18px 84px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:5}
+#cue.on{display:block}
+#help{position:absolute;right:18px;top:14px;font-size:12px;color:#4a4842;letter-spacing:.1em;z-index:6}
+</style></head><body>
+<div id="stage">
+<section class="slide on" data-suit="♠" data-cue="Скажи сразу: сегодня главное упражнение не в том, чтобы угадать правильную кнопку. Сегодня ты проговариваешь причину ВСЛУХ до нажатия, а я разбираю причину, а не действие. Спроси: «Если бы я сейчас спросил, почему ты поставила — что бы ты ответила?» Пусть привыкает к вопросу заранее."><div class="body" style="justify-content:center"><div class="kicker">Занятие 5 · Постфлоп</div><h1>Первая ставка</h1><div class="rule"></div><div class="lead">Три карты легли на стол. Банк уже есть. Дальше решение твоё — и его надо объяснить.</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Разбери на пальцах: две карты в руке, три на столе, попадание в пару — редкость, а не норма. Спроси её: «Как думаешь, чаще ты попадаешь во флоп или мимо?» Почти все новички отвечают неверно. Отсюда мостик: раз мимо бывает часто, нужно правило, а не настроение."><div class="body"><div class="kicker">Что вообще произошло</div><h2>Три исхода флопа</h2><div class="rule"></div><div class="cards c3"><div class="p"><div class="tag dim">попала</div><div class="t w">Есть рука</div><div class="d">Пара с сильным кикером и выше. Тут ты хочешь денег в банке.</div></div><div class="p hot"><div class="tag">почти</div><div class="t">Есть дро</div><div class="d">Не хватает одной карты до флеша или стрита. Рука пока пустая, но у неё есть будущее.</div></div><div class="p"><div class="tag dim">мимо</div><div class="t w">Ничего</div><div class="d">Две карты не сыграли. Это нормально: так будет чаще всего.</div></div></div><div class="big" style="margin-top:36px;text-align:center">На флопе <span class="mark">мимо</span> — обычное состояние. Проблема не в этом, а в том, что делать дальше</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Скажи так: этот стол мёртвый. Ни одна масть не повторяется, между картами дыры — догнать тебя почти нечем. Спроси: «Если у тебя тут туз с королём — кто мог попасть в этот флоп?» Подведи к мысли: сюда попадают немногие, значит ставка чаще заберёт банк сразу."><div class="body"><div class="kicker">Текстура борда</div><h2>Сухой флоп</h2><div class="rule"></div><div class="board"><div class="card">K<span class="s">♠</span></div><div class="card r">7<span class="s">♦</span></div><div class="card">2<span class="s">♣</span></div></div><div class="lead" style="text-align:center;margin:22px auto 0">Показать борд:    — три разные масти, карты далеко друг от друга, ни стрит-дро, ни флеш-дро собрать не из чего</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Тот же вопрос, другой ответ: сюда попадает половина стола. Червы дают флеш-дро, соседние карты — стриты. Спроси: «Что страшнее — что тебя уже обгоняют, или что обгонят на следующей карте?» Ответ: и то и другое, поэтому здесь ставка должна быть, а не чек."><div class="body"><div class="kicker">Текстура борда</div><h2>Мокрый флоп</h2><div class="rule"></div><div class="board"><div class="card r">Q<span class="s">♥</span></div><div class="card r">J<span class="s">♥</span></div><div class="card">9<span class="s">♠</span></div></div><div class="lead" style="text-align:center;margin:22px auto 0">Показать борд:    — две червы подряд по масти, карты стоят рядом: и флеш-дро, и куча стритов</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Дай ей механику на два движения глаз: сначала масти, потом соседство. Прогони три случайных флопа прямо на экране и заставь её вслух сказать «сухой» или «мокрый» за две секунды. Если сомневается дольше — значит борд мокрый, так и считаем."><div class="body"><div class="kicker">Как отличить</div><h2>Сухой против мокрого</h2><div class="rule"></div><table><tr><th>Смотри на</th><th>Сухой</th><th>Мокрый</th></tr><tr><td>Масти</td><td class="m">Все три разные</td><td class="m">Две или три одинаковые</td></tr><tr><td>Соседство</td><td class="m">Дыры между картами</td><td class="m">Карты идут подряд</td></tr><tr><td>Кто попал</td><td class="m">Мало кто</td><td class="m">Половина стола</td></tr><tr class="hot"><td>Что делать</td><td class="m">Ставка меньше, спокойно</td><td class="m">Ставить или уходить, не тянуть</td></tr></table></div></section>
+<section class="slide" data-suit="♣" data-cue="Напомни: считаем на флопе, умножаем на 4. Скажи прямо — мокрый борд опасен не «на ощущение», а вот этими 36%. Спроси: «Если он догоняет в трети случаев, ты хочешь, чтобы он смотрел следующую карту бесплатно?» Это подводка к размеру ставки."><div class="body"><div class="kicker">Почему на мокром опаснее</div><h2>Правило 4</h2><div class="rule"></div><div class="cards c3"><div class="p hot"><div class="n">36%</div><div class="t">Флеш-дро</div><div class="d">9 карт нужной масти. 9 × 4 — столько раз он доедет к риверу</div></div><div class="p"><div class="n">32%</div><div class="t w">Стрит с двух сторон</div><div class="d">8 карт закрывают ряд. 8 × 4</div></div><div class="p"><div class="n">16%</div><div class="t w">Дырка внутри</div><div class="d">4 карты. С этим уже можно жить</div></div></div><div class="big" style="margin-top:36px;text-align:center">Ауты × 4 — шанс догнать к риверу. Ауты × 2 — шанс на <span class="mark">следующей</span> карте</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Введи термин один раз и по-русски: «продолженная ставка» — ты продолжаешь то, что начала до флопа. Спроси: «Против скольких людей проще заставить всех сбросить — против одного или троих?» Пусть сама скажет. Дальше жёстко: за столом с двумя оппонентами блеф на флопе почти всегда деньги на ветер."><div class="body"><div class="kicker">Новый термин</div><h2>Продолженная ставка</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="tag dim">c-bet</div><div class="t w">Что это</div><div class="d">Ты рейзила до флопа — значит показала сильную руку. Ставка на флопе просто продолжает тот же рассказ. Попала или нет — стол этого не знает.</div></div><div class="p hot"><div class="tag">когда не надо</div><div class="t">Где ломается</div><div class="d">Против двоих и больше кто-нибудь да попал. И на мокром флопе с пустой рукой: ты платишь за право быть обогнанной.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Продолженная ставка работает <span class="mark">один на один</span>. На троих это подарок</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Это ядро занятия. Дай формулу вопросом: «Кто заплатит?» Если платят руки хуже твоей — ставка за деньгами. Если сбрасывают руки лучше твоей — блеф. Если ни то ни другое — чек. Прогони с ней три примера из прошлой практики и заставь назвать тип ставки словами."><div class="body"><div class="kicker">Зачем я ставлю</div><h2>Деньги или блеф</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="tag dim">велью</div><div class="t w">Ставка за деньгами</div><div class="d">Я впереди. Хочу, чтобы более слабая рука заплатила. Значит ставка должна быть такой, чтобы её реально коллировали.</div></div><div class="p"><div class="tag dim">блеф</div><div class="t w">Ставка-выгонялка</div><div class="d">Я сзади. Хочу, чтобы более сильная рука сбросила. Работает только там, где ему есть что сбрасывать.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Не подходит ни то, ни другое — это <span class="mark">чек</span>, а не «поставлю немножко»</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Посчитай вслух вместе с ней, медленно: банк 100, ты ставишь 50, он кладёт 50 в банк, где уже 150. Его 50 из 200 — это 25%. А флеш-дро у него доезжает в 36%. Спроси: «Ему выгодно платить?» Да. Поэтому четверть банка — подарок: ему хватает 13%."><div class="body"><div class="kicker">Размер</div><h2>Что покупает ставка</h2><div class="rule"></div><table><tr><th>Ставишь в банк 100</th><th>Ему коллировать</th><th>Сколько ему надо попадать</th></tr><tr><td>25 — четверть банка</td><td class="m">25</td><td class="m">13%</td></tr><tr class="hot"><td>50 — половина банка</td><td class="m">50</td><td class="m">25%</td></tr><tr><td>100 — весь банк</td><td class="m">100</td><td class="m">33%</td></tr></table></div></section>
+<section class="slide" data-suit="♣" data-cue="Скажи, почему половина — стандарт, а не «сколько не жалко»: она достаточно дорогая для дро и достаточно дешёвая, чтобы слабая рука заплатила. И главное — один размер на всё делает тебя нечитаемой. Спроси: «Если с сильной рукой ты ставишь много, а с блефом мало — что видит соперник?»"><div class="body"><div class="kicker">Правило размера</div><h2>Половина</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">Маленькая ставка <span class="mark">приглашает</span>. Ставка в весь банк <span class="mark">разгоняет</span>. Половина берёт плату и оставляет его в раздаче</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Многие новички считают чек трусостью. Скажи прямо: чек — полноценное решение, у него тоже должна быть причина. Спроси: «Назови мне ситуацию из прошлой практики, где ты поставила, а надо было чекнуть». Пусть вспомнит сама — так лучше закрепится."><div class="body"><div class="kicker">Обратная сторона</div><h2>Когда чек сильнее</h2><div class="rule"></div><div class="cards c3"><div class="p dense"><div class="t w">Двое и больше</div><div class="d">Кто-то попал. Блеф в толпу не проходит.</div></div><div class="p dense"><div class="t w">Рука средняя</div><div class="d">Вторая пара. Хочешь дойти до вскрытия дёшево, а не строить банк.</div></div><div class="p dense"><div class="t w">Ты не первая</div><div class="d">Есть кто-то после тебя. Чек и посмотри, что он сделает.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Чек — это <span class="mark">решение</span>, а не пропуск хода</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Объясни правило практики: рука не касается мыши, пока не прозвучали три фразы. Договорись со вторым участником, что он ловит нарушения. Предупреди: первые раздачи будет медленно и неловко — это нормально, скорость придёт через полчаса."><div class="body"><div class="kicker">Упражнение занятия</div><h2>Скажи вслух</h2><div class="rule"></div><div class="cards c3"><div class="p"><div class="tag dim">1</div><div class="t w">Моя рука</div><div class="d">«У меня туз с дамой, попала в верхнюю пару»</div></div><div class="p hot"><div class="tag">2</div><div class="t">Какой борд</div><div class="d">«Флоп мокрый: две червы и карты рядом»</div></div><div class="p"><div class="tag dim">3</div><div class="t w">Что я делаю ставкой</div><div class="d">«Ставлю половину, чтобы дро платило и чтобы слабая пара доложила»</div></div></div><div class="big" style="margin-top:36px;text-align:center">Сначала три фразы, <span class="mark">потом</span> кнопка. Не наоборот</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Закрепи: правильная кнопка со случайной мыслью — это удача, она не повторится. Ошибочная кнопка с честным разбором — это уже навык. Скажи, что в разборе после практики ты будешь спрашивать «почему», а не «зачем ты это сделала». И повтори: ошибаться вслух здесь безопасно."><div class="body"><div class="kicker">Как я разбираю</div><h2>Разбор</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">Я разбираю не то, <span class="mark">куда ты нажала</span>, а то, что ты сказала перед этим</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Показать приложение на экране: где кнопка, что внутри. Договориться о дате следующей встречи прямо сейчас, не откладывая."><div class="body"><div class="kicker">До следующей встречи</div><h2>Домашка</h2><div class="rule"></div><div class="cards c3"><div class="p hot"><div class="tag">один раз</div><div class="t">Три карточки в приложении</div><div class="d">Бот t.me/syndicate_academia_bot → «Тренажёр» → занятие 5. Пройти все три карточки и открыть шпаргалку «Шансы». Готово, когда все три карточки зелёные и ты прислала скрин экрана занятия 5.</div></div><div class="p"><div class="tag dim">каждый день</div><div class="t w">15 флопов вслух в PokerTH</div><div class="d">webclient.pokerth.net, полный стол с ботами. Играешь только те раздачи, где ты сама открыла рейзом и дошла до флопа. Перед каждым решением вслух три фразы: моя рука → борд сухой или мокрый → что делает ставка. Готово, когда есть таблица из 15 строк: борд (сухой/мокрый) · сколько оппонентов · ставка или чек · причина одной фразой. Помни: боты слабые, они коллируют мусор — оценивай своё обоснование, а не то, сработал ли блеф.</div></div><div class="p"><div class="tag dim">один раз</div><div class="t w">Проверить правило 4 калькулятором</div><div class="d">gipsyteam.ru/tools/poker-equity-calculator. Взять 3 борда из своей игры, где у тебя было дро: посчитать ауты, умножить на 4, записать свою прикидку. Потом вбить руки и борд в калькулятор и записать настоящий процент. Готово, когда есть 3 строки: моя прикидка · калькулятор · разница. Если разница больше 10 пунктов — принеси эту раздачу на разбор.</div></div></div><div class="big" style="margin-top:44px;text-align:center">Занятие 6 — <span class="mark">Занятие 6: выходим из ботов к живым людям клуба на PokerNow — первые раздачи, где напротив сидит человек.</span></div></div></section>
+</div>
+<div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера · занятие 5</div>
+<div><span id="num">1</span> / <span id="tot"></span></div></div>
+<div id="bar"></div><div id="cue"></div>
+<div id="help">← → слайды · T подсказка тренеру · F во весь экран</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,cueOn=false;
+  var stage=document.getElementById('stage'),cue=document.getElementById('cue'),
+      bar=document.getElementById('bar'),num=document.getElementById('num');
+  document.getElementById('tot').textContent=slides.length;
+  function fit(){var s=Math.min(innerWidth/1600,innerHeight/900);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+  addEventListener('resize',fit);fit();
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    num.textContent=i+1;bar.style.width=((i+1)/slides.length*100)+'%';
+    cue.textContent=slides[i].getAttribute('data-cue')||'';
+    cue.classList.toggle('on',cueOn&&!!cue.textContent);}
+  addEventListener('keydown',function(e){var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();show(i+1);}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();show(i-1);}
+    else if(k==='Home')show(0);else if(k==='End')show(slides.length-1);
+    else if('tTеЕ'.indexOf(k)>=0){cueOn=!cueOn;show(i);}
+    else if('fFаА'.indexOf(k)>=0){document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen();}});
+  addEventListener('click',function(e){e.clientX<innerWidth*.2?show(i-1):show(i+1)});
+  show(0);
+})();
+</script></body></html>

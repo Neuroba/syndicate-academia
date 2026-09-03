@@ -1,0 +1,135 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — курс</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;
+  --line:#2a2a30;--panel:#151519;--panel2:#1c1c22;--felt:#355129;--red:#b5292a;--ok:#3fb968}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:64px 84px;display:none;
+  background:radial-gradient(1200px 520px at 84% -10%,rgba(212,175,55,.13),transparent 60%),
+             linear-gradient(180deg,#0e0e11,#0b0b0d)}
+.slide.on{display:flex;flex-direction:column}
+@media (prefers-reduced-motion: no-preference){
+  .slide.on{animation:fade .22s ease}@keyframes fade{from{opacity:.35}to{opacity:1}}}
+.slide::after{content:attr(data-suit);position:absolute;right:-40px;bottom:-140px;font-size:520px;
+  line-height:1;color:rgba(212,175,55,.045);transform:rotate(-14deg);pointer-events:none}
+.kicker{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-weight:900;font-size:74px;line-height:1.04;color:#fff;margin:14px 0 0}
+h2{font-family:'Playfair Display',serif;font-weight:800;font-size:50px;color:var(--gold);margin:10px 0 6px;line-height:1.12}
+.rule{height:2px;width:210px;background:linear-gradient(90deg,var(--gold),transparent);margin:16px 0 26px}
+.lead{font-size:23px;color:var(--muted);line-height:1.55;max-width:1120px}
+.big{font-family:'Playfair Display',serif;font-size:42px;color:#fff;line-height:1.25}
+.mark{color:var(--gold)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.cards{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.p{background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+.p.hot{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1d1a10,#141209)}
+.p .t{font-family:'Playfair Display',serif;font-size:29px;color:var(--gold);margin-bottom:8px;line-height:1.2}
+.p .t.w{color:#fff}
+.p .d{font-size:19px;color:var(--muted);line-height:1.5}
+.p .n{font-size:40px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.p.dense{padding:20px 22px}.p.dense .t{font-size:25px}.p.dense .d{font-size:18px}
+.tag{display:inline-block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#0b0b0d;
+  background:var(--gold);padding:4px 11px;border-radius:5px;font-weight:700;margin-bottom:10px}
+.tag.dim{background:#2a2a30;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:20px}
+th{text-align:left;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);
+  font-weight:600;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+td{padding:13px 14px;border-bottom:1px solid #1a1a20;color:var(--ink);vertical-align:middle}
+td.m{color:var(--muted);font-size:18px}
+tr.hot td{background:rgba(212,175,55,.07)}tr.hot td:first-child{color:var(--gold);font-weight:700}
+.hand{display:flex;gap:5px}
+.card{width:48px;height:66px;background:#f4f1ea;border-radius:5px;color:#0b0b0d;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:21px;
+  line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.card.r{color:#b5292a}.card .s{font-size:21px;margin-top:2px;line-height:1}
+.card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold)}
+.ladder{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 34px}
+.rk{display:flex;align-items:center;gap:14px;padding:9px 13px;border-radius:9px;background:#131317;border:1px solid #1e1e24}
+.rk .i{width:26px;font-size:15px;color:var(--gold-soft);font-weight:700;text-align:right}
+.rk .nm{flex:1;font-size:19px}.rk .hand{transform:scale(.72);transform-origin:right center}
+.rk.top{background:linear-gradient(90deg,rgba(212,175,55,.16),#131317);border-color:rgba(212,175,55,.4)}
+.felt{position:relative;width:660px;height:320px;margin:0 auto;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:9px solid #17171c;border-radius:170px;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;width:96px}
+.seat .b{display:inline-block;padding:5px 0;width:78px;border-radius:7px;background:#101014;
+  border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.seat .r{font-size:12px;color:var(--muted);margin-top:4px}
+.seat.btn .b{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.seat.bl .b{background:#2b2118;color:var(--gold);border-color:rgba(212,175,55,.45)}
+.seat.early .b{border-color:rgba(181,41,42,.6);color:#e6a6a6}
+.streets{display:flex;align-items:flex-end;gap:26px}
+.st{flex:1;background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);
+  border-radius:12px;padding:20px;text-align:center}
+.st .lb{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.st .hand{justify-content:center}.st .d{font-size:16px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arrow{color:var(--gold);font-size:26px;padding-bottom:44px}
+.board{display:flex;justify-content:center;gap:14px;margin:14px 0}
+.board .card{width:88px;height:120px;font-size:40px;border-radius:9px}
+.board .card .s{font-size:38px;margin-top:5px}
+.foot{position:absolute;left:84px;right:84px;bottom:30px;display:flex;justify-content:space-between;
+  align-items:center;font-size:14px;color:#6c6860;z-index:3}
+.foot .l{font-family:'Playfair Display',serif;color:var(--muted)}.foot .l b{color:var(--gold)}
+#bar{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:0;z-index:4}
+#cue{position:absolute;left:0;right:0;bottom:0;background:#0a0a0c;border-top:2px solid var(--gold);
+  padding:18px 84px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:5}
+#cue.on{display:block}
+#help{position:absolute;right:18px;top:14px;font-size:12px;color:#4a4842;letter-spacing:.1em;z-index:6}
+
+html,body{overflow:auto;height:auto}
+body{background:radial-gradient(1200px 620px at 82% -12%,rgba(212,175,55,.12),transparent 60%),
+  linear-gradient(180deg,#0e0e11,#0b0b0d);min-height:100vh;padding:56px 6vw 80px}
+.wrap{max-width:1180px;margin:0 auto}
+.u{display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg,var(--panel),#131318);
+  border:1px solid var(--line);border-radius:13px;padding:22px 26px;margin-bottom:14px;transition:border-color .15s}
+.u:hover{border-color:rgba(212,175,55,.55)}
+.hd{display:flex;align-items:center;gap:16px;margin-bottom:9px;flex-wrap:wrap}
+.no{font-family:'Playfair Display',serif;font-size:30px;color:var(--gold);width:34px}
+.tm{font-family:'Playfair Display',serif;font-size:27px;color:#fff;flex:1;min-width:260px}
+.tb{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.gl{font-size:18px;color:var(--muted);line-height:1.5;margin-left:50px}
+.hw{margin:12px 0 0 68px;color:#7d7970;font-size:16px;line-height:1.7}
+.hw b{color:var(--ink);font-weight:500}
+.note{margin-top:26px;background:#151519;border:1px solid var(--line);border-radius:11px;
+  padding:18px 22px;font-size:17px;color:var(--muted);line-height:1.6}
+.note b{color:var(--gold)}
+</style></head><body><div class="wrap">
+<div class="kicker">Академия покера · курс с нуля</div>
+<h1 style="font-size:56px;margin:12px 0 0">Восемь занятий</h1>
+<div class="rule"></div>
+<div class="lead" style="margin-bottom:30px">Каждое занятие — 90 минут: теория, стол, разбор.
+Открывай нужное и жми <b style="color:var(--gold)">F</b> на весь экран.</div>
+<a class="u" href="urok-1.html">
+<div class="hd"><span class="no">1</span><span class="tm">Карта мира покера</span>
+<span class="tb">PokerTH · боты</span></div>
+<div class="gl">Во что играем, где и против кого. Механика и первая раздача.</div><ul class="hw"><li><b>Шпаргалка 1 и три карточки</b> — каждый день</li></ul></a><a class="u" href="urok-2.html">
+<div class="hd"><span class="no">2</span><span class="tm">Ход раздачи и сила позиции</span>
+<span class="tb">PokerTH · боты</span></div>
+<div class="gl">Она видит раздачу как четыре улицы, различает два порядка хода (до флопа — слева от BB, после — с SB) и понимает, почему на кнопке играют втрое больше рук, чем с ранней позиции.</div><ul class="hw"><li><b>Три карточки занятия 2</b> — каждый день</li><li><b>40 раздач за полным столом на PokerTH</b> — два раза за неделю</li><li><b>20 раздач вдвоём с парнем</b> — один раз</li></ul></a><a class="u" href="urok-3.html">
+<div class="hd"><span class="no">3</span><span class="tm">Стартовые руки</span>
+<span class="tb">PokerTH · боты</span></div>
+<div class="gl">Она знает, какие руки играть с какой позиции: делит стартовые руки на четыре зоны и открывает с ранних мест втрое уже, чем с кнопки.</div><ul class="hw"><li><b>Приложение Академии + шпаргалка</b> — каждый день</li><li><b>prefloptrainer.com — один сценарий</b> — три подхода</li><li><b>PokerTH — 30 раздач с дисциплиной</b> — два раза</li></ul></a><a class="u" href="urok-4.html">
+<div class="hd"><span class="no">4</span><span class="tm">Ауты и шансы банка</span>
+<span class="tb">PokerTH · оба + боты</span></div>
+<div class="gl">Она считает карты, которые её спасут, и по цене колла решает — платить или уйти.</div><ul class="hw"><li><b>Три карточки в Приложении Академии</b> — один раз</li><li><b>Двадцать раздач в PokerTH с вопросом вслух</b> — каждый день</li><li><b>Пять раскладов через калькулятор эквити</b> — каждый день</li></ul></a><a class="u" href="urok-5.html">
+<div class="hd"><span class="no">5</span><span class="tm">Постфлоп: ставки и текстура</span>
+<span class="tb">PokerTH · оба + боты</span></div>
+<div class="gl">На флопе она сама выбирает между ставкой, чеком и фолдом — и вслух объясняет, почему именно так.</div><ul class="hw"><li><b>Три карточки в приложении</b> — один раз</li><li><b>15 флопов вслух в PokerTH</b> — каждый день</li><li><b>Проверить правило 4 калькулятором</b> — один раз</li></ul></a><a class="u" href="urok-6.html">
+<div class="hd"><span class="no">6</span><span class="tm">Кеш-игра и живые соперники</span>
+<span class="tb">PokerNow · игроки клуба</span></div>
+<div class="gl">Понимает, чем кеш отличается от турнира, держит деньги по правилу закупок, за 20 раздач раскладывает соперников на четыре типа и садится играть с живыми людьми клуба.</div><ul class="hw"><li><b>Приложение Академии</b> — каждый день</li><li><b>Тетрадь соперников на PokerTH</b> — один раз, 30 минут</li><li><b>Калькулятор эквити</b> — один раз, 20 минут</li></ul></a><a class="u" href="urok-7.html">
+<div class="hd"><span class="no">7</span><span class="tm">Турниры и push/fold</span>
+<span class="tb">PokerNow · турнир</span></div>
+<div class="gl">Она измеряет стек в больших блайндах, видит, на какой стадии турнира находится, и ниже 15 bb играет только «всё или пас» по шпаргалке 4.</div><ul class="hw"><li><b>Три карточки занятия 7 плюс шпаргалка push/fold</b> — один раз</li><li><b>Двадцать раздач в PokerTH со счётом стека в блайндах</b> — каждый день</li><li><b>Двадцать решений по шпаргалке 4 с партнёром</b> — каждый день</li></ul></a><a class="u" href="urok-8.html">
+<div class="hd"><span class="no">8</span><span class="tm">Сборка, мини-турнир, разбор</span>
+<span class="tb">PokerNow · игроки клуба</span></div>
+<div class="gl">Она собирает всё вместе за одним столом с живыми игроками, видит свои ошибки по логу раздач и уходит с планом на первый месяц самостоятельной игры.</div><ul class="hw"><li><b>Тренажёр и шпаргалки</b> — каждый день · 10 минут</li><li><b>Игра по расписанию</b> — 3 раза в неделю · месяц</li><li><b>Свой разбор</b> — раз в неделю · воскресенье</li></ul></a>
+<div class="note"><b>Управление:</b> стрелки или пробел — слайды · <b>F</b> — полный экран ·
+<b>T</b> — подсказки тренеру. Подсказки смотри на репетиции: на занятии экран видят ученики.</div>
+</div></body></html>

@@ -1,0 +1,139 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — Занятие 2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;
+  --line:#2a2a30;--panel:#151519;--panel2:#1c1c22;--felt:#355129;--red:#b5292a;--ok:#3fb968}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:64px 84px;display:none;
+  background:radial-gradient(1200px 520px at 84% -10%,rgba(212,175,55,.13),transparent 60%),
+             linear-gradient(180deg,#0e0e11,#0b0b0d)}
+.slide.on{display:flex;flex-direction:column}
+@media (prefers-reduced-motion: no-preference){
+  .slide.on{animation:fade .22s ease}@keyframes fade{from{opacity:.35}to{opacity:1}}}
+.slide::after{content:attr(data-suit);position:absolute;right:-40px;bottom:-140px;font-size:520px;
+  line-height:1;color:rgba(212,175,55,.045);transform:rotate(-14deg);pointer-events:none}
+.kicker{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-weight:900;font-size:74px;line-height:1.04;color:#fff;margin:14px 0 0}
+h2{font-family:'Playfair Display',serif;font-weight:800;font-size:50px;color:var(--gold);margin:10px 0 6px;line-height:1.12}
+.rule{height:2px;width:210px;background:linear-gradient(90deg,var(--gold),transparent);margin:16px 0 26px}
+.lead{font-size:23px;color:var(--muted);line-height:1.55;max-width:1120px}
+.big{font-family:'Playfair Display',serif;font-size:42px;color:#fff;line-height:1.25}
+.mark{color:var(--gold)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.cards{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.p{background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+.p.hot{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1d1a10,#141209)}
+.p .t{font-family:'Playfair Display',serif;font-size:29px;color:var(--gold);margin-bottom:8px;line-height:1.2}
+.p .t.w{color:#fff}
+.p .d{font-size:19px;color:var(--muted);line-height:1.5}
+.p .n{font-size:40px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.p.dense{padding:20px 22px}.p.dense .t{font-size:25px}.p.dense .d{font-size:18px}
+.tag{display:inline-block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#0b0b0d;
+  background:var(--gold);padding:4px 11px;border-radius:5px;font-weight:700;margin-bottom:10px}
+.tag.dim{background:#2a2a30;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:20px}
+th{text-align:left;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);
+  font-weight:600;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+td{padding:13px 14px;border-bottom:1px solid #1a1a20;color:var(--ink);vertical-align:middle}
+td.m{color:var(--muted);font-size:18px}
+tr.hot td{background:rgba(212,175,55,.07)}tr.hot td:first-child{color:var(--gold);font-weight:700}
+.hand{display:flex;gap:5px}
+.card{width:48px;height:66px;background:#f4f1ea;border-radius:5px;color:#0b0b0d;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:21px;
+  line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.card.r{color:#b5292a}.card .s{font-size:21px;margin-top:2px;line-height:1}
+.card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold)}
+.ladder{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 34px}
+.rk{display:flex;align-items:center;gap:14px;padding:9px 13px;border-radius:9px;background:#131317;border:1px solid #1e1e24}
+.rk .i{width:26px;font-size:15px;color:var(--gold-soft);font-weight:700;text-align:right}
+.rk .nm{flex:1;font-size:19px}.rk .hand{transform:scale(.72);transform-origin:right center}
+.rk.top{background:linear-gradient(90deg,rgba(212,175,55,.16),#131317);border-color:rgba(212,175,55,.4)}
+.felt{position:relative;width:660px;height:320px;margin:0 auto;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:9px solid #17171c;border-radius:170px;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;width:96px}
+.seat .b{display:inline-block;padding:5px 0;width:78px;border-radius:7px;background:#101014;
+  border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.seat .r{font-size:12px;color:var(--muted);margin-top:4px}
+.seat.btn .b{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.seat.bl .b{background:#2b2118;color:var(--gold);border-color:rgba(212,175,55,.45)}
+.seat.early .b{border-color:rgba(181,41,42,.6);color:#e6a6a6}
+.streets{display:flex;align-items:flex-end;gap:26px}
+.st{flex:1;background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);
+  border-radius:12px;padding:20px;text-align:center}
+.st .lb{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.st .hand{justify-content:center}.st .d{font-size:16px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arrow{color:var(--gold);font-size:26px;padding-bottom:44px}
+.board{display:flex;justify-content:center;gap:14px;margin:14px 0}
+.board .card{width:88px;height:120px;font-size:40px;border-radius:9px}
+.board .card .s{font-size:38px;margin-top:5px}
+.foot{position:absolute;left:84px;right:84px;bottom:30px;display:flex;justify-content:space-between;
+  align-items:center;font-size:14px;color:#6c6860;z-index:3}
+.foot .l{font-family:'Playfair Display',serif;color:var(--muted)}.foot .l b{color:var(--gold)}
+#bar{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:0;z-index:4}
+#cue{position:absolute;left:0;right:0;bottom:0;background:#0a0a0c;border-top:2px solid var(--gold);
+  padding:18px 84px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:5}
+#cue.on{display:block}
+#help{position:absolute;right:18px;top:14px;font-size:12px;color:#4a4842;letter-spacing:.1em;z-index:6}
+</style></head><body>
+<div id="stage">
+<section class="slide on" data-suit="♠" data-cue="Начни с итога: сегодня карты почти не важны, важно КУДА ты села. Спроси её: в прошлый раз ты играла ботов — заметила, что иногда ходишь первой, а иногда последней? Скажи, что после этого занятия она будет понимать, почему это не случайность."><div class="body" style="justify-content:center"><div class="kicker">Занятие 2</div><h1>Ход раздачи и сила позиции</h1><div class="rule"></div><div class="lead">Четыре улицы, два разных порядка хода и место за столом, которое стоит денег</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Проговори вслух ритм: раздали — торговля — три карты — торговля — карта — торговля — карта — торговля. Спроси её, сколько раз за раздачу вообще принимается решение. Ответ — четыре, и это ключ ко всему занятию."><div class="body"><div class="kicker">Одна раздача</div><h2>Четыре улицы</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="tag dim">улица 1</div><div class="t w">Префлоп</div><div class="d">У тебя две карты, на столе пусто. Все решают вслепую.</div></div><div class="p hot"><div class="tag">улица 2</div><div class="t">Флоп</div><div class="d">Три общие карты открываются разом. Самый большой скачок информации.</div></div><div class="p"><div class="tag dim">улица 3</div><div class="t w">Тёрн</div><div class="d">Четвёртая общая карта. Ставки обычно растут.</div></div><div class="p"><div class="tag dim">улица 4</div><div class="t w">Ривер</div><div class="d">Пятая, последняя. Дальше только вскрытие.</div></div></div></div></section>
+<section class="slide" data-suit="♦" data-cue="Задержись на строке флопа: за одну секунду ты узнаёшь больше, чем за всю остальную раздачу. Спроси: если пять карт общие, чем ты отличаешься от соперника? Только двумя своими и тем, когда ты говоришь."><div class="body"><div class="kicker">Что видно</div><h2>Карты по улицам</h2><div class="rule"></div><table><tr><th>Улица</th><th>Карт на столе</th><th>Ты знаешь всего</th><th>Торговля</th></tr><tr><td>Префлоп</td><td class="m">0</td><td class="m">2</td><td class="m">есть</td></tr><tr class="hot"><td>Флоп</td><td class="m">3</td><td class="m">5</td><td class="m">есть</td></tr><tr><td>Тёрн</td><td class="m">4</td><td class="m">6</td><td class="m">есть</td></tr><tr><td>Ривер</td><td class="m">5</td><td class="m">7</td><td class="m">последняя</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Из семи твоих карт <span class="mark">пять</span> лежат на столе — их видят все</div></div></section>
+<section class="slide" data-suit="♥" data-cue="Покажи пальцем по кругу и назови каждое место вслух — пусть повторит за тобой. Потом сдвинь кнопку на одну позицию и спроси: кто теперь ранний, а кто поздний? Главное, что она должна унести: место не твоё навсегда, оно едет по кругу."><div class="body"><div class="kicker">Полный стол</div><h2>Кто где сидит</h2><div class="rule"></div><div class="felt">
+<div class="seat early" style="left:22%;top:2%"><div class="b">UTG</div><div class="r">ходит первым</div></div>
+<div class="seat early" style="left:50%;top:-7%"><div class="b">UTG+1</div><div class="r">рано</div></div>
+<div class="seat early" style="left:78%;top:2%"><div class="b">LJ</div><div class="r">рано</div></div>
+<div class="seat" style="left:99%;top:44%"><div class="b">HJ</div><div class="r">середина</div></div>
+<div class="seat" style="left:86%;top:93%"><div class="b">CO</div><div class="r">поздно</div></div>
+<div class="seat btn" style="left:50%;top:107%"><div class="b">BTN</div><div class="r">лучшее место</div></div>
+<div class="seat bl" style="left:14%;top:93%"><div class="b">SB</div><div class="r">малый блайнд</div></div>
+<div class="seat bl" style="left:1%;top:44%"><div class="b">BB</div><div class="r">большой блайнд</div></div>
+</div><div class="lead" style="margin-top:56px">Стол на 9: ранние UTG, UTG+1, UTG+2 · средние LJ, HJ · поздние CO, BTN · блайнды SB, BB. Кнопка отмечена фишкой, она сдвигается на одного влево каждую раздачу. Стрелкой показать порядок хода до флопа: старт слева от BB, по часовой стрелке до BB.</div></div></section>
+<section class="slide" data-suit="♠" data-cue="Это тот слайд, ради которого занятие. Скажи прямо: почти все новички путают именно здесь. Заставь её произнести обе фразы вслух, а потом закрой слайд и попроси повторить по памяти."><div class="body"><div class="kicker">Главное сегодня</div><h2>Два порядка</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">До флопа ходят слева от <span class="mark">большого блайнда</span>. После флопа — с <span class="mark">малого</span>.</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Спроси: почему блайндам дают преимущество до флопа? Потому что они платили не глядя. И сразу добей: это преимущество живёт ровно одну улицу, дальше SB становится самым неудобным местом за столом."><div class="body"><div class="kicker">Порядок хода</div><h2>Почему он меняется</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="t w">До флопа</div><div class="d">Блайнды уже поставили деньги вслепую, поэтому им дают говорить последними. Старт — от места слева от BB.</div></div><div class="p hot"><div class="t">После флопа</div><div class="d">Деньги уже в банке, привилегия кончилась. Малый блайнд говорит первым на флопе, тёрне и ривере — 3 улицы из 4.</div></div></div></div></section>
+<section class="slide" data-suit="♦" data-cue="Скажи, что это не мнение, а расчёт для стека в 100 больших блайндов. Спроси её: карты те же, руки те же — почему разница в четыре раза? Пусть попробует ответить сама, ответ она уже знает из предыдущего слайда."><div class="body"><div class="kicker">Цена места</div><h2>Одни и те же карты</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="n">11,4%</div><div class="t w">UTG открывает</div><div class="d">Первая позиция за полным столом. За тобой ещё семь человек, каждый может ударить.</div></div><div class="p hot"><div class="n">40,3%</div><div class="t">Кнопка открывает</div><div class="d">Впереди только два блайнда. Рук почти вчетверо больше при том же наборе карт.</div></div></div></div></section>
+<section class="slide" data-suit="♥" data-cue="Не проси запоминать таблицу, попроси увидеть кривую: цифры растут сверху вниз. Отдельно поясни строку SB — 73,9% только потому, что там остался один соперник, а не потому, что место хорошее. Это ловушка, к ней вернёмся."><div class="body"><div class="kicker">Полный стол, 100 бб</div><h2>Сколько рук открывают</h2><div class="rule"></div><table><tr><th>Позиция</th><th>Открытие рейзом</th></tr><tr><td>UTG</td><td class="m">11,4%</td></tr><tr><td>UTG+1</td><td class="m">13,2%</td></tr><tr><td>LJ</td><td class="m">15,7%</td></tr><tr><td>HJ</td><td class="m">19,6%</td></tr><tr><td>CO</td><td class="m">26,1%</td></tr><tr class="hot"><td>BTN</td><td class="m">40,3%</td></tr><tr><td>SB</td><td class="m">73,9%</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Чем позже говоришь — тем больше рук <span class="mark">можно себе позволить</span></div></div></section>
+<section class="slide" data-suit="♠" data-cue="Приведи бытовой пример: торг на рынке, где ты называешь цену первой, против того, где сначала называет продавец. Спроси, в каком случае ей комфортнее. Свяжи это с тем, что она увидит на практике через двадцать минут."><div class="body"><div class="kicker">Откуда берётся разница</div><h2>Последнее слово</h2><div class="rule"></div><div class="cards c2"><div class="p"><div class="t w">Информация</div><div class="d">На кнопке к твоему ходу все уже показали: кто пас, кто вложил, кто дрогнул. Ты решаешь, зная больше всех.</div></div><div class="p hot"><div class="t">Управление банком</div><div class="d">Хочешь — делаешь улицу дорогой, хочешь — бесплатной. Тот, кто говорит первым, такого выбора не имеет.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Позиция — это <span class="mark">информация</span>, а информация — это деньги</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Объясни просто: игрок с кнопки открывает почти половину всего, значит у него часто мусор, и против мусора можно играть шире. А тот, кто зашёл с первой позиции, слабых рук почти не имеет. Скажи, что цифры на память не нужны — нужна логика «дальше от меня открыли, значит крепче»."><div class="body"><div class="kicker">Большой блайнд</div><h2>Сколько защищать</h2><div class="rule"></div><table><tr><th>Кто открыл</th><th>Защищаешь примерно</th></tr><tr class="hot"><td>Кнопка</td><td class="m">56% рук</td></tr><tr><td>CO</td><td class="m">48%</td></tr><tr><td>HJ</td><td class="m">40%</td></tr><tr><td>Самая ранняя</td><td class="m">30%</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Чем ближе к тебе открыли — тем <span class="mark">слабее</span> его карты</div></div></section>
+<section class="slide" data-suit="♦" data-cue="Это ответ на вопрос, который обязательно возникнет дома: почему вдвоём приходится играть почти всё подряд. Спроси её: если платишь в каждой раздаче, сколько можно сбросить, прежде чем стек кончится? Пусть посчитает грубо."><div class="body"><div class="kicker">Блайнды</div><h2>Как часто ты платишь вслепую</h2><div class="rule"></div><div class="cards c3"><div class="p"><div class="n">22%</div><div class="t w">Стол на 9</div><div class="d">Каждая пятая раздача. Терпимо, ранние позиции просто пропускаешь.</div></div><div class="p"><div class="n">67%</div><div class="t w">Втроём</div><div class="d">Две раздачи из трёх ты в блайнде. Сидеть и ждать тузов нельзя — сожрут.</div></div><div class="p hot"><div class="n">100%</div><div class="t">Вдвоём</div><div class="d">Каждая раздача. Кнопка разыгрывает 90–100% рук, потому что ждать нечего.</div></div></div></div></section>
+<section class="slide" data-suit="♥" data-cue="Обрати внимание на третью строку: втроём кнопка сидит слева от BB, поэтому кнопка ходит ПЕРВОЙ до флопа. Это противоречит рефлексу «кнопка всегда последняя» — предупреди заранее, иначе за столом на троих она зависнет."><div class="body"><div class="kicker">Размер стола</div><h2>Какие места вообще есть</h2><div class="rule"></div><table><tr><th>Игроков</th><th>Позиции</th><th>Первым до флопа</th></tr><tr><td>9</td><td class="m">UTG, UTG+1, UTG+2, LJ, HJ, CO, BTN, SB, BB</td><td class="m">UTG</td></tr><tr><td>6</td><td class="m">LJ, HJ, CO, BTN, SB, BB</td><td class="m">LJ</td></tr><tr class="hot"><td>3</td><td class="m">только BTN, SB, BB</td><td class="m">BTN — кнопка</td></tr><tr><td>2</td><td class="m">BTN/SB и BB</td><td class="m">SB, он же кнопка</td></tr></table><div class="big" style="margin-top:36px;text-align:center">Втроём ранних позиций <span class="mark">нет вообще</span></div></div></section>
+<section class="slide" data-suit="♠" data-cue="Скажи прямо: вы с парнем будете гонять матчи один на один, и там SB — лучшее место. Мозг запомнит «я на SB, значит я хозяйка улицы». За полным столом это ровно наоборот. Попроси её проговорить оба случая вслух прямо сейчас."><div class="body"><div class="kicker">Ловушка домашних матчей</div><h2>Вдвоём всё иначе</h2><div class="rule"></div><div class="big" style="font-size:52px;text-align:center;margin:30px 0">Вдвоём малый блайнд — <span class="mark">это и есть кнопка</span></div><div class="lead" style="text-align:center;margin:0 auto">Правило TDA №34: ходит первым до флопа и последним на флопе, тёрне и ривере. Единственное место в покере, где SB играет в позиции.</div></div></section>
+<section class="slide" data-suit="♣" data-cue="Закрывающий слайд теории. Дай ей контрольный вопрос: ты на малом блайнде, флоп открылся — кто говорит первым? Правильный ответ начинается со «смотря сколько нас за столом». Если она так ответит, занятие сделано."><div class="body"><div class="kicker">Не перепутать</div><h2>Один и тот же SB</h2><div class="rule"></div><div class="cards c2"><div class="p hot"><div class="t">Вдвоём</div><div class="d">SB — это кнопка. Последнее слово на флопе, тёрне и ривере. Лучшее место за столом.</div></div><div class="p"><div class="t w">За столом на 3 и больше</div><div class="d">SB говорит первым на всех трёх улицах после флопа. Худшее место за столом.</div></div></div><div class="big" style="margin-top:36px;text-align:center">Рефлекс из домашних матчей за полным столом сработает <span class="mark">наоборот</span></div></div></section>
+<section class="slide" data-suit="♥" data-cue="Показать приложение на экране: где кнопка, что внутри. Договориться о дате следующей встречи прямо сейчас, не откладывая."><div class="body"><div class="kicker">До следующей встречи</div><h2>Домашка</h2><div class="rule"></div><div class="cards c3"><div class="p hot"><div class="tag">каждый день</div><div class="t">Три карточки занятия 2</div><div class="d">Бот Академии t.me/syndicate_academia_bot → «Тренажёр» → карточки занятия 2 (их ровно три). Прогонять каждый день. Готово, когда два дня подряд отвечаешь на все три без единой подсказки.</div></div><div class="p"><div class="tag dim">два раза за неделю</div><div class="t w">40 раздач за полным столом на PokerTH</div><div class="d">webclient.pokerth.net, полный стол с ботами. Перед каждым своим ходом называй вслух свою позицию (UTG / LJ / CO / кнопка / блайнд). Параллельно веди лист на 10 строк: позиция — сколько игроков говорит после меня — вошла в раздачу или нет. Готово, когда сыграно 40 раздач и лист на 10 строк заполнен — принести его на разбор.</div></div><div class="p"><div class="tag dim">один раз</div><div class="t w">20 раздач вдвоём с парнем</div><div class="d">Матч один на один на PokerTH. В каждой раздаче до карт скажи вслух: «я на SB — значит я кнопка, после флопа говорю последней» или «я на BB — после флопа говорю первой». Спорные вскрытия проверяйте на plistingsrussia.com/which-hand-wins-calculator, партнёр за судью. Готово, когда 20 раздач сыграны и ни разу не ошиблась в том, кто говорит первым.</div></div></div><div class="big" style="margin-top:44px;text-align:center">Занятие 3 — <span class="mark">Занятие 3 — какие две карты вообще стоит открывать: стартовые руки и первая шпаргалка курса.</span></div></div></section>
+</div>
+<div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера · занятие 2</div>
+<div><span id="num">1</span> / <span id="tot"></span></div></div>
+<div id="bar"></div><div id="cue"></div>
+<div id="help">← → слайды · T подсказка тренеру · F во весь экран</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,cueOn=false;
+  var stage=document.getElementById('stage'),cue=document.getElementById('cue'),
+      bar=document.getElementById('bar'),num=document.getElementById('num');
+  document.getElementById('tot').textContent=slides.length;
+  function fit(){var s=Math.min(innerWidth/1600,innerHeight/900);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+  addEventListener('resize',fit);fit();
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    num.textContent=i+1;bar.style.width=((i+1)/slides.length*100)+'%';
+    cue.textContent=slides[i].getAttribute('data-cue')||'';
+    cue.classList.toggle('on',cueOn&&!!cue.textContent);}
+  addEventListener('keydown',function(e){var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();show(i+1);}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();show(i-1);}
+    else if(k==='Home')show(0);else if(k==='End')show(slides.length-1);
+    else if('tTеЕ'.indexOf(k)>=0){cueOn=!cueOn;show(i);}
+    else if('fFаА'.indexOf(k)>=0){document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen();}});
+  addEventListener('click',function(e){e.clientX<innerWidth*.2?show(i-1):show(i+1)});
+  show(0);
+})();
+</script></body></html>

@@ -1,0 +1,53 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;--line:#2a2a30;--panel:#151519;--green:#3fb968;--red:#d06b6b}
+@page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#000}body{font-family:'Inter',Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;min-height:297mm;position:relative;overflow:hidden;background:radial-gradient(1100px 480px at 82% -8%,rgba(212,175,55,.13),transparent 60%),linear-gradient(180deg,#0e0e11,#0b0b0d);padding:14mm 16mm 12mm}
+.suit-bg{position:absolute;font-family:'Playfair Display',serif;color:rgba(212,175,55,.04);font-size:300px;bottom:-30px;right:-20px;transform:rotate(-10deg);font-weight:800}
+.kicker{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+.brand{font-family:'Playfair Display',serif;font-weight:900;font-size:26px;color:#fff;margin:5px 0 1px}
+.brand .s{color:var(--gold);font-size:13px;vertical-align:super;margin-left:7px}
+.h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:800;margin:9px 0 3px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:13px;max-width:165mm;line-height:1.5}
+.big{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border:1px solid #3a3320;border-radius:11px;padding:12px 16px;font-size:13.5px;color:var(--ink);line-height:1.5;margin-bottom:14px}
+.big b{color:var(--gold)}
+.h2{font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:700;margin:2px 0 7px;display:flex;align-items:center;gap:8px}
+.h2::before{content:'';width:14px;height:2px;background:var(--gold);border-radius:2px}
+table{width:100%;border-collapse:collapse}
+th{background:#0f0f13;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;text-align:left;font-weight:600}
+td{padding:11px 13px;font-size:12.5px;border-bottom:1px solid var(--line);vertical-align:top}
+td.pos{color:#fff;font-weight:700;white-space:nowrap;width:42mm}
+td.pos span{display:block;color:var(--muted);font-weight:400;font-size:10.5px;margin-top:2px}
+td.rng{color:var(--gold);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.5}
+.wide{color:var(--green) !important}
+.note{margin-top:13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.note b{color:var(--gold)}
+.foot{margin-top:13px;padding-top:9px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
+.foot .l{font-family:'Playfair Display',serif;font-size:12px;color:var(--muted)}.foot .l b{color:var(--gold)}
+.foot .m{font-size:9px;color:#6c6860;letter-spacing:.1em;text-transform:uppercase}
+</style></head><body><div class="page">
+<div class="suit-bg">♣</div>
+<div class="kicker">Академия · Шпаргалка 4/4</div>
+<div class="brand">SYNDICATE<span class="s">♠ ♥ ♦ ♣</span></div>
+<div class="h1">Push / Fold — короткий стек</div>
+<div class="sub">В турнире, когда стек стал маленьким, игра упрощается до двух действий.</div>
+
+<div class="big"><b>Стек ≤ 15 больших блайндов</b> — забудь про лимпы и коллы. Только <b>олл-ин (push)</b> или <b>фолд</b>. Чем короче стек и чем позже позиция — тем шире можно пушить.</div>
+
+<div class="h2">Диапазон пуша (≈10 bb), по позиции</div>
+<table>
+  <tr><th>Позиция</th><th>Пушим олл-ин</th></tr>
+  <tr><td class="pos">Ранняя <span>UTG / первым</span></td><td class="rng">77+ · AJs+ · AQo+ · KQs</td></tr>
+  <tr><td class="pos">Средняя</td><td class="rng">55+ · ATs+ · AJo+ · KJs+ · KQo · QJs</td></tr>
+  <tr><td class="pos">Поздняя <span>CO / cutoff</span></td><td class="rng">22+ · A7s+ · A9o+ · KTs+ · KJo+ · QTs+ · JTs · T9s</td></tr>
+  <tr><td class="pos">Кнопка <span>BTN</span></td><td class="rng">22+ · любой туз · K5s+ / K9o+ · Q8s+ / QTo+ · J8s+ · T8s+ · 98s · 87s</td></tr>
+  <tr><td class="pos">Малый блайнд <span>SB против BB</span></td><td class="rng wide">Очень широко: любые пары · любой туз/король · Q4s+ · большинство бродвеев и мастевых</td></tr>
+</table>
+
+<div class="note"><b>Стек 15 bb</b> — сузь диапазоны примерно на 15% (осторожнее, у соперника больше фолд-эквити против тебя нет). <b>Стек ≤ 8 bb</b> — расширяй, дави фолд-эквитией: часто выгоднее пуш, чем ждать.</div>
+<div class="note"><b>Логика:</b> при коротком стеке ты выигрываешь не только вскрытием, но и тем, что соперники пасуют. Пуш = давление. Сомневаешься при ≤10 bb в поздней позиции — чаще пуш, чем фолд.</div>
+
+<div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера</div><div class="m">Шпаргалка · push / fold</div></div>
+</div></body></html>

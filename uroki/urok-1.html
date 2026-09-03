@@ -1,0 +1,541 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYNDICATE Академия — Занятие 1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{
+  --gold:#d4af37; --gold-soft:#c9a227; --ink:#efe9db; --muted:#9a958c;
+  --line:#2a2a30; --panel:#151519; --panel2:#1c1c22;
+  --felt:#355129; --red:#b5292a; --ok:#3fb968;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;color:var(--ink)}
+
+/* сцена фиксированного размера, вписывается в окно — типографика не пляшет */
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:64px 84px;display:none;
+  background:radial-gradient(1200px 520px at 84% -10%,rgba(212,175,55,.13),transparent 60%),
+             linear-gradient(180deg,#0e0e11,#0b0b0d);}
+.slide.on{display:flex;flex-direction:column}
+@media (prefers-reduced-motion: no-preference){
+  .slide.on{animation:fade .22s ease}
+  @keyframes fade{from{opacity:.35}to{opacity:1}}
+}
+/* гигантская масть фоном */
+.slide::after{content:attr(data-suit);position:absolute;right:-40px;bottom:-140px;
+  font-size:520px;line-height:1;color:rgba(212,175,55,.045);transform:rotate(-14deg);pointer-events:none}
+
+.kicker{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-weight:900;font-size:74px;line-height:1.04;color:#fff;margin:14px 0 0}
+h2{font-family:'Playfair Display',serif;font-weight:800;font-size:50px;color:var(--gold);margin:10px 0 6px;line-height:1.12}
+.rule{height:2px;width:210px;background:linear-gradient(90deg,var(--gold),transparent);margin:16px 0 26px}
+.lead{font-size:23px;color:var(--muted);line-height:1.55;max-width:1080px}
+.big{font-family:'Playfair Display',serif;font-size:44px;color:#fff;line-height:1.25}
+.mark{color:var(--gold)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+
+/* панели */
+.cards{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.p{background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+.p.hot{border-color:rgba(212,175,55,.5);background:linear-gradient(180deg,#1d1a10,#141209)}
+.p .t{font-family:'Playfair Display',serif;font-size:29px;color:var(--gold);margin-bottom:8px}
+.p .t.w{color:#fff}
+.p .d{font-size:19px;color:var(--muted);line-height:1.5}
+.p .n{font-size:40px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+  color:#0b0b0d;background:var(--gold);padding:4px 11px;border-radius:5px;font-weight:700;margin-bottom:10px}
+.tag.dim{background:#2a2a30;color:var(--muted)}
+
+/* таблица */
+table{width:100%;border-collapse:collapse;font-size:20px}
+th{text-align:left;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);
+  font-weight:600;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+td{padding:14px;border-bottom:1px solid #1a1a20;color:var(--ink);vertical-align:middle}
+td.m{color:var(--muted);font-size:18px}
+tr.hot td{background:rgba(212,175,55,.07)}
+tr.hot td:first-child{color:var(--gold);font-weight:700}
+
+/* игральные карты */
+.hand{display:flex;gap:5px}
+.card{width:48px;height:66px;background:#f4f1ea;border-radius:5px;color:#0b0b0d;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;font-size:21px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.card.r{color:#b5292a}
+.card .s{font-size:21px;margin-top:2px;line-height:1}
+.card.back{background:linear-gradient(135deg,#20202a,#14141b);border:1px solid #34343f;color:var(--gold)}
+
+/* лестница комбинаций */
+.ladder{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 34px}
+.rk{display:flex;align-items:center;gap:14px;padding:9px 13px;border-radius:9px;background:#131317;border:1px solid #1e1e24}
+.rk .i{width:26px;font-size:15px;color:var(--gold-soft);font-weight:700;text-align:right}
+.rk .nm{flex:1;font-size:19px}
+.rk .hand{transform:scale(.72);transform-origin:right center}
+.rk.top{background:linear-gradient(90deg,rgba(212,175,55,.16),#131317);border-color:rgba(212,175,55,.4)}
+
+/* стол с позициями */
+.felt{position:relative;width:660px;height:340px;margin:0 auto;
+  background:radial-gradient(closest-side,#3d5c2e,#2b421f);border:9px solid #17171c;border-radius:170px;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.seat{position:absolute;transform:translate(-50%,-50%);text-align:center;width:96px}
+.seat .b{display:inline-block;padding:5px 0;width:78px;border-radius:7px;background:#101014;
+  border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.seat .r{font-size:12px;color:var(--muted);margin-top:4px}
+.seat.btn .b{background:var(--gold);color:#0b0b0d;border-color:var(--gold)}
+.seat.bl .b{background:#2b2118;color:var(--gold);border-color:rgba(212,175,55,.45)}
+.seat.early .b{border-color:rgba(181,41,42,.6);color:#e6a6a6}
+
+/* улицы */
+.streets{display:flex;align-items:flex-end;gap:26px}
+.st{flex:1;background:linear-gradient(180deg,var(--panel),#131318);border:1px solid var(--line);
+  border-radius:12px;padding:20px;text-align:center}
+.st .lb{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.st .hand{justify-content:center}
+.st .d{font-size:16px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arrow{color:var(--gold);font-size:26px;padding-bottom:44px}
+
+/* словарь */
+.words{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.words .w{background:#131317;border:1px solid #1e1e24;border-radius:9px;padding:13px 8px;text-align:center;font-size:19px}
+
+/* подвал / навигация */
+.foot{position:absolute;left:84px;right:84px;bottom:30px;display:flex;justify-content:space-between;
+  align-items:center;font-size:14px;color:#6c6860;z-index:3}
+.foot .l{font-family:'Playfair Display',serif;color:var(--muted)}
+.foot .l b{color:var(--gold)}
+#bar{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:0;z-index:4}
+#cue{position:absolute;left:0;right:0;bottom:0;background:#0a0a0c;border-top:2px solid var(--gold);
+  padding:18px 84px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:5}
+#cue.on{display:block}
+#cue b{color:var(--gold)}
+#help{position:absolute;right:18px;top:14px;font-size:12px;color:#4a4842;letter-spacing:.1em;z-index:6}
+</style></head><body>
+
+<div id="stage">
+
+<!-- 1 -->
+<section class="slide on" data-suit="♠" data-cue="Знакомство. Спросить: играли когда-нибудь вообще? Что видели — кино, приложение, друзья? От ответа зависит темп. Сказать: сегодня не учимся выигрывать, сегодня разбираемся, куда мы попали.">
+  <div class="body" style="justify-content:center">
+    <div class="kicker">Академия покера · занятие 1 из 8</div>
+    <h1>Карта мира покера</h1>
+    <div class="rule"></div>
+    <div class="lead">Во что мы играем, где это происходит и против кого.<br>А потом — первая раздача.</div>
+    <div style="margin-top:52px" class="hand">
+      <div class="card">A<span class="s">♠</span></div>
+      <div class="card r">K<span class="s">♥</span></div>
+      <div class="card r">Q<span class="s">♦</span></div>
+      <div class="card">J<span class="s">♣</span></div>
+      <div class="card back">♠</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-suit="♣" data-cue="Главная мысль: «покер» — слово-зонтик. Мы учим холдём, потому что это почти всё, что она встретит. Остальное назвать и отпустить, не углубляться.">
+  <div class="body">
+    <div class="kicker">Первое, что надо развести</div>
+    <h2>Покер — не одна игра, а семья</h2>
+    <div class="rule"></div>
+    <table>
+      <tr><th style="width:26%">Игра</th><th style="width:44%">Суть</th><th>Насколько живая</th></tr>
+      <tr class="hot"><td>Техасский холдём</td><td class="m">2 карты свои, 5 общих на столе</td><td class="m">около 95% всего покера в мире</td></tr>
+      <tr><td>Омаха</td><td class="m">4 карты свои, играешь ровно две</td><td class="m">вторая по массовости, качает сильнее</td></tr>
+      <tr><td>Семикарточный стад</td><td class="m">общих карт нет вообще</td><td class="m">был главным до 2000-х, почти вымер</td></tr>
+      <tr><td>Короткая колода</td><td class="m">холдём без карт ниже шестёрки</td><td class="m">нишевая, комбинации меняются местами</td></tr>
+    </table>
+    <div class="big" style="margin-top:34px">Говорят «покер» — почти всегда имеют в виду <span class="mark">холдём</span>.</div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-suit="♦" data-cue="Это самое важное различие первого занятия. Если она запомнит только одну фразу — пусть будет нижняя. Спросить: как думаешь, где страшнее? Правильный ответ — в турнире, потому что решает не она.">
+  <div class="body">
+    <div class="kicker">Две разные игры под одним названием</div>
+    <h2>Кеш и турнир</h2>
+    <div class="rule"></div>
+    <div class="cards c2">
+      <div class="p">
+        <div class="tag">кеш</div>
+        <div class="t w">Фишка = доллар</div>
+        <div class="d">Села когда хочешь, встала когда хочешь, забрала со стола то, что лежит.
+        Блайнды не растут. Можно ждать хорошую руку хоть час — тебя ничто не гонит.</div>
+      </div>
+      <div class="p">
+        <div class="tag dim">турнир</div>
+        <div class="t w">Фишки без цены</div>
+        <div class="d">Заплатила взнос, получила фишки, второй раз денег не вносишь. Играешь до вылета.
+        Блайнды растут по часам и давят. Деньги получает верхушка — обычно 10–15%.</div>
+      </div>
+    </div>
+    <div class="big" style="margin-top:40px;text-align:center">
+      В кеше можно <span class="mark">ждать</span>. В турнире ждать <span class="mark">нельзя</span>.
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-suit="♥" data-cue="Показать цифры скорости — они объясняют, почему онлайн опаснее для новичка. Мы начинаем в закрытой комнате, потом выходим на живой стол клуба.">
+  <div class="body">
+    <div class="kicker">Где вообще играют</div>
+    <h2>Три среды</h2>
+    <div class="rule"></div>
+    <div class="cards c3">
+      <div class="p">
+        <div class="t">Живой стол</div>
+        <div class="n">25–30</div>
+        <div class="d" style="margin-top:6px">раздач в час<br><br>Клуб, казино, дом. Видишь людей, дилер раздаёт, есть время подумать.</div>
+      </div>
+      <div class="p">
+        <div class="t">Онлайн-румы</div>
+        <div class="n">60–100</div>
+        <div class="d" style="margin-top:6px">раздач в час<br><br>PokerStars, GGPoker. Несколько столов сразу, соперники в среднем сильнее.</div>
+      </div>
+      <div class="p hot">
+        <div class="t">Домашняя игра онлайн</div>
+        <div class="n">как договоришься</div>
+        <div class="d" style="margin-top:6px">Комната по ссылке, между своими.<br><br><b style="color:var(--gold)">Здесь мы и учимся.</b></div>
+      </div>
+    </div>
+    <div class="lead" style="margin-top:34px">Онлайн ошибки идут втрое плотнее. И учиться там быстрее, и терять — тоже.</div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-suit="♠" data-cue="Ключ ко всему курсу. В казино соперник — заведение с зашитым преимуществом. В покере соперник — люди. Поэтому в покер можно выигрывать в долгую, а в рулетку нельзя. Это не мотивация, это арифметика.">
+  <div class="body">
+    <div class="kicker">Главное отличие</div>
+    <h2>Против кого ты играешь</h2>
+    <div class="rule"></div>
+    <div class="cards c2">
+      <div class="p">
+        <div class="tag dim">казино</div>
+        <div class="t w">Рулетка, блэкджек</div>
+        <div class="d">Соперник — <b style="color:#e6a6a6">заведение</b>. Преимущество зашито в правила.
+        В долгую выиграть нельзя: это не характер и не везение, это арифметика.</div>
+      </div>
+      <div class="p hot">
+        <div class="tag">покер</div>
+        <div class="t w">Ты против людей</div>
+        <div class="d">Заведение берёт рейк с банка или взнос за турнир и <b style="color:var(--gold)">в игру не вмешивается</b>.
+        Обыгрывать надо людей за столом — и это возможно.</div>
+      </div>
+    </div>
+    <div class="big" style="margin-top:40px;text-align:center">
+      Короткая дистанция решается <span class="mark">удачей</span>. Длинная — <span class="mark">решениями</span>.
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-suit="♣" data-cue="Снять мифы сразу, иначе они мешают учиться. Особенно первый: новички ждут, что покер про блеф, и начинают блефовать вместо того, чтобы играть сильные руки.">
+  <div class="body">
+    <div class="kicker">Прежде чем начнём</div>
+    <h2>Чем покер не является</h2>
+    <div class="rule"></div>
+    <div class="cards c2" style="gap:18px">
+      <div class="p"><div class="t w">Не про блеф</div>
+        <div class="d">Блеф — небольшая часть игры. Основа: играть сильные руки с правильной позиции
+        и не платить, когда цена не сходится.</div></div>
+      <div class="p"><div class="t w">Не про «читать по глазам»</div>
+        <div class="d">Читают по действиям, размерам ставок и позиции. Онлайн лиц нет вообще —
+        и играть это не мешает.</div></div>
+      <div class="p"><div class="t w">Не нужна математика</div>
+        <div class="d">Одно правило — умножить на 4 и на 2. И умение считать до двадцати. Всё.</div></div>
+      <div class="p"><div class="t w">Не быстро</div>
+        <div class="d">Это навык, а не везение. Через восемь занятий ты не станешь профи —
+        ты станешь человеком, который понимает, что делает.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-suit="♦" data-cue="Показать, что курс — не самоцель, а вход. После Академии есть куда идти: клуб играет Пн, Чт, Сб. Не продавать сейчас, просто обозначить дорогу.">
+  <div class="body">
+    <div class="kicker">Где в этой карте мы</div>
+    <h2>Путь игрока</h2>
+    <div class="rule"></div>
+    <div class="cards c3">
+      <div class="p hot"><div class="tag">сейчас</div><div class="t">Академия</div>
+        <div class="d">Восемь занятий. Учишься понимать, что делаешь за столом.</div></div>
+      <div class="p"><div class="t">Клуб SYNDICATE</div>
+        <div class="d">Живая игра по понедельникам, четвергам и субботам. Настоящий стол, настоящие люди.</div></div>
+      <div class="p"><div class="t">Фонд игроков</div>
+        <div class="d">Играешь на деньги фонда, результат делите. Своим банкроллом рисковать не надо.</div></div>
+    </div>
+    <div class="lead" style="margin-top:36px">Учись → играй → получай финансирование. Весь путь под одной крышей.</div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-suit="♠" data-cue="Переход к механике. Дальше — конкретика: колода, комбинации, стол, улицы, действия. Темп сменить: меньше рассуждений, больше показа.">
+  <div class="body" style="justify-content:center">
+    <div class="kicker">Часть вторая</div>
+    <h1>Механика</h1>
+    <div class="rule"></div>
+    <div class="lead">Колода · комбинации · стол и позиции · четыре улицы · пять действий</div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-suit="♥" data-cue="Быстро. Колода стандартная, 52 карты. Джокеров нет. Масти между собой РАВНЫ — это частый вопрос новичка: пики не старше червей.">
+  <div class="body">
+    <div class="kicker">Из чего играем</div>
+    <h2>Колода</h2>
+    <div class="rule"></div>
+    <div class="cards c2">
+      <div class="p"><div class="n">52</div><div class="d" style="margin-top:8px">карты. Джокеров нет</div></div>
+      <div class="p"><div class="n" style="font-size:34px">♠ <span style="color:#d06b6b">♥</span> <span style="color:#d06b6b">♦</span> ♣</div><div class="d" style="margin-top:8px">четыре масти по 13 карт, от двойки до туза</div></div>
+    </div>
+    <div class="p hot" style="margin-top:22px">
+      <div class="t">На экране буквы латинские — привыкаем сразу</div>
+      <div class="hand" style="margin-top:14px;justify-content:space-between">
+        <div class="card">A<span class="s">♠</span></div>
+        <div class="card">K<span class="s">♠</span></div>
+        <div class="card r">Q<span class="s">♥</span></div>
+        <div class="card r">J<span class="s">♦</span></div>
+        <div class="card">10<span class="s">♣</span></div>
+        <div class="d" style="flex:1;padding-left:26px;align-self:center;font-size:20px">
+          <b style="color:var(--gold)">A</b> — туз · <b style="color:var(--gold)">K</b> — король ·
+          <b style="color:var(--gold)">Q</b> — дама · <b style="color:var(--gold)">J</b> — валет ·
+          дальше просто числа
+        </div>
+      </div>
+    </div>
+    <div class="big" style="margin-top:28px;text-align:center">Масти между собой <span class="mark">равны</span>. Пики не старше червей.</div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-suit="♣" data-cue="Самый важный слайд занятия. Не зачитывать список сверху вниз — спрашивать «а что реже выпадает?» и двигаться по логике редкости. Это единственное, что надо выучить наизусть; всё остальное можно подсмотреть.">
+  <div class="body">
+    <div class="kicker">Выучить наизусть · шпаргалка 1</div>
+    <h2>Что бьёт что</h2>
+    <div class="rule"></div>
+    <div class="ladder">
+      <div class="rk top"><div class="i">10</div><div class="nm">Флеш-рояль</div>
+        <div class="hand"><div class="card">A<span class="s">♠</span></div><div class="card">K<span class="s">♠</span></div><div class="card">Q<span class="s">♠</span></div><div class="card">J<span class="s">♠</span></div><div class="card">10<span class="s">♠</span></div></div></div>
+      <div class="rk"><div class="i">5</div><div class="nm">Стрит</div>
+        <div class="hand"><div class="card">9<span class="s">♠</span></div><div class="card r">8<span class="s">♥</span></div><div class="card r">7<span class="s">♦</span></div><div class="card">6<span class="s">♣</span></div><div class="card">5<span class="s">♠</span></div></div></div>
+      <div class="rk top"><div class="i">9</div><div class="nm">Стрит-флеш</div>
+        <div class="hand"><div class="card r">9<span class="s">♥</span></div><div class="card r">8<span class="s">♥</span></div><div class="card r">7<span class="s">♥</span></div><div class="card r">6<span class="s">♥</span></div><div class="card r">5<span class="s">♥</span></div></div></div>
+      <div class="rk"><div class="i">4</div><div class="nm">Сет · тройка</div>
+        <div class="hand"><div class="card">8<span class="s">♠</span></div><div class="card r">8<span class="s">♥</span></div><div class="card r">8<span class="s">♦</span></div></div></div>
+      <div class="rk top"><div class="i">8</div><div class="nm">Каре</div>
+        <div class="hand"><div class="card">Q<span class="s">♠</span></div><div class="card r">Q<span class="s">♥</span></div><div class="card r">Q<span class="s">♦</span></div><div class="card">Q<span class="s">♣</span></div></div></div>
+      <div class="rk"><div class="i">3</div><div class="nm">Две пары</div>
+        <div class="hand"><div class="card">K<span class="s">♠</span></div><div class="card r">K<span class="s">♥</span></div><div class="card r">4<span class="s">♦</span></div><div class="card">4<span class="s">♣</span></div></div></div>
+      <div class="rk"><div class="i">7</div><div class="nm">Фулл-хаус</div>
+        <div class="hand"><div class="card">J<span class="s">♠</span></div><div class="card r">J<span class="s">♥</span></div><div class="card r">J<span class="s">♦</span></div><div class="card">3<span class="s">♣</span></div><div class="card r">3<span class="s">♦</span></div></div></div>
+      <div class="rk"><div class="i">2</div><div class="nm">Пара</div>
+        <div class="hand"><div class="card">A<span class="s">♠</span></div><div class="card r">A<span class="s">♦</span></div></div></div>
+      <div class="rk"><div class="i">6</div><div class="nm">Флеш</div>
+        <div class="hand"><div class="card">A<span class="s">♣</span></div><div class="card">J<span class="s">♣</span></div><div class="card">8<span class="s">♣</span></div><div class="card">5<span class="s">♣</span></div><div class="card">2<span class="s">♣</span></div></div></div>
+      <div class="rk"><div class="i">1</div><div class="nm">Старшая карта</div>
+        <div class="hand"><div class="card">A<span class="s">♠</span></div><div class="card back">?</div></div></div>
+    </div>
+    <div class="lead" style="margin-top:22px">Логика одна: <span class="mark">чем реже комбинация — тем она сильнее</span>.</div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-suit="♦" data-cue="Показать стол целиком. Красные места — ранние, оттуда играем мало. Золотая кнопка — лучшее место, ходит последней после флопа. Подробно позиции будут на занятии 2, сейчас только назвать.">
+  <div class="body">
+    <div class="kicker">Забежим вперёд · подробно на занятии 2</div>
+    <h2>Стол и места</h2>
+    <div class="rule"></div>
+    <div class="felt">
+      <div class="seat early" style="left:22%;top:2%"><div class="b">UTG</div><div class="r">ходит первым</div></div>
+      <div class="seat early" style="left:50%;top:-6%"><div class="b">UTG+1</div><div class="r">рано</div></div>
+      <div class="seat early" style="left:78%;top:2%"><div class="b">LJ</div><div class="r">рано</div></div>
+      <div class="seat" style="left:99%;top:44%"><div class="b">HJ</div><div class="r">середина</div></div>
+      <div class="seat" style="left:86%;top:92%"><div class="b">CO</div><div class="r">поздно</div></div>
+      <div class="seat btn" style="left:50%;top:106%"><div class="b">BTN</div><div class="r">лучшее место</div></div>
+      <div class="seat bl" style="left:14%;top:92%"><div class="b">SB</div><div class="r">малый блайнд</div></div>
+      <div class="seat bl" style="left:1%;top:44%"><div class="b">BB</div><div class="r">большой блайнд</div></div>
+    </div>
+    <div class="cards c2" style="margin-top:66px">
+      <div class="p"><div class="t w">Красные места — ранние</div><div class="d">Ходишь первой, ничего ни о ком не знаешь. Отсюда играем очень мало рук.</div></div>
+      <div class="p hot"><div class="t">Кнопка — лучшее место</div><div class="d">После флопа ходишь последней. Последнее слово — это информация, а информация — это деньги.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-suit="♠" data-cue="Вопрос, который новички не задают, но он важный: зачем вообще блайнды? Без них все ждали бы только тузов и игры не было бы. Блайнды заставляют банк существовать.">
+  <div class="body">
+    <div class="kicker">Зачем это придумали</div>
+    <h2>Блайнды</h2>
+    <div class="rule"></div>
+    <div class="lead" style="max-width:1180px">Два игрока слева от кнопки обязаны поставить ещё до раздачи карт —
+    вслепую, не глядя. Малый блайнд и большой блайнд. Каждый круг они сдвигаются на место влево,
+    так что платят по очереди все.</div>
+    <div class="cards c2" style="margin-top:38px">
+      <div class="p"><div class="t w">Если бы их не было</div>
+        <div class="d">Все ждали бы только тузов, никто не вкладывался бы в банк — и игра встала бы.</div></div>
+      <div class="p hot"><div class="t">Что они делают</div>
+        <div class="d">Заставляют банк существовать с первой секунды. Есть что выигрывать — значит есть смысл играть.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-suit="♥" data-cue="Четыре улицы. Ключ: карты открываются постепенно, и на каждом шаге снова торговля. Твои две карты не меняются — меняется стол.">
+  <div class="body">
+    <div class="kicker">Как раскрывается раздача</div>
+    <h2>Четыре улицы</h2>
+    <div class="rule"></div>
+    <div class="streets">
+      <div class="st"><div class="lb">префлоп</div>
+        <div class="hand"><div class="card">A<span class="s">♠</span></div><div class="card r">K<span class="s">♥</span></div></div>
+        <div class="d">Только твои две карты. Общих нет.</div></div>
+      <div class="arrow">→</div>
+      <div class="st"><div class="lb">флоп</div>
+        <div class="hand"><div class="card r">Q<span class="s">♦</span></div><div class="card">7<span class="s">♠</span></div><div class="card">2<span class="s">♣</span></div></div>
+        <div class="d">Три общие карты сразу.</div></div>
+      <div class="arrow">→</div>
+      <div class="st"><div class="lb">тёрн</div>
+        <div class="hand"><div class="card r">J<span class="s">♥</span></div></div>
+        <div class="d">Четвёртая общая.</div></div>
+      <div class="arrow">→</div>
+      <div class="st"><div class="lb">ривер</div>
+        <div class="hand"><div class="card">9<span class="s">♣</span></div></div>
+        <div class="d">Пятая, последняя.</div></div>
+    </div>
+    <div class="big" style="margin-top:40px;text-align:center">
+      После каждой улицы — <span class="mark">торговля</span>. Четыре круга за раздачу.
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-suit="♣" data-cue="Пять действий — весь набор. Больше в покере делать нечего. Проговорить: чек можно только если до тебя никто не поставил.">
+  <div class="body">
+    <div class="kicker">Весь набор</div>
+    <h2>Пять действий</h2>
+    <div class="rule"></div>
+    <div class="cards c3" style="gap:18px">
+      <div class="p"><div class="t">Фолд</div><div class="d">Выбросить карты. Ты вне раздачи, ничего больше не платишь.</div></div>
+      <div class="p"><div class="t">Чек</div><div class="d">Пропустить ход бесплатно. Можно только если до тебя никто не поставил.</div></div>
+      <div class="p"><div class="t">Колл</div><div class="d">Уравнять чужую ставку. Заплатила столько же — осталась в игре.</div></div>
+      <div class="p"><div class="t">Бет</div><div class="d">Поставить первой, когда до тебя никто не ставил.</div></div>
+      <div class="p"><div class="t">Рейз</div><div class="d">Поднять: увеличить чужую ставку. Остальным придётся доплатить или выйти.</div></div>
+      <div class="p hot"><div class="t">Олл-ин</div><div class="d">Поставить всё, что перед тобой. Не отдельное действие — крайняя форма бета или рейза.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-suit="♦" data-cue="Отдать словарь. Сказать: эти слова будут звучать постоянно, не стесняйся переспрашивать. Список есть в приложении и на шпаргалке.">
+  <div class="body">
+    <div class="kicker">Двадцать слов, которые будут звучать постоянно</div>
+    <h2>Словарь</h2>
+    <div class="rule"></div>
+    <div class="words">
+      <div class="w">блайнд</div><div class="w">префлоп</div><div class="w">флоп</div><div class="w">тёрн</div><div class="w">ривер</div>
+      <div class="w">чек</div><div class="w">колл</div><div class="w">рейз</div><div class="w">фолд</div><div class="w">банк</div>
+      <div class="w">стек</div><div class="w">борд</div><div class="w">позиция</div><div class="w">кнопка</div><div class="w">олл-ин</div>
+      <div class="w">бай-ин</div><div class="w">рейк</div><div class="w">дро</div><div class="w">аут</div><div class="w">велью</div>
+    </div>
+    <div class="lead" style="margin-top:38px">Не стесняйся переспрашивать. Тот, кто кивает молча, через три занятия перестаёт понимать вообще.</div>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-suit="♠" data-cue="Переход к столу. Сказать прямо: боты играют слабо, стратегию с них снимать нельзя. Сейчас учим только механику. И задача не выиграть.">
+  <div class="body">
+    <div class="kicker">Тридцать минут за столом</div>
+    <h2>Первая раздача</h2>
+    <div class="rule"></div>
+    <div class="cards c2">
+      <div class="p hot">
+        <div class="t">Две задачи, больше ничего</div>
+        <div class="d" style="font-size:21px;line-height:1.7">
+          1. Назвать вслух, что у тебя собралось.<br>
+          2. Назвать вслух своё действие — до того, как нажала.
+        </div>
+      </div>
+      <div class="p">
+        <div class="t w">Чего мы не делаем</div>
+        <div class="d">Не пытаемся выиграть. Не считаем шансы. Не думаем о сопернике.
+        Сегодня только руки и кнопки.</div>
+      </div>
+    </div>
+    <div class="lead" style="margin-top:34px">
+      Соперники за столом — боты. Играют они слабо, и <span class="mark">стратегию с них снимать нельзя</span>.
+      Сейчас они нужны только чтобы раздача шла.
+    </div>
+  </div>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-suit="♥" data-cue="Закрыть занятие. Показать приложение на своём экране — где кнопка, что там карточки и шпаргалки. Договориться о дате следующей встречи ПРЯМО СЕЙЧАС, не откладывая.">
+  <div class="body">
+    <div class="kicker">До следующей встречи</div>
+    <h2>Домашка</h2>
+    <div class="rule"></div>
+    <div class="cards c3">
+      <div class="p hot"><div class="tag">каждый день</div><div class="t">Пять минут в приложении</div>
+        <div class="d">Бот Академии → кнопка «Тренажёр». Три карточки по сегодняшней теме.</div></div>
+      <div class="p"><div class="t w">Шпаргалка 1</div>
+        <div class="d">Рейтинг рук. Распечатать или держать в телефоне. К следующему разу — знать наизусть.</div></div>
+      <div class="p"><div class="t w">Двадцать минут за столом</div>
+        <div class="d">Против ботов. Задача не выиграть, а ни разу не запутаться, чей ход и что нажимать.</div></div>
+    </div>
+    <div class="big" style="margin-top:46px;text-align:center">
+      Занятие 2 — <span class="mark">ход раздачи и сила позиции</span>.
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="foot" id="foot">
+  <div class="l"><b>SYNDICATE</b> · Академия покера</div>
+  <div><span id="num">1</span> / <span id="tot">17</span></div>
+</div>
+<div id="bar"></div>
+<div id="cue"></div>
+<div id="help">← → слайды · T подсказка тренеру · F во весь экран</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var i = 0, cueOn = false;
+  var stage = document.getElementById('stage'),
+      cue = document.getElementById('cue'),
+      bar = document.getElementById('bar'),
+      num = document.getElementById('num');
+  document.getElementById('tot').textContent = slides.length;
+
+  function fit(){
+    var s = Math.min(innerWidth / 1600, innerHeight / 900);
+    stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  addEventListener('resize', fit); fit();
+
+  function show(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('on', k === i); });
+    num.textContent = i + 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    cue.textContent = slides[i].getAttribute('data-cue') || '';
+    cue.classList.toggle('on', cueOn && !!cue.textContent);
+  }
+  addEventListener('keydown', function(e){
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); show(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 1);
+    else if (k === 't' || k === 'T' || k === 'е' || k === 'Е') { cueOn = !cueOn; show(i); }
+    else if (k === 'f' || k === 'F' || k === 'а' || k === 'А') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }
+  });
+  addEventListener('click', function(e){ if (e.clientX < innerWidth * .2) show(i - 1); else show(i + 1); });
+  show(0);
+})();
+</script>
+</body></html>

@@ -1,0 +1,77 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a227;--ink:#efe9db;--muted:#9a958c;--line:#2a2a30;--panel:#151519}
+@page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#000}body{font-family:'Inter',Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;min-height:297mm;position:relative;overflow:hidden;background:radial-gradient(1100px 480px at 82% -8%,rgba(212,175,55,.13),transparent 60%),linear-gradient(180deg,#0e0e11,#0b0b0d);padding:14mm 16mm 12mm}
+.suit-bg{position:absolute;font-family:'Playfair Display',serif;color:rgba(212,175,55,.04);font-size:300px;bottom:-30px;right:-20px;transform:rotate(-10deg);font-weight:800}
+.kicker{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+.brand{font-family:'Playfair Display',serif;font-weight:900;font-size:26px;color:#fff;margin:5px 0 1px}
+.brand .s{color:var(--gold);font-size:13px;vertical-align:super;margin-left:7px}
+.h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:800;margin:9px 0 3px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:13px}
+.h2{font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:700;margin:14px 0 7px;display:flex;align-items:center;gap:8px}
+.h2::before{content:'';width:14px;height:2px;background:var(--gold);border-radius:2px}
+.rule{background:linear-gradient(90deg,rgba(212,175,55,.12),transparent);border:1px solid #3a3320;border-radius:11px;padding:13px 16px;display:flex;gap:26px;flex-wrap:wrap}
+.rule .b{font-size:13px;color:var(--ink);line-height:1.5}
+.rule .b b{font-family:'Playfair Display',serif;color:var(--gold);font-size:20px}
+table{width:100%;border-collapse:collapse;margin-top:2px}
+th{background:#0f0f13;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;text-align:left;font-weight:600}
+th.r,td.r{text-align:right}
+td{padding:8px 12px;font-size:12.5px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.nm{color:var(--ink)}
+td.o{color:var(--gold);font-weight:700}
+td.pc{color:var(--ink);font-weight:600}
+tr:hover td{background:rgba(212,175,55,.04)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.note{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.note b{color:var(--gold)}
+.foot{margin-top:13px;padding-top:9px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
+.foot .l{font-family:'Playfair Display',serif;font-size:12px;color:var(--muted)}.foot .l b{color:var(--gold)}
+.foot .m{font-size:9px;color:#6c6860;letter-spacing:.1em;text-transform:uppercase}
+</style></head><body><div class="page">
+<div class="suit-bg">♦</div>
+<div class="kicker">Академия · Шпаргалка 3/4</div>
+<div class="brand">SYNDICATE<span class="s">♠ ♥ ♦ ♣</span></div>
+<div class="h1">Математика: ауты и шансы банка</div>
+<div class="sub">Аут — карта, которая усиливает твою руку. Считаешь ауты → прикидываешь шанс попасть → сравниваешь с ценой колла.</div>
+
+<div class="h2">Правило 4 и 2</div>
+<div class="rule">
+  <div class="b"><b>×4</b> &nbsp;на флопе, если идёшь до ривера<br><span style="color:var(--muted)">ауты × 4 ≈ % попасть за 2 карты</span></div>
+  <div class="b"><b>×2</b> &nbsp;на одну следующую карту<br><span style="color:var(--muted)">ауты × 2 ≈ % попасть за 1 карту</span></div>
+</div>
+
+<div class="two">
+  <div>
+    <div class="h2">Частые дро → ауты → шанс</div>
+    <table>
+      <tr><th>Дро</th><th class="r">Ауты</th><th class="r">2 карты</th><th class="r">1 карта</th></tr>
+      <tr><td class="nm">Флеш-дро</td><td class="o r">9</td><td class="pc r">35%</td><td class="pc r">19%</td></tr>
+      <tr><td class="nm">Двусторонний стрит</td><td class="o r">8</td><td class="pc r">32%</td><td class="pc r">17%</td></tr>
+      <tr><td class="nm">Флеш + стрит</td><td class="o r">15</td><td class="pc r">54%</td><td class="pc r">32%</td></tr>
+      <tr><td class="nm">Гатшот (внутр. стрит)</td><td class="o r">4</td><td class="pc r">17%</td><td class="pc r">9%</td></tr>
+      <tr><td class="nm">Две оверкарты</td><td class="o r">6</td><td class="pc r">24%</td><td class="pc r">13%</td></tr>
+      <tr><td class="nm">Пара → сет</td><td class="o r">2</td><td class="pc r">8%</td><td class="pc r">4%</td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="h2">Шансы банка (pot odds)</div>
+    <table>
+      <tr><th>Ставка соперника</th><th class="r">Нужно эквити</th></tr>
+      <tr><td class="nm">1/4 банка</td><td class="pc r">17%</td></tr>
+      <tr><td class="nm">1/3 банка</td><td class="pc r">20%</td></tr>
+      <tr><td class="nm">1/2 банка</td><td class="pc r">25%</td></tr>
+      <tr><td class="nm">2/3 банка</td><td class="pc r">29%</td></tr>
+      <tr><td class="nm">Банк (пот)</td><td class="pc r">33%</td></tr>
+      <tr><td class="nm">1.5 × банк</td><td class="pc r">37%</td></tr>
+    </table>
+    <div class="note" style="margin-top:9px"><b>Как читать:</b> справа — сколько % тебе нужно, чтобы колл был в плюс. Если твой шанс попасть (слева) выше — колл оправдан.</div>
+  </div>
+</div>
+
+<div class="note"><b>Пример:</b> флеш-дро на флопе = 9 аутов → ×4 ≈ <b>35%</b> дойти до флеша. Соперник ставит 1/2 банка → нужно <b>25%</b>. 35% &gt; 25% — <b>колл в плюс</b>.</div>
+
+<div class="foot"><div class="l"><b>SYNDICATE</b> · Академия покера</div><div class="m">Шпаргалка · ауты и шансы</div></div>
+</div></body></html>
